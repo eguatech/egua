@@ -1,4 +1,7 @@
 const Egua = require("./src/egua.js");
 const main = new Egua();
 
-main.run("(91 + 1) * 18 / 263 == 203");
+main.run(`
+escreva 2+1;
+escreva "hello";
+`);

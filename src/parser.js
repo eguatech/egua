@@ -1,5 +1,6 @@
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./Expr.js");
+const Stmt = require("./Stmt.js");
 
 class ParserError extends Error {}
 
@@ -164,12 +165,30 @@ module.exports = class Parser {
         return this.equality();
     }
 
+    printStatement() {
+        let value = this.expression();
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o valor.");
+        return new Stmt.Escreva(value);
+    }
+
+    expressionStatement() {
+        let expr = this.expression();
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após expressão.");
+        return new Stmt.Expression(expr);
+    }
+
+    statement() {
+        if (this.match(tokenTypes.ESCREVA)) return this.printStatement();
+
+        return this.expressionStatement();
+    }
+
     parse() {
-        try {
-            return this.expression();
-        } catch (error) {
-            console.log(error);
-            return null;
+        let statements = [];
+        while (!this.isAtEnd()) {
+            statements.push(this.statement());
         }
+
+        return statements
     }
 };

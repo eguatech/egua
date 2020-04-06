@@ -32,7 +32,7 @@ const defineAst = function(baseName, types) {
 
     file.write(`class ${baseName} {\n`);
     file.write("  accept(visitor) {}");
-    file.write(`}\n\n`);
+    file.write(`\n}\n\n`);
 
     let exportString = "";
     for (let key in types) {
@@ -52,4 +52,9 @@ defineAst("Expr", {
     Grouping: "Expr expression",
     Literal: "Object value",
     Unary: "Token operator, Expr right"
+});
+
+defineAst("Stmt", {
+    Expression: "Expr expression",
+    Escreva: "Expr expression"
 });

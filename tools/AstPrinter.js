@@ -1,5 +1,5 @@
 module.exports = class AstPrinter {
-    print(expr) {
+    escreva(expr) {
         return expr.accept(this);
     }
 

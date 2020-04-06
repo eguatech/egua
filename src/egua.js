@@ -14,12 +14,12 @@ class Egua {
         const tokens = scanner.scan();
 
         const parser = new Parser(tokens, this);
-        const expression = parser.parse();
+        const statements = parser.parse();
 
         if (this.hadError === true) return;
 
         let interpreter = new Interpreter(this);
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 
     report(line, where, message) {

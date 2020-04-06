@@ -114,16 +114,32 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitExpressionStmt(stmt) {
+        this.evaluate(stmt.expression);
+        return null;
+    }
+
+    visitPrintStmt(stmt) {
+        let value = this.evaluate(stmt.expression);
+        console.log(this.stringify(value));
+        return null;
+    }
+
     stringify(object) {
         if (object === null) return "nil";
 
         return object.toString();
     }
 
-    interpret(expr) {
+    execute(stmt) {
+        stmt.accept(this);
+    }
+
+    interpret(statements) {
         try {
-            let value = this.evaluate(expr);
-            console.log(this.stringify(value));
+            for (let i=0; i < statements.length; i++){
+                this.execute(statements[i]);
+            }
         } catch (error) {
             this.Egua.runtimeError(error);
         }
