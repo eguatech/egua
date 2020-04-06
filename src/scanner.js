@@ -195,7 +195,7 @@ class Scanner {
                 if (this.match("/")) {
                     while (this.peek() != "\n" && !this.endOfCode()) this.advance();
                 } else {
-                    this.addToken(SLASH);
+                    this.addToken(tokenTypes.SLASH);
                 }
                 break;
 

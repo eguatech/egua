@@ -1,10 +1,12 @@
 const Scanner = require("./scanner.js");
 const Parser = require("./parser.js");
+const Interpreter = require("./interpreter.js");
 const tokenTypes = require("./tokenTypes.js");
 
 class Egua {
     constructor() {
         this.hadError = false;
+        this.hadRuntimeError = false;
     }
 
     run(code) {
@@ -15,6 +17,9 @@ class Egua {
         const expression = parser.parse();
 
         if (this.hadError === true) return;
+
+        let interpreter = new Interpreter(this);
+        interpreter.interpret(expression);
     }
 
     report(line, where, message) {
@@ -32,6 +37,15 @@ class Egua {
 
     throw(line, error) {
         throw new Error(line + " " + error);
+    }
+
+    runtimeError(error) {
+        if (error.token && error.token.line) {
+            console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
+        } else {
+            console.error(error);
+        }
+        this.hadRuntimeError = true;
     }
 }
 

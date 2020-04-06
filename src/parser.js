@@ -168,8 +168,8 @@ module.exports = class Parser {
         try {
             return this.expression();
         } catch (error) {
-            console.log(error)
+            console.log(error);
             return null;
         }
     }
-}
+};
