@@ -2,6 +2,18 @@ class Expr {
     accept(visitor) {}
 }
 
+class Assign extends Expr {
+    constructor(name, value) {
+        super();
+        this.name = name;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitAssignExpr(this);
+    }
+}
+
 class Binary extends Expr {
     constructor(left, operator, right) {
         super();
@@ -49,9 +61,22 @@ class Unary extends Expr {
     }
 }
 
+class Variable extends Expr {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+
+    accept(visitor) {
+        return visitor.visitVariableExpr(this);
+    }
+}
+
 module.exports = {
+    Assign,
     Binary,
     Grouping,
     Literal,
-    Unary
+    Unary,
+    Variable
 };

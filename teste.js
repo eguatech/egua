@@ -2,6 +2,7 @@ const Egua = require("./src/egua.js");
 const main = new Egua();
 
 main.run(`
-escreva 2+1;
-escreva "hello";
+var a = 2;
+var b = 5;
+escreva a+b;
 `);

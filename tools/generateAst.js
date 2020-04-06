@@ -12,15 +12,15 @@ const defineType = function(file, baseName, className, fieldList) {
     const fields = fieldList.split(", ");
     const fieldNames = fields.map(field => field.split(" ")[1]);
 
-    file.write(`  constructor (${fieldNames.join(", ")}) {\n`);
+    file.write(`  constructor(${fieldNames.join(", ")}) {\n`);
     file.write(`    super();\n`);
     fieldNames.forEach(fieldName => {
         file.write(`    this.${fieldName} = ${fieldName};\n`);
     });
     file.write(`  }\n\n`);
 
-    file.write(`  accept (visitor) {\n`);
-    file.write(`    return visitor.visit${className}${baseName}(this)\n`);
+    file.write(`  accept(visitor) {\n`);
+    file.write(`    return visitor.visit${className}${baseName}(this);\n`);
     file.write(`  }\n`);
 
     file.write(`}\n\n`);
@@ -48,13 +48,16 @@ const defineAst = function(baseName, types) {
 };
 
 defineAst("Expr", {
+    Assign: "Token name, Expr value",
     Binary: "Expr left, Token operator, Expr right",
     Grouping: "Expr expression",
     Literal: "Object value",
-    Unary: "Token operator, Expr right"
+    Unary: "Token operator, Expr right",
+    Variable: "Token name"
 });
 
 defineAst("Stmt", {
     Expression: "Expr expression",
-    Escreva: "Expr expression"
+    Escreva: "Expr expression",
+    Var: "Token name, Expr initializer"
 });

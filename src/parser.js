@@ -87,6 +87,10 @@ module.exports = class Parser {
             return new Expr.Literal(this.previous().literal);
         }
 
+        if (this.match(tokenTypes.IDENTIFIER)) {
+            return new Expr.Variable(this.previous());
+        }
+
         if (this.match(tokenTypes.LEFT_PAREN)) {
             let expr = this.expression();
             this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após a expressão.");
@@ -161,8 +165,26 @@ module.exports = class Parser {
         return expr;
     }
 
+    assignment() {
+        let expr = this.equality();
+
+        if (this.match(tokenTypes.EQUAL)) {
+            let equals = this.previous();
+            let value = this.assignment();
+
+            if (expr instanceof Expr.Variable) {
+                let name = expr.name;
+                return new Expr.Assign(name, value);
+            }
+
+            this.error(equals, "Tarefa de atribuição inválida");
+        }
+
+        return expr;
+    }
+
     expression() {
-        return this.equality();
+        return this.assignment();
     }
 
     printStatement() {
@@ -183,10 +205,35 @@ module.exports = class Parser {
         return this.expressionStatement();
     }
 
+    varDeclaration() {
+        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome de variável.");
+        let initializer = null;
+        if (this.match(tokenTypes.EQUAL)) {
+            initializer = this.expression();
+        }
+
+        this.consume(
+            tokenTypes.SEMICOLON,
+            "Esperado ';' após a declaração da variável."
+        );
+        return new Stmt.Var(name, initializer);
+    }
+
+    declaration() {
+        try {
+            if (this.match(tokenTypes.VAR)) return this.varDeclaration();
+
+            return this.statement();
+        } catch (error) {
+            this.synchronize();
+            return null;
+        }
+    }
+
     parse() {
         let statements = [];
         while (!this.isAtEnd()) {
-            statements.push(this.statement());
+            statements.push(this.declaration());
         }
 
         return statements
