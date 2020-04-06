@@ -1,5 +1,4 @@
 const  tokenTypes = require("./tokenTypes.js");
-const Token = require("./token.js");
 
 const reservedWords = {
     e: tokenTypes.E,
@@ -19,6 +18,19 @@ const reservedWords = {
     var: tokenTypes.VAR,
     enquanto: tokenTypes.ENQUANTO
 };
+
+class Token {
+    constructor(type, lexeme, literal, line) {
+        this.type = type;
+        this.lexeme = lexeme;
+        this.literal = literal;
+        this.line = line;
+    }
+
+    toString() {
+        return this.type + " " + this.lexeme + " " + this.literal;
+    }
+}
 
 class Scanner {
     constructor(code, Egua) {
