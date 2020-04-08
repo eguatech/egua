@@ -1,4 +1,4 @@
-const Scanner = require("./scanner.js");
+const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
 const Interpreter = require("./interpreter.js");
 const tokenTypes = require("./tokenTypes.js");
@@ -10,8 +10,8 @@ class Egua {
     }
 
     run(code) {
-        const scanner = new Scanner(code, this);
-        const tokens = scanner.scan();
+        const lexer = new Lexer(code, this);
+        const tokens = lexer.scan();
 
         const parser = new Parser(tokens, this);
         const statements = parser.parse();

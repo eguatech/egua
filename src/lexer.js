@@ -34,7 +34,7 @@ class Token {
     }
 }
 
-class Scanner {
+module.exports = class Lexer {
     constructor(code, Egua) {
         this.Egua = Egua;
         this.code = code;
@@ -218,7 +218,7 @@ class Scanner {
             default:
                 if (this.isDigit(c)) this.parseNumber();
                 else if (this.isAlpha(c)) this.identifyKeyword();
-                else this.Egua.throw(this.line, "Unexpected character.");
+                else this.Egua.throw(this.line, "Caractere inexperado.");
         }
     }
 
@@ -231,6 +231,4 @@ class Scanner {
         this.tokens.push(new Token(tokenTypes.EOF, "", null, this.line));
         return this.tokens;
     }
-}
-
-module.exports = Scanner;
+};
