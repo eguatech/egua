@@ -1,7 +1,8 @@
 const RuntimeError = require("./runtimeError.js");
 
 module.exports = class Environment {
-    constructor() {
+    constructor(enclosing) {
+        this.enclosing = enclosing || null;
         this.values = {};
     }
 
@@ -9,9 +10,14 @@ module.exports = class Environment {
         this.values[varName] = value;
     }
 
-    assignVar(name, values) {
+    assignVar(name, value) {
         if (this.values[name.lexeme] !== undefined) {
             this.values[name.lexeme] = value;
+            return;
+        }
+
+        if (this.enclosing != null) {
+            this.enclosing.assignVar(name, value);
             return;
         }
 
@@ -22,6 +28,8 @@ module.exports = class Environment {
         if (this.values[token.lexeme] !== undefined) {
             return this.values[token.lexeme];
         }
+
+        if (this.enclosing !== null) return this.enclosing.getVar(token);
 
         throw new RuntimeError(token, "Variável não definida '" + token.lexeme + "'.");
     }

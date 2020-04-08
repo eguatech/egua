@@ -119,7 +119,7 @@ module.exports = class Interpreter {
     visitAssignExpr(expr) {
         let value = this.evaluate(expr.value);
 
-        this.environment.assignVar(expr.name, expr.value);
+        this.environment.assignVar(expr.name, value);
         return value;
     }
 
@@ -135,6 +135,24 @@ module.exports = class Interpreter {
     visitPrintStmt(stmt) {
         let value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
+        return null;
+    }
+
+    executeBlock(statements, environment) {
+        let previous = this.environment;
+        try {
+            this.environment = environment;
+
+            for (let i = 0; i < statements.length; i++) {
+                this.execute(statements[i]);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
+    visitBlockStmt(stmt) {
+        this.executeBlock(stmt.statements, new Environment(this.environment));
         return null;
     }
 
