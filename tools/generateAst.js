@@ -9,8 +9,14 @@ if (!outputDir.endsWith("/") && !outputDir.endsWith("\\"))
 const defineType = function(file, baseName, className, fieldList) {
     file.write(`class ${className} extends ${baseName} {\n`);
 
-    const fields = fieldList.split(", ");
-    const fieldNames = fields.map(field => field.split(" ")[1]);
+    let fieldNames, fields;
+    if (typeof fieldList === "string") {
+        fields = fieldList.split(", ");
+        fieldNames = fields.map(field => field.split(" ")[1]);
+    } else {
+        fields = [];
+        fieldNames = [];
+    }
 
     file.write(`  constructor(${fieldNames.join(", ")}) {\n`);
     file.write(`    super();\n`);
@@ -52,6 +58,7 @@ defineAst("Expr", {
     Binary: "Expr left, Token operator, Expr right",
     Grouping: "Expr expression",
     Literal: "Object value",
+    Logical: "Expr left, Token operator, Expr right",
     Unary: "Token operator, Expr right",
     Variable: "Token name"
 });
@@ -60,5 +67,8 @@ defineAst("Stmt", {
     Expression: "Expr expression",
     Block: "List statements",
     Escreva: "Expr expression",
+    Enquanto: "Expr condition, Stmt body",
+    Se: "Expression condition, Stmt thenBranch, Stmt elseBranch",
+    Pausa: undefined,
     Var: "Token name, Expr initializer"
 });

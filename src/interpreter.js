@@ -2,6 +2,8 @@ const tokenTypes = require("./tokenTypes.js");
 const RuntimeError = require("./runtimeError.js");
 const Environment = require("./environment.js");
 
+class BreakException extends Error {}
+
 module.exports = class Interpreter {
     constructor(Egua) {
         this.Egua = Egua;
@@ -91,8 +93,6 @@ module.exports = class Interpreter {
                     return String(left) + String(right);
                 }
 
-                //
-                //
                 throw new RuntimeError(
                     expr.operator,
                     "Operadores precisam ser dois números ou duas strings."
@@ -132,7 +132,51 @@ module.exports = class Interpreter {
         return null;
     }
 
-    visitPrintStmt(stmt) {
+    visitLogicalExpr(expr) {
+        let left = this.evaluate(expr.left);
+
+        // se OU token
+        if (expr.operator.type == tokenTypes.OU) {
+            // se um estado for verdadeiro, retorna verdadeiro
+            if (this.isTruthy(left)) return left;
+        }
+
+        // se E token
+        else {
+            // se um estado for falso, retorna falso
+            if (!this.isTruthy(left)) return left;
+        }
+
+        //
+        return this.evaluate(expr.right);
+    }
+
+    visitIfStmt(stmt) {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+        } else if (stmt.elseBranch !== null) {
+            this.execute(stmt.elseBranch);
+        }
+
+        return null;
+    }
+
+    visitWhileStmt(stmt) {
+        try {
+            while (this.isTruthy(this.evaluate(stmt.condition))) {
+                this.execute(stmt.body);
+            }
+        } catch (error) {
+            if (error instanceof BreakException) {
+            } else {
+                throw error;
+            }
+        }
+
+        return null;
+    }
+
+    visitEscrevaStmt(stmt) {
         let value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
         return null;
@@ -164,6 +208,10 @@ module.exports = class Interpreter {
 
         this.environment.defineVar(stmt.name.lexeme, value);
         return null;
+    }
+
+    visitBreakStmt(stmt) {
+        throw new BreakException();
     }
 
     stringify(object) {

@@ -31,7 +31,42 @@ class Escreva extends Stmt {
     }
 
     accept(visitor) {
-        return visitor.visitPrintStmt(this);
+        return visitor.visitEscrevaStmt(this);
+    }
+}
+
+class Enquanto extends Stmt {
+    constructor(condition, body) {
+        super();
+        this.condition = condition;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitWhileStmt(this);
+    }
+}
+
+class Se extends Stmt {
+    constructor(condition, thenBranch, elseBranch) {
+        super();
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
+    }
+
+    accept(visitor) {
+        return visitor.visitIfStmt(this);
+    }
+}
+
+class Pausa extends Stmt {
+    constructor() {
+        super();
+    }
+
+    accept(visitor) {
+        return visitor.visitBreakStmt(this);
     }
 }
 
@@ -51,5 +86,8 @@ module.exports = {
     Expression,
     Block,
     Escreva,
+    Enquanto,
+    Se,
+    Pausa,
     Var
 };

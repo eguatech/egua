@@ -37,5 +37,7 @@ module.exports = {
     VERDADEIRO: "VERDADEIRO",
     VAR: "VAR",
     ENQUANTO: "ENQUANTO",
+    PAUSA: "PAUSA",
+    CONTINUA: "CONTINUA",
     EOF: "EOF"
 };

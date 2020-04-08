@@ -10,6 +10,7 @@ module.exports = class Parser {
         this.Egua = Egua;
 
         this.current = 0;
+        this.loopDepth = 0;
     }
 
     synchronize() {
@@ -165,8 +166,32 @@ module.exports = class Parser {
         return expr;
     }
 
-    assignment() {
+    e() {
         let expr = this.equality();
+
+        while (this.match(tokenTypes.E)) {
+            let operator = this.previous();
+            let right = this.equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    ou() {
+        let expr = this.e();
+
+        while (this.match(tokenTypes.OU)) {
+            let operator = this.previous();
+            let right = this.e();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    assignment() {
+        let expr = this.ou();
 
         if (this.match(tokenTypes.EQUAL)) {
             let equals = this.previous();
@@ -210,7 +235,96 @@ module.exports = class Parser {
         return statements;
     }
 
+    ifStatement() {
+        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'se'.");
+        let condition = this.expression();
+        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condição do se.");
+
+        let thenBranch = this.statement();
+        let elseBranch = null;
+        if (this.match(tokenTypes.SENAO)) {
+            elseBranch = this.statement();
+        }
+
+        return new Stmt.Se(condition, thenBranch, elseBranch);
+    }
+
+    whileStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'enquanto'.");
+            let condition = this.expression();
+            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condicional.");
+            let body = this.statement();
+
+            return new Stmt.Enquanto(condition, body);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    forStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'para'.");
+
+            let initializer;
+            if (this.match(tokenTypes.SEMICOLON)) {
+                initializer = null;
+            } else if (this.match(tokenTypes.VAR)) {
+                initializer = this.varDeclaration();
+            } else {
+                initializer = this.expressionStatement();
+            }
+
+            let condition = null;
+            if (!this.check(tokenTypes.SEMICOLON)) {
+                condition = this.expression();
+            }
+
+            let increment = null;
+            if (!this.check(tokenTypes.RIGHT_PAREN)) {
+                increment = this.expression();
+            }
+
+            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após cláusulas");
+
+            let body = this.statement();
+
+            if (increment !== null) {
+                body = new Stmt.Block([body, new Stmt.Expression(increment)]);
+            }
+
+            if (condition == null) condition = new Expr.Literal(true);
+
+            body = new Stmt.Enquanto(condition, body);
+
+            if (initializer !== null) {
+                body = new Stmt.Block([initializer, body]);
+            }
+
+            return body;
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    breakStatement() {
+        if (this.loopDepth < 1) {
+            this.error(this.previous(), "'pausa' deve estar dentro de um loop.");
+        }
+
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'pausa'.");
+        return new Stmt.Pausa();
+    }
+
     statement() {
+        if (this.match(tokenTypes.PAUSA)) return this.breakStatement();
+        if (this.match(tokenTypes.PARA)) return this.forStatement();
+        if (this.match(tokenTypes.ENQUANTO)) return this.whileStatement();
+        if (this.match(tokenTypes.SE)) return this.ifStatement();
         if (this.match(tokenTypes.ESCREVA)) return this.printStatement();
         if (this.match(tokenTypes.LEFT_BRACE)) return new Stmt.Block(this.block());
 

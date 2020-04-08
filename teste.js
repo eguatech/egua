@@ -2,23 +2,13 @@ const Egua = require("./src/egua.js");
 const main = new Egua();
 
 main.run(`
-var a = "a";
-var b = "b";
-var c = "c";
-{
-  var a = "fora a";
-  var b = "fora b";
-  {
-    var a = "dentro a";
+var a = 0;
+var b = 1;
+
+enquanto(a < 10000) {
     escreva a;
-    escreva b;
-    escreva c;
-  }
-  escreva a;
-  escreva b;
-  escreva c;
+    a = a + 1;
 }
-escreva a;
 escreva b;
-escreva c;
+
 `);
