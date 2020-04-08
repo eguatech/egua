@@ -9,10 +9,9 @@ if (!outputDir.endsWith("/") && !outputDir.endsWith("\\"))
 const defineType = function(file, baseName, className, fieldList) {
     file.write(`class ${className} extends ${baseName} {\n`);
 
-    let fieldNames, fields;
+    let fieldNames;
     if (typeof fieldList === "string") {
-        fields = fieldList.split(", ");
-        fieldNames = fields.map(field => field.split(" ")[1]);
+        fieldNames = fieldList.split(", ");
     } else {
         fields = [];
         fieldNames = [];
@@ -54,21 +53,21 @@ const defineAst = function(baseName, types) {
 };
 
 defineAst("Expr", {
-    Assign: "Token name, Expr value",
-    Binary: "Expr left, Token operator, Expr right",
-    Grouping: "Expr expression",
-    Literal: "Object value",
-    Logical: "Expr left, Token operator, Expr right",
-    Unary: "Token operator, Expr right",
-    Variable: "Token name"
+    Assign: "name, value",
+    Binary: "left, operator, right",
+    Grouping: "expression",
+    Literal: "value",
+    Logical: "left, operator, right",
+    Unary: "operator, right",
+    Variable: "name"
 });
 
 defineAst("Stmt", {
-    Expression: "Expr expression",
-    Block: "List statements",
-    Escreva: "Expr expression",
-    Enquanto: "Expr condition, Stmt body",
-    Se: "Expression condition, Stmt thenBranch, Stmt elseBranch",
+    Expression: "expression",
+    Block: "statements",
+    Escreva: "expression",
+    Enquanto: "condition, body",
+    Se: "condition, thenBranch, elseBranch",
     Pausa: undefined,
-    Var: "Token name, Expr initializer"
+    Var: "name, initializer"
 });
