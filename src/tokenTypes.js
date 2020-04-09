@@ -10,6 +10,7 @@ module.exports = {
     SEMICOLON: "SEMICOLON",
     SLASH: "SLASH",
     STAR: "STAR",
+    STAR_STAR: "STAR_STAR",
     BANG: "BANG",
     BANG_EQUAL: "BANG_EQUAL",
     EQUAL: "EQUAL",

@@ -64,6 +64,10 @@ module.exports = class Interpreter {
         let right = this.evaluate(expr.right);
 
         switch (expr.operator.type) {
+            case tokenTypes.STAR_STAR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Math.pow(left, right);
+
             case tokenTypes.GREATER:
                 this.checkNumberOperands(expr.operator, left, right);
                 return Number(left) > Number(right);
