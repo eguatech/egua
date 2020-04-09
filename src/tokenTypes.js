@@ -38,6 +38,5 @@ module.exports = {
     VAR: "VAR",
     ENQUANTO: "ENQUANTO",
     PAUSA: "PAUSA",
-    CONTINUA: "CONTINUA",
     EOF: "EOF"
 };
