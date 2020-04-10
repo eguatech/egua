@@ -11,6 +11,7 @@ module.exports = {
     SLASH: "SLASH",
     STAR: "STAR",
     STAR_STAR: "STAR_STAR",
+    MODULUS: "MODULUS",
     BANG: "BANG",
     BANG_EQUAL: "BANG_EQUAL",
     EQUAL: "EQUAL",

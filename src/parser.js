@@ -126,7 +126,7 @@ module.exports = class Parser {
     multiplication() {
         let expr = this.unary();
 
-        while (this.match(tokenTypes.SLASH, tokenTypes.STAR)) {
+        while (this.match(tokenTypes.SLASH, tokenTypes.STAR, tokenTypes.MODULUS)) {
             let operator = this.previous();
             let right = this.unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -225,11 +225,17 @@ module.exports = class Parser {
     }
 
     printStatement() {
-        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' antes dos valores em escreva.");
+        this.consume(
+            tokenTypes.LEFT_PAREN,
+            "Esperado '(' antes dos valores em escreva."
+        );
 
         let value = this.expression();
 
-        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após os valores em escreva.");
+        this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após os valores em escreva."
+        );
         this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o valor.");
 
         return new Stmt.Escreva(value);
@@ -301,7 +307,10 @@ module.exports = class Parser {
                 condition = this.expression();
             }
 
-            this.consume(tokenTypes.SEMICOLON, "Esperado ';' após valores da condicional");
+            this.consume(
+                tokenTypes.SEMICOLON,
+                "Esperado ';' após valores da condicional"
+            );
 
             let increment = null;
             if (!this.check(tokenTypes.RIGHT_PAREN)) {

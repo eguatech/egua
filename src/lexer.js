@@ -170,6 +170,9 @@ module.exports = class Lexer {
             case ";":
                 this.addToken(tokenTypes.SEMICOLON);
                 break;
+            case "%":
+                this.addToken(tokenTypes.MODULUS);
+                break;
             case "*":
                 if (this.peek() === "*") {
                     this.addToken(tokenTypes.STAR_STAR);

@@ -110,6 +110,10 @@ module.exports = class Interpreter {
                 this.checkNumberOperands(expr.operator, left, right);
                 return Number(left) * Number(right);
 
+            case tokenTypes.MODULUS:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) % Number(right);
+
             case tokenTypes.BANG_EQUAL:
                 return !this.isEqual(left, right);
 
