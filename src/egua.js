@@ -45,7 +45,7 @@ class Egua {
     }
 
     throw(line, error) {
-        throw new Error(`Line ${ line }. ${error}`);
+        throw new Error(`Line ${line}. ${error}`);
     }
 
     runtimeError(error) {

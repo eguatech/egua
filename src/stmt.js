@@ -13,6 +13,31 @@ class Expression extends Stmt {
     }
 }
 
+class Funcao extends Stmt {
+    constructor(name, params, body) {
+        super();
+        this.name = name;
+        this.params = params;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitFunctionStmt(this);
+    }
+}
+
+class Retorna extends Stmt {
+    constructor(keyword, value) {
+        super();
+        this.keyword = keyword;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitReturnStmt(this);
+    }
+}
+
 class Block extends Stmt {
     constructor(statements) {
         super();
@@ -84,6 +109,8 @@ class Var extends Stmt {
 
 module.exports = {
     Expression,
+    Funcao,
+    Retorna,
     Block,
     Escreva,
     Enquanto,

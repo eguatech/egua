@@ -1,6 +1,7 @@
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
+const Environment = require("./environment");
 
 class ParserError extends Error {}
 
@@ -80,6 +81,7 @@ module.exports = class Parser {
     }
 
     primary() {
+        if (this.match(tokenTypes.FUNCAO)) return this.function("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NIL)) return new Expr.Literal(null);
@@ -101,6 +103,39 @@ module.exports = class Parser {
         throw this.error(this.peek(), "Esperado expressão.");
     }
 
+    finishCall(callee) {
+        let args = [];
+        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+            do {
+                if (args.length >= 255) {
+                    error(this.peek(), "Não pode haver mais de 255 argumentos.");
+                }
+                args.push(this.expression());
+            } while (this.match(tokenTypes.COMMA));
+        }
+
+        let paren = this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após os argumentos."
+        );
+
+        return new Expr.Call(callee, paren, args);
+    }
+
+    call() {
+        let expr = this.primary();
+
+        while (true) {
+            if (this.match(tokenTypes.LEFT_PAREN)) {
+                expr = this.finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
     unary() {
         if (this.match(tokenTypes.BANG, tokenTypes.MINUS)) {
             let operator = this.previous();
@@ -108,7 +143,7 @@ module.exports = class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return this.primary();
+        return this.call();
     }
 
     addition() {
@@ -348,7 +383,20 @@ module.exports = class Parser {
         return new Stmt.Pausa();
     }
 
+    returnStatement() {
+        let keyword = this.previous();
+        let value = null;
+
+        if (!this.check(tokenTypes.SEMICOLON)) {
+            value = this.expression();
+        }
+
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o retorno.");
+        return new Stmt.Retorna(keyword, value);
+    }
+
     statement() {
+        if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
         if (this.match(tokenTypes.PAUSA)) return this.breakStatement();
         if (this.match(tokenTypes.PARA)) return this.forStatement();
         if (this.match(tokenTypes.ENQUANTO)) return this.whileStatement();
@@ -373,12 +421,39 @@ module.exports = class Parser {
         return new Stmt.Var(name, initializer);
     }
 
+    function(kind) {
+        let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
+        this.consume(tokenTypes.LEFT_PAREN, `Esperado '(' após o nome ${kind}.`);
+
+        let parameters = [];
+        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+            do {
+                if (parameters.length >= 255) {
+                    this.error(this.peek(), "Não pode haver mais de 255 parâmetros");
+                }
+
+                parameters.push(
+                    this.consume(tokenTypes.IDENTIFIER, "Esperado nome de parâmetro.")
+                );
+            } while (this.match(tokenTypes.COMMA));
+        }
+
+        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
+        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo ${kind}.`);
+
+        let body = this.block();
+
+        return new Stmt.Funcao(name, parameters, body);
+    }
+
     declaration() {
         try {
+            if (this.match(tokenTypes.FUNCAO)) return this.function("funcao");
             if (this.match(tokenTypes.VAR)) return this.varDeclaration();
 
             return this.statement();
         } catch (error) {
+            console.log(error);
             this.synchronize();
             return null;
         }

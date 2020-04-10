@@ -13,7 +13,6 @@ const defineType = function(file, baseName, className, fieldList) {
     if (typeof fieldList === "string") {
         fieldNames = fieldList.split(", ");
     } else {
-        fields = [];
         fieldNames = [];
     }
 
@@ -55,6 +54,7 @@ const defineAst = function(baseName, types) {
 defineAst("Expr", {
     Assign: "name, value",
     Binary: "left, operator, right",
+    Call: "callee, paren, args",
     Grouping: "expression",
     Literal: "value",
     Logical: "left, operator, right",
@@ -64,6 +64,8 @@ defineAst("Expr", {
 
 defineAst("Stmt", {
     Expression: "expression",
+    Funcao: "name, params, body",
+    Retorna: "keyword, value",
     Block: "statements",
     Escreva: "expression",
     Enquanto: "condition, body",

@@ -3,11 +3,74 @@ const RuntimeError = require("./runtimeError.js");
 const Environment = require("./environment.js");
 
 class BreakException extends Error {}
+class Retorna extends Error {
+    constructor(value) {
+        super(value);
+        this.value = value;
+    }
+}
+
+class Callable {
+    arity() {
+        return this.arityValue;
+    }
+}
+
+class StandardFn extends Callable {
+    constructor(arityValue, func) {
+        super();
+        this.arityValue = arityValue;
+        this.func = func;
+    }
+
+    call(interpreter, args) {
+        return this.func.apply(null, args);
+    }
+}
+
+class EguaFunction extends Callable {
+    constructor(declaration, closure) {
+        super();
+        this.declaration = declaration;
+        this.closure = closure;
+    }
+
+    arity() {
+        return this.declaration.params.length;
+    }
+
+    toString() {
+        return `<funcao ${this.declaration.name.lexeme}>`;
+    }
+
+    call(interpreter, args) {
+        let environment = new Environment(this.closure);
+        for (let i = 0; i < this.declaration.params.length; i++) {
+            environment.defineVar(this.declaration.params[i].lexeme, args[i]);
+        }
+
+        try {
+            interpreter.executeBlock(this.declaration.body, environment);
+        } catch (error) {
+            if (error instanceof Retorna) {
+                return error.value;
+            }
+        }
+    }
+}
 
 module.exports = class Interpreter {
     constructor(Egua) {
         this.Egua = Egua;
-        this.environment = new Environment();
+        this.globals = new Environment();
+        this.environment = this.globals;
+
+        this.globals.defineVar(
+            "clock", // clock da standart function
+            new StandardFn(0, () => {
+                return Date.now() / 1000;
+            })
+        );
     }
 
     visitLiteralExpr(expr) {
@@ -124,6 +187,31 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitCallExpr(expr) {
+        let callee = this.evaluate(expr.callee);
+
+        let args = [];
+        for (let i = 0; i < expr.args.length; i++) {
+            args.push(this.evaluate(expr.args[i]));
+        }
+
+        if (!(callee instanceof Callable)) {
+            throw new RuntimeError(
+                expr.paren,
+                "Só pode chamar função ou classe."
+            );
+        }
+
+        if (args.length !== callee.arity()) {
+            throw new RuntimeError(
+                expr.paren,
+                `Esperado ${callee.arity()} argumentos mas só há ${args.length} argumento(s).`
+            );
+        }
+
+        return callee.call(this, args);
+    }
+
     visitAssignExpr(expr) {
         let value = this.evaluate(expr.value);
 
@@ -220,6 +308,18 @@ module.exports = class Interpreter {
 
     visitBreakStmt(stmt) {
         throw new BreakException();
+    }
+
+    visitReturnStmt(stmt) {
+        let value = null;
+        if (stmt.value != null) value = this.evaluate(stmt.value);
+
+        throw new Retorna(value);
+    }
+
+    visitFunctionStmt(stmt) {
+        let func = new EguaFunction(stmt, this.environment);
+        this.environment.defineVar(stmt.name.lexeme, func);
     }
 
     stringify(object) {
