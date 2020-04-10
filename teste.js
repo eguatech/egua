@@ -1,6 +1,4 @@
 const Egua = require("./src/egua.js");
 const main = new Egua();
 
-main.run(`
-escreva(10%99);
-`);
+main.runfile("../teste.egua"); // sempre verificar o erro na pontuação de estado da pasta
