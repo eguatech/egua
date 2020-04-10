@@ -94,9 +94,9 @@ module.exports = class Lexer {
         return this.code.charAt(this.current + 1);
     }
 
-    parseString() {
-        while (this.peek() != '"' && !this.endOfCode()) {
-            if (this.peek() == "\n") this.line = +1;
+    parseString(stringChar='"') {
+        while (this.peek() !== stringChar && !this.endOfCode()) {
+            if (this.peek() === "\n") this.line = +1;
             this.advance();
         }
 
@@ -219,7 +219,11 @@ module.exports = class Lexer {
                 break;
 
             case '"':
-                this.parseString();
+                this.parseString('"');
+                break;
+
+            case "'":
+                this.parseString("'");
                 break;
 
             default:
