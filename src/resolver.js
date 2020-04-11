@@ -145,6 +145,11 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitFunctionExpr(stmt) {
+        this.resolveFunction(stmt, FunctionType.FUNCAO);
+        return null;
+    }
+
     visitExpressionStmt(stmt) {
         this.resolve(stmt.expression);
         return null;
