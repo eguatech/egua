@@ -242,8 +242,7 @@ module.exports = class Interpreter {
     }
 
     visitVariableExpr(expr) {
-        let a = this.lookupVar(expr.name, expr);
-        return a;
+        return this.lookupVar(expr.name, expr);
     }
 
     visitExpressionStmt(stmt) {

@@ -38,7 +38,6 @@ module.exports = class Resolver {
     constructor(interpreter, egua) {
         this.interpreter = interpreter;
         this.egua = egua;
-        this.egua = egua;
         this.scopes = new Stack();
 
         this.currentFunction = FunctionType.NONE;
@@ -68,13 +67,13 @@ module.exports = class Resolver {
         this.scopes.pop();
     }
 
-    resolveStmt(stmt) {
-        stmt.accept(this);
-    }
-
     resolve(statements) {
-        for (let i = 0; i < statements.length; i++) {
-            this.resolveStmt(statements[i]);
+        if (Array.isArray(statements)) {
+            for (let i = 0; i < statements.length; i++) {
+                statements[i].accept(this);
+            }
+        } else {
+            statements.accept(this);
         }
     }
 
@@ -110,14 +109,14 @@ module.exports = class Resolver {
     visitVarStmt(stmt) {
         this.declare(stmt.name);
         if (stmt.initializer !== null) {
-            this.resolveStmt(stmt.initializer);
+            this.resolve(stmt.initializer);
         }
         this.define(stmt.name);
         return null;
     }
 
     visitAssignExpr(expr) {
-        this.resolveStmt(expr.value);
+        this.resolve(expr.value);
         this.resolveLocal(expr, expr.name);
         return null;
     }
@@ -147,19 +146,19 @@ module.exports = class Resolver {
     }
 
     visitExpressionStmt(stmt) {
-        this.resolveStmt(stmt.expression);
+        this.resolve(stmt.expression);
         return null;
     }
 
     visitIfStmt(stmt) {
-        this.resolveStmt(stmt.condition);
+        this.resolve(stmt.condition);
         this.resolve(stmt.thenBranch);
         if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
         return null;
     }
 
     visitEscrevaStmt(stmt) {
-        this.resolveStmt(stmt.expression);
+        this.resolve(stmt.expression);
     }
 
     visitReturnStmt(stmt) {
@@ -167,36 +166,36 @@ module.exports = class Resolver {
             this.egua.error(stmt.keyword, "Não é possível retornar do código do escopo superior.");
         }
         if (stmt.value != null) {
-            this.resolveStmt(stmt.value);
+            this.resolve(stmt.value);
         }
         return null;
     }
 
     visitWhileStmt(stmt) {
-        this.resolveStmt(stmt.condition);
+        this.resolve(stmt.condition);
         this.resolve(stmt.body);
         return null;
     }
 
     visitBinaryExpr(expr) {
-        this.resolveStmt(expr.left);
-        this.resolveStmt(expr.right);
+        this.resolve(expr.left);
+        this.resolve(expr.right);
         return null;
     }
 
     visitCallExpr(expr) {
-        this.resolveStmt(expr.callee);
+        this.resolve(expr.callee);
 
         let args = expr.args;
         for (let i = 0; i < args.length; i++) {
-            this.resolveStmt(args[i]);
+            this.resolve(args[i]);
         }
 
         return null;
     }
 
     visitGroupingExpr(expr) {
-        this.resolveStmt(expr.expression);
+        this.resolve(expr.expression);
         return null;
     }
 
@@ -205,13 +204,13 @@ module.exports = class Resolver {
     }
 
     visitLogicalExpr(expr) {
-        this.resolveStmt(expr.left);
-        this.resolveStmt(expr.right);
+        this.resolve(expr.left);
+        this.resolve(expr.right);
         return null;
     }
 
     visitUnaryExpr(expr) {
-        this.resolveStmt(expr.right);
+        this.resolve(expr.right);
         return null;
     }
 };

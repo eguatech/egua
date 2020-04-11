@@ -11,7 +11,7 @@ module.exports = class Environment {
     }
 
     assignVarAt(distance, name, value) {
-        this.ancestor(distance).values[name] = value;
+        this.ancestor(distance).values[name.lexeme] = value;
     }
 
     assignVar(name, value) {
