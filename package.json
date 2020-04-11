@@ -1,0 +1,19 @@
+{
+  "name": "egua",
+  "version": "1.0.0",
+  "description": "Linguagem de programação simples e moderna para aprender a programar",
+  "main": "index.js",
+  "scripts": {},
+  "repository": "eguatech/egua",
+  "bin": {
+    "dragon": "./bin/egua"
+  },
+  "keywords": [
+    "egua",
+    "egua-lang",
+    "programming-lang"
+  ],
+  "author": "Lucas",
+  "license": "MIT",
+  "homepage": "https://github.com/eguatech/egua"
+}

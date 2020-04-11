@@ -1,7 +1,7 @@
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
-const Environment = require("./environment");
+const Environment = require("./environment.js");
 
 class ParserError extends Error {}
 

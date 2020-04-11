@@ -3,22 +3,44 @@ const Parser = require("./parser.js");
 const Interpreter = require("./interpreter.js");
 const tokenTypes = require("./tokenTypes.js");
 const fs = require("fs");
+const readline = require("readline");
 
-class Egua {
+module.exports = class Egua {
     constructor() {
         this.hadError = false;
         this.hadRuntimeError = false;
     }
 
+    runPrompt() {
+        const interpreter = new Interpreter(this);
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            prompt: ">>> "
+        });
+
+        rl.prompt();
+
+        rl.on("line", line => {
+            this.hadError = false;
+            this.hadRuntimeError = false;
+
+            this.run(line, interpreter);
+            rl.prompt();
+        });
+    }
+
     runfile(filename) {
+        const interpreter = new Interpreter(this);
+
         const fileData = fs.readFileSync(filename).toString();
-        this.run(fileData);
-    
+        this.run(fileData, interpreter);
+
         if (this.hadError) process.exit(65);
         if (this.hadRuntimeError) process.exit(70);
-      }
+    }
 
-    run(code) {
+    run(code, interpreter) {
         const lexer = new Lexer(code, this);
         const tokens = lexer.scan();
 
@@ -27,7 +49,6 @@ class Egua {
 
         if (this.hadError === true) return;
 
-        let interpreter = new Interpreter(this);
         interpreter.interpret(statements);
     }
 
@@ -56,6 +77,4 @@ class Egua {
         }
         this.hadRuntimeError = true;
     }
-}
-
-module.exports = Egua;
+};
