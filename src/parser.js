@@ -51,6 +51,11 @@ module.exports = class Parser {
         return this.peek().type === type;
     }
 
+    checkNext(type) {
+        if (this.isAtEnd()) return false;
+        return this.tokens[this.current + 1].type === type;
+    }
+
     peek() {
         return this.tokens[this.current];
     }
@@ -81,7 +86,7 @@ module.exports = class Parser {
     }
 
     primary() {
-        if (this.match(tokenTypes.FUNCAO)) return this.function("funcao");
+        if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NIL)) return new Expr.Literal(null);
@@ -423,6 +428,10 @@ module.exports = class Parser {
 
     function(kind) {
         let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
+        return new Stmt.Funcao(name, this.functionBody(kind));
+    }
+
+    functionBody(kind) {
         this.consume(tokenTypes.LEFT_PAREN, `Esperado '(' após o nome ${kind}.`);
 
         let parameters = [];
@@ -443,12 +452,18 @@ module.exports = class Parser {
 
         let body = this.block();
 
-        return new Stmt.Funcao(name, parameters, body);
+        return new Expr.Funcao(parameters, body);
     }
 
     declaration() {
         try {
-            if (this.match(tokenTypes.FUNCAO)) return this.function("funcao");
+            if (
+                this.check(tokenTypes.FUNCAO) &&
+                this.checkNext(tokenTypes.IDENTIFIER)
+            ) {
+                this.consume(tokenTypes.FUNCAO, null);
+                return this.function("funcao");
+            }
             if (this.match(tokenTypes.VAR)) return this.varDeclaration();
 
             return this.statement();

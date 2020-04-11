@@ -27,6 +27,18 @@ class Binary extends Expr {
     }
 }
 
+class Funcao extends Expr {
+    constructor(params, body) {
+        super();
+        this.params = params;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitFunctionExpr(this);
+    }
+}
+
 class Call extends Expr {
     constructor(callee, paren, args) {
         super();
@@ -101,6 +113,7 @@ class Variable extends Expr {
 module.exports = {
     Assign,
     Binary,
+    Funcao,
     Call,
     Grouping,
     Literal,

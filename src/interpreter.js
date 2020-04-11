@@ -29,8 +29,9 @@ class StandardFn extends Callable {
 }
 
 class EguaFunction extends Callable {
-    constructor(declaration, closure) {
+    constructor(name, declaration, closure) {
         super();
+        this.name = name;
         this.declaration = declaration;
         this.closure = closure;
     }
@@ -40,7 +41,8 @@ class EguaFunction extends Callable {
     }
 
     toString() {
-        return `<funcao ${this.declaration.name.lexeme}>`;
+        if (this.name === null) return "<função anônima>";
+        return `<funcao ${this.name}>`;
     }
 
     call(interpreter, args) {
@@ -317,8 +319,16 @@ module.exports = class Interpreter {
         throw new Retorna(value);
     }
 
+    visitFunctionExpr(expr) {
+        return new EguaFunction(null, expr, this.environment);
+    }
+
     visitFunctionStmt(stmt) {
-        let func = new EguaFunction(stmt, this.environment);
+        let func = new EguaFunction(
+            stmt.name.lexeme,
+            stmt.func,
+            this.environment
+        );
         this.environment.defineVar(stmt.name.lexeme, func);
     }
 

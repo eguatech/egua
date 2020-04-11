@@ -14,11 +14,10 @@ class Expression extends Stmt {
 }
 
 class Funcao extends Stmt {
-    constructor(name, params, body) {
+    constructor(name, func) {
         super();
         this.name = name;
-        this.params = params;
-        this.body = body;
+        this.func = func;
     }
 
     accept(visitor) {
