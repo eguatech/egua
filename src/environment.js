@@ -10,6 +10,10 @@ module.exports = class Environment {
         this.values[varName] = value;
     }
 
+    assignVarAt(distance, name, value) {
+        this.ancestor(distance).values[name] = value;
+    }
+
     assignVar(name, value) {
         if (this.values[name.lexeme] !== undefined) {
             this.values[name.lexeme] = value;
@@ -22,6 +26,19 @@ module.exports = class Environment {
         }
 
         throw new RuntimeError(name, "Variável não definida '" + name.lexeme + "'.");
+    }
+
+    ancestor(distance) {
+        let environment = this;
+        for (let i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+
+        return environment;
+    }
+
+    getVarAt(distance, name) {
+        return this.ancestor(distance).values[name];
     }
 
     getVar(token) {

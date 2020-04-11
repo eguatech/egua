@@ -1,5 +1,6 @@
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
+const Resolver = require("./resolver.js");
 const Interpreter = require("./interpreter.js");
 const tokenTypes = require("./tokenTypes.js");
 const fs = require("fs");
@@ -46,6 +47,9 @@ module.exports = class Egua {
 
         const parser = new Parser(tokens, this);
         const statements = parser.parse();
+
+        const resolver = new Resolver(interpreter, this);
+        resolver.resolve(statements);
 
         if (this.hadError === true) return;
 

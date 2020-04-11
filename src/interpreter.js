@@ -66,6 +66,7 @@ module.exports = class Interpreter {
         this.Egua = Egua;
         this.globals = new Environment();
         this.environment = this.globals;
+        this.locals = new Map();
 
         this.globals.defineVar(
             "clock", // clock da standart function
@@ -73,6 +74,10 @@ module.exports = class Interpreter {
                 return Date.now() / 1000;
             })
         );
+    }
+
+    resolve(expr, depth) {
+        this.locals.set(expr, depth);
     }
 
     visitLiteralExpr(expr) {
@@ -217,12 +222,28 @@ module.exports = class Interpreter {
     visitAssignExpr(expr) {
         let value = this.evaluate(expr.value);
 
-        this.environment.assignVar(expr.name, value);
+        let distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            this.environment.assignVarAt(distance, expr.name, value);
+        } else {
+            this.environment.assignVar(expr.name, value);
+        }
+
         return value;
     }
 
+    lookupVar(name, expr) {
+        let distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            return this.environment.getVarAt(distance, name.lexeme);
+        } else {
+            return this.globals.getVar(name);
+        }
+    }
+
     visitVariableExpr(expr) {
-        return this.environment.getVar(expr.name);
+        let a = this.lookupVar(expr.name, expr);
+        return a;
     }
 
     visitExpressionStmt(stmt) {

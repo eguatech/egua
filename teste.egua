@@ -1,5 +1,10 @@
-var anonima = funcao() {
- retorna 3;
-};
+var a = "global";
+{
+  funcao showA() {
+    escreva(a);
+  }
 
-escreva(anonima);
+  showA();
+  var a = "block";
+  showA();
+}
