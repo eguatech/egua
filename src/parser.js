@@ -559,7 +559,6 @@ module.exports = class Parser {
 
             return this.statement();
         } catch (error) {
-            console.log(error);
             this.synchronize();
             return null;
         }

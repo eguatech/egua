@@ -57,8 +57,9 @@ class EguaFunction extends Callable {
         } catch (error) {
             if (error instanceof Retorna) {
                 if (this.isInitializer) return this.closure.getVarAt(0, "isto");
-
                 return error.value;
+            } else {
+                throw error;
             }
         }
 
@@ -92,7 +93,7 @@ class EguaInstance {
         let method = this.creatorClass.findMethod(name.lexeme);
         if (method) return method.bind(this);
 
-        throw new RuntimeError("Propriedade indefinida '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Método indefinido não recuperado.");
     }
 
     set(name, value) {
@@ -453,7 +454,7 @@ module.exports = class Interpreter {
     visitSubscriptExpr(expr) {
         let obj = this.evaluate(expr.callee);
         if (!Array.isArray(obj) && obj.constructor !== Object)
-            throw new Error("Somente vetores podem ser subescritos.");
+            throw new RuntimeError(expr.callee.name, "Somente vetores e dicionário podem ser sobrescritos.");
 
         let index = this.evaluate(expr.index);
         if (Array.isArray(obj)) {
@@ -476,9 +477,9 @@ module.exports = class Interpreter {
     visitSetExpr(expr) {
         let obj = this.evaluate(expr.object);
 
-        if (!(obj instanceof EguaInstance) && !obj.constructor == Object) {
+        if (!(obj instanceof DragonInstance) && obj.constructor !== Object) {
             throw new RuntimeError(
-                expr.name.lexeme + " - Somente instâncias e dicionários possuem campos."
+                expr.object.name, "Somente instâncias e dicionários podem possuir campos."
             );
         }
 
@@ -506,7 +507,7 @@ module.exports = class Interpreter {
         if (stmt.superclass !== null) {
             superclass = this.evaluate(stmt.superclass);
             if (!(superclass instanceof EguaClass)) {
-                throw new Error(stmt.superclass.name, "Superclasse precisa ser uma classe.");
+                throw new RuntimeError(stmt.superclass.name, "Superclasse precisa ser uma classe.");
             }
         }
 
@@ -549,9 +550,9 @@ module.exports = class Interpreter {
             return object[expr.name];
         }
 
-        throw new Error(
-            expr.name.lexeme +
-            " - Você só pode acessar métodos do objeto e dicionários."
+        throw new RuntimeError(
+            expr.name,
+            "Você só pode acessar métodos do objeto e dicionários."
         );
     }
 
@@ -583,8 +584,8 @@ module.exports = class Interpreter {
 
         let method = superclass.findMethod(expr.method.lexeme);
 
-        if (method === null) {
-            throw new RuntimeError("Propriedade indefinida '" + expr.name.lexeme + "'.");
+        if (method === undefined) {
+            throw new RuntimeError(expr, "O objeto chamado pelo 'super' é indefinido.");
         }
 
         return method.bind(object);

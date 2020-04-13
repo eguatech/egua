@@ -65,7 +65,7 @@ module.exports = class Egua {
 
     error(token, errorMessage) {
         if (token.type === tokenTypes.EOF) {
-            this.report(token.line, " no fim", errorMessage);
+            this.report(token.line, " no final", errorMessage);
         } else {
             this.report(token.line, " no '" + token.lexeme + "'", errorMessage);
         }
@@ -76,7 +76,9 @@ module.exports = class Egua {
     }
 
     runtimeError(error) {
-        if (error.token && error.token.line) {
+        let line = error.token.line || error.token.keyword.line;
+        if (error.token && line) {
+
             console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
         } else {
             console.error(error);
