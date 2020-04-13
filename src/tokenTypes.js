@@ -42,6 +42,7 @@ module.exports = {
     VERDADEIRO: "VERDADEIRO",
     VAR: "VAR",
     ENQUANTO: "ENQUANTO",
+    HERDA: "HERDA",
     PAUSA: "PAUSA",
     EOF: "EOF"
 };

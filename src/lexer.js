@@ -17,7 +17,8 @@ const reservedWords = {
     verdadeiro: tokenTypes.VERDADEIRO,
     var: tokenTypes.VAR,
     enquanto: tokenTypes.ENQUANTO,
-    pausa: tokenTypes.PAUSA
+    pausa: tokenTypes.PAUSA,
+    herda: tokenTypes.HERDA
 };
 
 class Token {
