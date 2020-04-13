@@ -23,8 +23,8 @@ class StandardFn extends Callable {
         this.func = func;
     }
 
-    call(interpreter, args) {
-        return this.func.apply(null, args);
+    call(interpreter, args, token) {
+        return this.func.apply(null, [...args, token]);
     }
 }
 
@@ -166,6 +166,37 @@ module.exports = class Interpreter {
                 return obj.length;
             })
         );
+
+        this.globals.defineVar(
+            "texto",
+            new StandardFn(1, value => {
+              return `${value}`;
+            })
+          );
+      
+          this.globals.defineVar(
+            "real",
+            new StandardFn(1, (value, token) => {
+              if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+                throw new RuntimeError(
+                  token,
+                  "Somente números podem passar para real."
+                );
+              return parseFloat(value);
+            })
+          );
+      
+          this.globals.defineVar(
+            "inteiro",
+            new StandardFn(1, (value, token) => {
+              if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+                throw new RuntimeError(
+                  token,
+                  "Somente números podem passar para inteiro."
+                );
+              return parseInt(value);
+            })
+          );
     }
 
     resolve(expr, depth) {
@@ -213,7 +244,7 @@ module.exports = class Interpreter {
         if (left === null && right === null) return true;
         else if (left === null) return false;
 
-        return left == right;
+        return left === right;
     }
 
     checkNumberOperands(operator, left, right) {
@@ -308,6 +339,10 @@ module.exports = class Interpreter {
             );
         }
 
+        if (callee instanceof StandardFn) {
+            return callee.call(this, args, expr.callee.name);
+          }
+          
         return callee.call(this, args);
     }
 
