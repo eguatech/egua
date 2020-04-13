@@ -33,7 +33,7 @@ module.exports = {
     FUNCAO: "FUNCAO",
     PARA: "PARA",
     SE: "SE",
-    NIL: "NIL",
+    NULO: "NULO",
     OU: "OU",
     ESCREVA: "ESCREVA",
     RETORNA: "RETORNA",

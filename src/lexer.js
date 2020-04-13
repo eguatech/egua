@@ -8,7 +8,7 @@ const reservedWords = {
     para: tokenTypes.PARA,
     funcao: tokenTypes.FUNCAO,
     se: tokenTypes.SE,
-    nil: tokenTypes.NIL,
+    nulo: tokenTypes.NULO,
     ou: tokenTypes.OU,
     escreva: tokenTypes.ESCREVA,
     retorna: tokenTypes.RETORNA,

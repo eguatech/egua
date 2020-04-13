@@ -644,7 +644,7 @@ module.exports = class Interpreter {
     }
 
     stringify(object) {
-        if (object === null) return "nil";
+        if (object === null) return "nulo";
         if (Array.isArray(object)) return object;
 
         return object.toString();
