@@ -342,11 +342,11 @@ module.exports = class Interpreter {
             );
         }
 
-        if (args.length !== callee.arity()) {
-            throw new RuntimeError(
-                expr.paren,
-                `Esperado ${callee.arity()} argumentos mas só há ${args.length} argumento(s).`
-            );
+        if (args.length < callee.arity()) {
+            let diff = callee.arity() - args.length;
+            for (let i = 0; i < diff; i++) {
+                args.push(null);
+            }
         }
 
         if (callee instanceof StandardFn) {
