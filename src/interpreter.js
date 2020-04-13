@@ -24,7 +24,8 @@ class StandardFn extends Callable {
     }
 
     call(interpreter, args, token) {
-        return this.func.apply(null, [...args, token]);
+        this.token = token;
+        return this.func.apply(this, args);
     }
 }
 
@@ -155,31 +156,31 @@ module.exports = class Interpreter {
 
         this.globals.defineVar(
             "clock", // clock da standart function
-            new StandardFn(0, () => {
+            new StandardFn(0, function() {
                 return Date.now() / 1000;
             })
         );
 
         this.globals.defineVar(
             "tamanho",
-            new StandardFn(1, obj => {
+            new StandardFn(1, function(obj) {
                 return obj.length;
             })
         );
 
         this.globals.defineVar(
             "texto",
-            new StandardFn(1, value => {
-              return `${value}`;
+            new StandardFn(1, function(value) {
+                return `${value}`;
             })
           );
       
           this.globals.defineVar(
             "real",
-            new StandardFn(1, (value, token) => {
-              if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+            new StandardFn(1, function(value) {
+                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
                 throw new RuntimeError(
-                  token,
+                  this.token,
                   "Somente números podem passar para real."
                 );
               return parseFloat(value);
@@ -188,10 +189,10 @@ module.exports = class Interpreter {
       
           this.globals.defineVar(
             "inteiro",
-            new StandardFn(1, (value, token) => {
-              if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+            new StandardFn(1, function(value) {
+                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
                 throw new RuntimeError(
-                  token,
+                  this.token,
                   "Somente números podem passar para inteiro."
                 );
               return parseInt(value);
