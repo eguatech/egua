@@ -29,11 +29,12 @@ class StandardFn extends Callable {
 }
 
 class EguaFunction extends Callable {
-    constructor(name, declaration, closure) {
+    constructor(name, declaration, closure, isInitializer = false) {
         super();
         this.name = name;
         this.declaration = declaration;
         this.closure = closure;
+        this.isInitializer = isInitializer;
     }
 
     arity() {
@@ -55,9 +56,87 @@ class EguaFunction extends Callable {
             interpreter.executeBlock(this.declaration.body, environment);
         } catch (error) {
             if (error instanceof Retorna) {
+                if (this.isInitializer) return this.closure.getVarAt(0, "isto");
+
                 return error.value;
             }
         }
+
+        if (this.isInitializer) return this.closure.getVarAt(0, "isto");
+        return null;
+    }
+
+    bind(instance) {
+        let environment = new Environment(this.closure);
+        environment.defineVar("isto", instance);
+        return new EguaFunction(
+            this.name,
+            this.declaration,
+            environment,
+            this.isInitializer
+        );
+    }
+}
+
+class EguaInstance {
+    constructor(creatorClass) {
+        this.creatorClass = creatorClass;
+        this.fields = {};
+    }
+
+    get(name) {
+        if (this.fields.hasOwnProperty(name.lexeme)) {
+            return this.fields[name.lexeme];
+        }
+
+        let method = this.creatorClass.findMethod(name.lexeme);
+        if (method) return method.bind(this);
+
+        throw new RuntimeError("Propriedade indefinida '" + name.lexeme + "'.");
+    }
+
+    set(name, value) {
+        this.fields[name.lexeme] = value;
+    }
+
+    toString() {
+        return "<" + this.creatorClass.name + " instância>";
+    }
+}
+
+class EguaClass extends Callable {
+    constructor(name, methods) {
+        super();
+        this.name = name;
+        this.methods = methods;
+    }
+
+    findMethod(name) {
+        if (this.methods.hasOwnProperty(name)) {
+            return this.methods[name];
+        }
+
+        return undefined;
+    }
+
+    toString() {
+        return this.name;
+    }
+
+    arity() {
+        let initializer = this.findMethod("construtor");
+        return initializer ? initializer.arity() : 0;
+    }
+
+    call(interpreter, args) {
+        let instance = new EguaInstance(this);
+
+        let initializer = this.findMethod("construtor");
+        if (initializer) {
+            initializer.bind(instance).call(interpreter, args);
+        }
+
+        return instance;
     }
 }
 
@@ -340,16 +419,68 @@ module.exports = class Interpreter {
     }
 
     visitFunctionExpr(expr) {
-        return new EguaFunction(null, expr, this.environment);
+        return new EguaFunction(null, expr, this.environment, false);
+    }
+
+    visitSetExpr(expr) {
+        let obj = this.evaluate(expr.object);
+
+        if (!(obj instanceof EguaInstance)) {
+            throw new RuntimeError(expr.name + " Somente instâncias possuem campos.");
+        }
+
+        let value = this.evaluate(expr.value);
+        obj.set(expr.name, value);
+        return value;
     }
 
     visitFunctionStmt(stmt) {
         let func = new EguaFunction(
             stmt.name.lexeme,
             stmt.func,
-            this.environment
+            this.environment,
+            false
         );
         this.environment.defineVar(stmt.name.lexeme, func);
+    }
+
+    visitClassStmt(stmt) {
+        this.environment.defineVar(stmt.name.lexeme, null);
+
+        let methods = {};
+        let definedMethods = stmt.methods;
+        for (let i = 0; i < stmt.methods.length; i++) {
+            let currentMethod = definedMethods[i];
+            let isInitializer = currentMethod.name.lexeme === "construtor";
+            let func = new EguaFunction(
+                currentMethod.name.lexeme,
+                currentMethod.func,
+                this.environment,
+                isInitializer
+            );
+            methods[currentMethod.name.lexeme] = func;
+        }
+
+        let created = new EguaClass(stmt.name.lexeme, methods);
+
+        this.environment.assignVar(stmt.name, created);
+        return null;
+    }
+
+    visitGetExpr(expr) {
+        let object = this.evaluate(expr.object);
+        if (object instanceof EguaInstance) {
+            return object.get(expr.name);
+        }
+
+        throw new Error(
+            expr.name,
+            "Você só pode acessar métodos do objeto."
+        );
+    }
+
+    visitThisExpr(expr) {
+        return this.lookupVar(expr.keyword, expr);
     }
 
     stringify(object) {

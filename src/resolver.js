@@ -31,7 +31,14 @@ class Stack {
 
 const FunctionType = {
     NONE: "NONE",
-    FUNCAO: "FUNCAO"
+    FUNCAO: "FUNCAO",
+    CONSTRUTOR: "CONSTRUTOR",
+    METHOD: "METHOD"
+};
+
+const ClassType = {
+    NONE: "NONE",
+    CLASSE: "CLASSE"
 };
 
 module.exports = class Resolver {
@@ -41,6 +48,7 @@ module.exports = class Resolver {
         this.scopes = new Stack();
 
         this.currentFunction = FunctionType.NONE;
+        this.currentClass = ClassType.NONE;
     }
 
     define(name) {
@@ -150,6 +158,38 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitClassStmt(stmt) {
+        let enclosingClass = this.currentClass;
+        this.currentClass = ClassType.CLASSE;
+
+        this.declare(stmt.name);
+        this.define(stmt.name);
+
+        this.beginScope();
+        this.scopes.peek()["isto"] = true; // AQUI
+
+        let methods = stmt.methods;
+        for (let i = 0; i < methods.length; i++) {
+            let declaration = FunctionType.METHOD;
+
+            if (methods[i].name.lexeme === "isto") {
+                declaration = FunctionType.CONSTRUTOR;
+            }
+
+            this.resolveFunction(methods[i].func, declaration);
+        }
+
+        this.endScope();
+
+        this.currentClass = enclosingClass;
+        return null;
+    }
+
+    visitGetExpr(expr) {
+        this.resolve(expr.object);
+        return null;
+    }
+
     visitExpressionStmt(stmt) {
         this.resolve(stmt.expression);
         return null;
@@ -170,7 +210,10 @@ module.exports = class Resolver {
         if (this.currentFunction === FunctionType.NONE) {
             this.egua.error(stmt.keyword, "Não é possível retornar do código do escopo superior.");
         }
-        if (stmt.value != null) {
+        if (stmt.value !== null) {
+            if (this.currentFunction === FunctionType.CONSTRUTOR) {
+                this.egua.error(stmt.keyword, "Não pode retornar o valor do construtor.");
+            }
             this.resolve(stmt.value);
         }
         return null;
@@ -216,6 +259,20 @@ module.exports = class Resolver {
 
     visitUnaryExpr(expr) {
         this.resolve(expr.right);
+        return null;
+    }
+
+    visitSetExpr(expr) {
+        this.resolve(expr.value);
+        this.resolve(expr.object);
+        return null;
+    }
+
+    visitThisExpr(expr) {
+        if (this.currentClass == ClassType.NONE) {
+            this.egua.error(expr.keyword, "Não pode usar 'isto' fora da classe.");
+        }
+        this.resolveLocal(expr, expr.keyword);
         return null;
     }
 };

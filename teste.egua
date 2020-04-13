@@ -1,12 +1,17 @@
-funcao fibonacci(iterations) {
-  var a = 0;
-  var b = 1;
-  para (var i = 0; i < iterations; i = i + 1) {
-    var temp = a + b;
-    a = b;
-    b = temp;
-    escreva(temp);
+classe Test {
+  testFunc() {
+    escreva("hello");
   }
 }
 
-fibonacci(100);
+var test = Test();
+test.testFunc(); 
+
+
+classe Test {
+  construtor() {
+    escreva(isto);
+  }
+}
+
+var test = Test(); 

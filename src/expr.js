@@ -52,6 +52,18 @@ class Call extends Expr {
     }
 }
 
+class Get extends Expr {
+    constructor(object, name) {
+        super();
+        this.object = object;
+        this.name = name;
+    }
+
+    accept(visitor) {
+        return visitor.visitGetExpr(this);
+    }
+}
+
 class Grouping extends Expr {
     constructor(expression) {
         super();
@@ -87,6 +99,30 @@ class Logical extends Expr {
     }
 }
 
+class Set extends Expr {
+    constructor(object, name, value) {
+        super();
+        this.object = object;
+        this.name = name;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitSetExpr(this);
+    }
+}
+
+class Isto extends Expr {
+    constructor(keyword) {
+        super();
+        this.keyword = keyword;
+    }
+
+    accept(visitor) {
+        return visitor.visitThisExpr(this);
+    }
+}
+
 class Unary extends Expr {
     constructor(operator, right) {
         super();
@@ -115,9 +151,12 @@ module.exports = {
     Binary,
     Funcao,
     Call,
+    Get,
     Grouping,
     Literal,
     Logical,
+    Set,
+    Isto,
     Unary,
     Variable
 };

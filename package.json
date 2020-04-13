@@ -6,7 +6,7 @@
   "scripts": {},
   "repository": "eguatech/egua",
   "bin": {
-    "dragon": "./bin/egua"
+    "egua": "./bin/egua"
   },
   "keywords": [
     "egua",

@@ -90,6 +90,7 @@ module.exports = class Parser {
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NIL)) return new Expr.Literal(null);
+        if (this.match(tokenTypes.ISTO)) return new Expr.Isto(this.previous());
 
         if (this.match(tokenTypes.NUMBER, tokenTypes.STRING)) {
             return new Expr.Literal(this.previous().literal);
@@ -133,6 +134,12 @@ module.exports = class Parser {
         while (true) {
             if (this.match(tokenTypes.LEFT_PAREN)) {
                 expr = this.finishCall(expr);
+            } else if (this.match(tokenTypes.DOT)) {
+                let name = this.consume(
+                    tokenTypes.IDENTIFIER,
+                    "Esperado nome do método após '.'."
+                );
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }
@@ -252,8 +259,10 @@ module.exports = class Parser {
             if (expr instanceof Expr.Variable) {
                 let name = expr.name;
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                let get = expr;
+                return new Expr.Set(get.object, get.name, value);
             }
-
             this.error(equals, "Tarefa de atribuição inválida");
         }
 
@@ -455,6 +464,19 @@ module.exports = class Parser {
         return new Expr.Funcao(parameters, body);
     }
 
+    classDeclaration() {
+        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome da classe.");
+        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' antes do escopo da classe.");
+
+        let methods = [];
+        while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+            methods.push(this.function("method"));
+        }
+
+        this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
+        return new Stmt.Classe(name, methods);
+    }
+
     declaration() {
         try {
             if (
@@ -465,6 +487,7 @@ module.exports = class Parser {
                 return this.function("funcao");
             }
             if (this.match(tokenTypes.VAR)) return this.varDeclaration();
+            if (this.match(tokenTypes.CLASSE)) return this.classDeclaration();
 
             return this.statement();
         } catch (error) {

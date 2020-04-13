@@ -37,6 +37,18 @@ class Retorna extends Stmt {
     }
 }
 
+class Classe extends Stmt {
+    constructor(name, methods) {
+        super();
+        this.name = name;
+        this.methods = methods;
+    }
+
+    accept(visitor) {
+        return visitor.visitClassStmt(this);
+    }
+}
+
 class Block extends Stmt {
     constructor(statements) {
         super();
@@ -110,6 +122,7 @@ module.exports = {
     Expression,
     Funcao,
     Retorna,
+    Classe,
     Block,
     Escreva,
     Enquanto,
