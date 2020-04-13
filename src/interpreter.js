@@ -49,8 +49,16 @@ class EguaFunction extends Callable {
 
     call(interpreter, args) {
         let environment = new Environment(this.closure);
-        for (let i = 0; i < this.declaration.params.length; i++) {
-            environment.defineVar(this.declaration.params[i].lexeme, args[i]);
+        let params = this.declaration.params;
+        for (let i = 0; i < params.length; i++) {
+            let param = params[i];
+
+            let name = param['name'].lexeme;
+            let value = args[i];
+            if (args[i] === null) {
+                value = param['default'] ? param['default'].value : null;
+            }
+            environment.defineVar(name, value);
         }
 
         try {

@@ -110,7 +110,6 @@ module.exports = class Resolver {
                 "Não é possível ler a variável local em seu próprio inicializador."
             );
         }
-
         this.resolveLocal(expr, expr.name);
         return null;
     }
@@ -137,8 +136,8 @@ module.exports = class Resolver {
         this.beginScope();
         let params = func.params;
         for (let i = 0; i < params.length; i++) {
-            this.declare(params[i]);
-            this.define(params[i]);
+            this.declare(params[i]['name']);
+            this.define(params[i]['name']);
         }
         this.resolve(func.body);
         this.endScope();
