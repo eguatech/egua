@@ -285,7 +285,7 @@ module.exports = class Resolver {
     }
 
     visitArrayExpr(expr) {
-        for (let i=0; i < expr.values.length; i++) {
+        for (let i = 0; i < expr.values.length; i++) {
             this.resolve(expr.values[i]);
         }
         return null;
@@ -294,6 +294,10 @@ module.exports = class Resolver {
     visitSubscriptExpr(expr) {
         this.resolve(expr.callee);
         this.resolve(expr.index);
+        return null;
+    }
+
+    visitAssignsubscriptExpr(expr) {
         return null;
     }
 

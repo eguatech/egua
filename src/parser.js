@@ -167,8 +167,11 @@ module.exports = class Parser {
                 );
                 expr = new Expr.Get(expr, name);
             } else if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
-                let index = this.primary();
-                let closeBracket = this.consume(tokenTypes.RIGHT_SQUARE_BRACKET, "Esperado ']' após escrita do index.");
+                let index = this.expression();
+                let closeBracket = this.consume(
+                    tokenTypes.RIGHT_SQUARE_BRACKET,
+                    "Esperado ']' após escrita de index."
+                );
                 expr = new Expr.Subscript(expr, index, closeBracket);
             } else {
                 break;
@@ -292,6 +295,8 @@ module.exports = class Parser {
             } else if (expr instanceof Expr.Get) {
                 let get = expr;
                 return new Expr.Set(get.object, get.name, value);
+            } else if (expr instanceof Expr.Subscript) {
+                return new Expr.Assignsubscript(expr.callee, expr.index, value);
             }
             this.error(equals, "Tarefa de atribuição inválida");
         }

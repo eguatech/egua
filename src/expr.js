@@ -110,6 +110,19 @@ class Subscript extends Expr {
     }
 }
 
+class Assignsubscript extends Expr {
+    constructor(obj, index, value) {
+        super();
+        this.obj = obj;
+        this.index = index;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitAssignsubscriptExpr(this);
+    }
+}
+
 class Logical extends Expr {
     constructor(left, operator, right) {
         super();
@@ -192,6 +205,7 @@ module.exports = {
     Literal,
     Array,
     Subscript,
+    Assignsubscript,
     Logical,
     Set,
     Super,

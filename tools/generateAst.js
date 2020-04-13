@@ -61,6 +61,7 @@ defineAst("Expr", {
     Literal: "value",
     Array: "values",
     Subscript: "callee, index, closeBracket",
+    Assignsubscript: "obj, index, value",
     Logical: "left, operator, right",
     Set: "object, name, value",
     Super: "keyword, method",

@@ -158,6 +158,13 @@ module.exports = class Interpreter {
                 return Date.now() / 1000;
             })
         );
+
+        this.globals.defineVar(
+            "tamanho",
+            new StandardFn(1, obj => {
+                return obj.length;
+            })
+        );
     }
 
     resolve(expr, depth) {
@@ -427,13 +434,33 @@ module.exports = class Interpreter {
         return new EguaFunction(null, expr, this.environment, false);
     }
 
+    visitAssignsubscriptExpr(expr) {
+        let obj = this.evaluate(expr.obj);
+        let index = this.evaluate(expr.index);
+        let value = this.evaluate(expr.value);
+
+        if (Array.isArray(obj)) {
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
+            }
+        }
+
+        obj[index] = value;
+    }
+
     visitSubscriptExpr(expr) {
         let list = this.evaluate(expr.callee);
-        if (!Array.isArray(list)) throw new Error("Somente vetores podem ser subescritos.");
+        if (!Array.isArray(list))
+            throw new Error("Somente vetores podem ser subescritos.");
 
         let index = this.evaluate(expr.index);
         if (!Number.isInteger(index)) {
-            throw new RuntimeError(expr.closeBracket, "Somente números podem ser usados para indexar um vetor.");
+            throw new RuntimeError(
+                expr.closeBracket,
+                "Somente números podem ser usados para indexar um vetor."
+            );
         }
 
         if (index >= list.length) {
@@ -522,7 +549,7 @@ module.exports = class Interpreter {
 
     visitArrayExpr(expr) {
         let values = [];
-        for (let i=0; i < expr.values.length; i++) {
+        for (let i = 0; i < expr.values.length; i++) {
             values.push(this.evaluate(expr.values[i]));
         }
         return values;
