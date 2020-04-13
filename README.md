@@ -21,12 +21,6 @@ classe Test {
 
 var test = Test();
 
-var a = [1, 2, 3];
-escreva(a[0]);
-
-var a = {'a': 1, 'b': 9};
-escreva(a['b']);
-
 classe A {
   test() {
     escreva("yes");
@@ -47,4 +41,12 @@ a.a();
 ```js
 var text = "oi";
 escreva(inteiro(text));
+```
+
+```js
+var a = [1, 2, 3];
+escreva(a[0]);
+
+var a = {'a': 1, 'b': 9};
+escreva(a['b']);
 ```
