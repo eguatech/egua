@@ -454,7 +454,10 @@ module.exports = class Interpreter {
     visitSubscriptExpr(expr) {
         let obj = this.evaluate(expr.callee);
         if (!Array.isArray(obj) && obj.constructor !== Object)
-            throw new RuntimeError(expr.callee.name, "Somente vetores e dicionário podem ser sobrescritos.");
+            throw new RuntimeError(
+                expr.callee.name, 
+                "Somente vetores e dicionário podem ser sobrescritos."
+            );
 
         let index = this.evaluate(expr.index);
         if (Array.isArray(obj)) {
@@ -479,7 +482,8 @@ module.exports = class Interpreter {
 
         if (!(obj instanceof DragonInstance) && obj.constructor !== Object) {
             throw new RuntimeError(
-                expr.object.name, "Somente instâncias e dicionários podem possuir campos."
+                expr.object.name, 
+                "Somente instâncias e dicionários podem possuir campos."
             );
         }
 
@@ -507,7 +511,10 @@ module.exports = class Interpreter {
         if (stmt.superclass !== null) {
             superclass = this.evaluate(stmt.superclass);
             if (!(superclass instanceof EguaClass)) {
-                throw new RuntimeError(stmt.superclass.name, "Superclasse precisa ser uma classe.");
+                throw new RuntimeError(
+                    stmt.superclass.name, 
+                    "Superclasse precisa ser uma classe."
+                );
             }
         }
 
