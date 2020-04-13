@@ -5,7 +5,7 @@ classe Test {
 }
 
 var test = Test();
-test.testFunc(); 
+test.testFunc();
 
 
 classe Test {
@@ -14,4 +14,7 @@ classe Test {
   }
 }
 
-var test = Test(); 
+var test = Test();
+
+var a = [1, 2, 3];
+escreva(a[0]);

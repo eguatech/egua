@@ -427,6 +427,21 @@ module.exports = class Interpreter {
         return new EguaFunction(null, expr, this.environment, false);
     }
 
+    visitSubscriptExpr(expr) {
+        let list = this.evaluate(expr.callee);
+        if (!Array.isArray(list)) throw new Error("Somente vetores podem ser subescritos.");
+
+        let index = this.evaluate(expr.index);
+        if (!Number.isInteger(index)) {
+            throw new RuntimeError(expr.closeBracket, "Somente números podem ser usados para indexar um vetor.");
+        }
+
+        if (index >= list.length) {
+            throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
+        }
+        return list[index];
+    }
+
     visitSetExpr(expr) {
         let obj = this.evaluate(expr.object);
 
@@ -503,6 +518,14 @@ module.exports = class Interpreter {
 
     visitThisExpr(expr) {
         return this.lookupVar(expr.keyword, expr);
+    }
+
+    visitArrayExpr(expr) {
+        let values = [];
+        for (let i=0; i < expr.values.length; i++) {
+            values.push(this.evaluate(expr.values[i]));
+        }
+        return values;
     }
 
     visitSuperExpr(expr) {

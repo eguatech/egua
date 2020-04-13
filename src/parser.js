@@ -95,6 +95,23 @@ module.exports = class Parser {
             );
             return new Expr.Super(keyword, method);
         }
+        if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
+            let values = [];
+            if (this.match(tokenTypes.RIGHT_SQUARE_BRACKET)) {
+                return new Expr.Array([]);
+            }
+            while (!this.match(tokenTypes.RIGHT_SQUARE_BRACKET)) {
+                let value = this.assignment();
+                values.push(value);
+                if (this.peek().type !== tokenTypes.RIGHT_SQUARE_BRACKET) {
+                    this.consume(
+                        tokenTypes.COMMA,
+                        "Esperado vírgula antes da próxima expressão."
+                    );
+                }
+            }
+            return new Expr.Array(values);
+        }
         if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
@@ -149,6 +166,10 @@ module.exports = class Parser {
                     "Esperado nome do método após '.'."
                 );
                 expr = new Expr.Get(expr, name);
+            } else if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
+                let index = this.primary();
+                let closeBracket = this.consume(tokenTypes.RIGHT_SQUARE_BRACKET, "Esperado ']' após escrita do index.");
+                expr = new Expr.Subscript(expr, index, closeBracket);
             } else {
                 break;
             }

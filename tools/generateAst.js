@@ -59,6 +59,8 @@ defineAst("Expr", {
     Get: "object, name",
     Grouping: "expression",
     Literal: "value",
+    Array: "values",
+    Subscript: "callee, index, closeBracket",
     Logical: "left, operator, right",
     Set: "object, name, value",
     Super: "keyword, method",

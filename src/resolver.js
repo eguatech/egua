@@ -284,6 +284,19 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitArrayExpr(expr) {
+        for (let i=0; i < expr.values.length; i++) {
+            this.resolve(expr.values[i]);
+        }
+        return null;
+    }
+
+    visitSubscriptExpr(expr) {
+        this.resolve(expr.callee);
+        this.resolve(expr.index);
+        return null;
+    }
+
     visitLiteralExpr(expr) {
         return null;
     }

@@ -143,6 +143,12 @@ module.exports = class Lexer {
         const c = this.advance();
 
         switch (c) {
+            case "[":
+                this.addToken(tokenTypes.LEFT_SQUARE_BRACKET);
+                break;
+            case "]":
+                this.addToken(tokenTypes.RIGHT_SQUARE_BRACKET);
+                break;
             case "(":
                 this.addToken(tokenTypes.LEFT_PAREN);
                 break;

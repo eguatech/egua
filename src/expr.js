@@ -86,6 +86,30 @@ class Literal extends Expr {
     }
 }
 
+class Array extends Expr {
+    constructor(values) {
+        super();
+        this.values = values;
+    }
+
+    accept(visitor) {
+        return visitor.visitArrayExpr(this);
+    }
+}
+
+class Subscript extends Expr {
+    constructor(callee, index, closeBracket) {
+        super();
+        this.callee = callee;
+        this.index = index;
+        this.closeBracket = closeBracket;
+    }
+
+    accept(visitor) {
+        return visitor.visitSubscriptExpr(this);
+    }
+}
+
 class Logical extends Expr {
     constructor(left, operator, right) {
         super();
@@ -166,6 +190,8 @@ module.exports = {
     Get,
     Grouping,
     Literal,
+    Array,
+    Subscript,
     Logical,
     Set,
     Super,
