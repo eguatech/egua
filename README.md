@@ -42,7 +42,9 @@ classe B herda A {
 var a = B();
 a.test();
 a.a();
+```
 
+```js
 var text = "oi";
 escreva(inteiro(text));
 ```
