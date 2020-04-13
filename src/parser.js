@@ -431,19 +431,7 @@ module.exports = class Parser {
 
             let body = this.statement();
 
-            if (increment !== null) {
-                body = new Stmt.Block([body, new Stmt.Expression(increment)]);
-            }
-
-            if (condition == null) condition = new Expr.Literal(true);
-
-            body = new Stmt.Enquanto(condition, body);
-
-            if (initializer !== null) {
-                body = new Stmt.Block([initializer, body]);
-            }
-
-            return body;
+            return new Stmt.Para(initializer, condition, increment, body);
         } finally {
             this.loopDepth -= 1;
         }
@@ -457,6 +445,15 @@ module.exports = class Parser {
         this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'pausa'.");
         return new Stmt.Pausa();
     }
+
+    continueStatement() {
+        if (this.loopDepth < 1) {
+          this.error(this.previous(), "'continua' precisa estar em um laço de repetição.");
+        }
+    
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'continua'.");
+        return new Stmt.Continua();
+      }
 
     returnStatement() {
         let keyword = this.previous();
@@ -472,6 +469,7 @@ module.exports = class Parser {
 
     statement() {
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
+        if (this.match(tokenTypes.CONTINUA)) return this.continueStatement();
         if (this.match(tokenTypes.PAUSA)) return this.breakStatement();
         if (this.match(tokenTypes.PARA)) return this.forStatement();
         if (this.match(tokenTypes.ENQUANTO)) return this.whileStatement();
@@ -513,10 +511,13 @@ module.exports = class Parser {
 
                 let paramObj = {};
 
-                paramObj['name'] = this.consume(tokenTypes.IDENTIFIER, "Expect parameter name.");
+                paramObj['name'] = this.consume(
+                    tokenTypes.IDENTIFIER, 
+                    "Expect parameter name."
+                );
 
                 if (this.match(tokenTypes.EQUAL)) {
-                paramObj['default'] = this.primary();
+                paramObj["default"] = this.primary();
                 }
 
                 parameters.push(paramObj);

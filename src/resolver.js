@@ -42,6 +42,12 @@ const ClassType = {
     SUBCLASS: "SUBCLASS"
 };
 
+const LoopType = {
+    NONE: "NONE",
+    ENQUANTO: "ENQUANTO",
+    PARA: "PARA"
+  };
+
 module.exports = class Resolver {
     constructor(interpreter, egua) {
         this.interpreter = interpreter;
@@ -50,6 +56,7 @@ module.exports = class Resolver {
 
         this.currentFunction = FunctionType.NONE;
         this.currentClass = ClassType.NONE;
+        this.currentLoop = ClassType.NONE;
     }
 
     define(name) {
@@ -136,8 +143,8 @@ module.exports = class Resolver {
         this.beginScope();
         let params = func.params;
         for (let i = 0; i < params.length; i++) {
-            this.declare(params[i]['name']);
-            this.define(params[i]['name']);
+            this.declare(params[i]["name"]);
+            this.define(params[i]["name"]);
         }
         this.resolve(func.body);
         this.endScope();
@@ -261,6 +268,24 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitForStmt(stmt) {
+        if (stmt.initializer !== null) {
+          this.resolve(stmt.initializer);
+        }
+        if (stmt.condition !== null) {
+          this.resolve(stmt.condition);
+        }
+        if (stmt.increment !== null) {
+          this.resolve(stmt.increment);
+        }
+    
+        let enclosingType = this.currentLoop;
+        this.currentLoop = LoopType.ENQUANTO;
+        this.resolve(stmt.body);
+        this.currentLoop = enclosingType;
+        return null;
+    }
+
     visitBinaryExpr(expr) {
         this.resolve(expr.left);
         this.resolve(expr.right);
@@ -301,6 +326,14 @@ module.exports = class Resolver {
     visitSubscriptExpr(expr) {
         this.resolve(expr.callee);
         this.resolve(expr.index);
+        return null;
+    }
+
+    visitContinueStmt(stmt) {
+        return null;
+      }
+    
+    visitBreakStmt(stmt) {
         return null;
     }
 

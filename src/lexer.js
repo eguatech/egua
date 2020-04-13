@@ -18,6 +18,7 @@ const reservedWords = {
     var: tokenTypes.VAR,
     enquanto: tokenTypes.ENQUANTO,
     pausa: tokenTypes.PAUSA,
+    continua: tokenTypes.CONTINUA,
     herda: tokenTypes.HERDA
 };
 

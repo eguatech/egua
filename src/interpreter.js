@@ -2,7 +2,8 @@ const tokenTypes = require("./tokenTypes.js");
 const RuntimeError = require("./runtimeError.js");
 const Environment = require("./environment.js");
 
-class BreakException extends Error {}
+class ContinueException extends Error { }
+class BreakException extends Error { }
 class Retorna extends Error {
     constructor(value) {
         super(value);
@@ -53,10 +54,10 @@ class EguaFunction extends Callable {
         for (let i = 0; i < params.length; i++) {
             let param = params[i];
 
-            let name = param['name'].lexeme;
+            let name = param["name"].lexeme;
             let value = args[i];
             if (args[i] === null) {
-                value = param['default'] ? param['default'].value : null;
+                value = param["default"] ? param["default"].value : null;
             }
             environment.defineVar(name, value);
         }
@@ -164,57 +165,57 @@ module.exports = class Interpreter {
 
         this.globals.defineVar(
             "clock", // clock da standart function
-            new StandardFn(0, function() {
+            new StandardFn(0, function () {
                 return Date.now() / 1000;
             })
         );
 
         this.globals.defineVar(
             "tamanho",
-            new StandardFn(1, function(obj) {
+            new StandardFn(1, function (obj) {
                 return obj.length;
             })
         );
 
         this.globals.defineVar(
             "texto",
-            new StandardFn(1, function(value) {
+            new StandardFn(1, function (value) {
                 return `${value}`;
             })
-          );
-      
-          this.globals.defineVar(
+        );
+
+        this.globals.defineVar(
             "real",
-            new StandardFn(1, function(value) {
+            new StandardFn(1, function (value) {
                 if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-                throw new RuntimeError(
-                  this.token,
-                  "Somente números podem passar para real."
-                );
-              return parseFloat(value);
+                    throw new RuntimeError(
+                        this.token,
+                        "Somente números podem passar para real."
+                    );
+                return parseFloat(value);
             })
-          );
-      
-          this.globals.defineVar(
+        );
+
+        this.globals.defineVar(
             "inteiro",
-            new StandardFn(1, function(value) {
+            new StandardFn(1, function (value) {
                 if (value === undefined || value === null) {
                     throw new RuntimeError(
-                  this.token,
-                  "Somente números podem passar para inteiro."
-                );
-            }
+                        this.token,
+                        "Somente números podem passar para inteiro."
+                    );
+                }
 
-            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
-              throw new RuntimeError(
-                this.token,
-                "Somente números podem passar para inteiro."
-              );
-            }
+                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+                    throw new RuntimeError(
+                        this.token,
+                        "Somente números podem passar para inteiro."
+                    );
+                }
 
-              return parseInt(value);
+                return parseInt(value);
             })
-          );
+        );
     }
 
     resolve(expr, depth) {
@@ -359,8 +360,8 @@ module.exports = class Interpreter {
 
         if (callee instanceof StandardFn) {
             return callee.call(this, args, expr.callee.name);
-          }
-          
+        }
+
         return callee.call(this, args);
     }
 
@@ -424,18 +425,51 @@ module.exports = class Interpreter {
         return null;
     }
 
-    visitWhileStmt(stmt) {
-        try {
-            while (this.isTruthy(this.evaluate(stmt.condition))) {
-                this.execute(stmt.body);
+    visitForStmt(stmt) {
+        if (stmt.initializer !== null) {
+            this.evaluate(stmt.initializer);
+        }
+        while (true) {
+            if (stmt.condition !== null) {
+                if (!this.isTruthy(this.evaluate(stmt.condition))) {
+                    break;
+                }
             }
-        } catch (error) {
-            if (error instanceof BreakException) {
-            } else {
-                throw error;
+
+            try {
+                this.execute(stmt.body);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // do nothing and continue the loop
+                } else {
+                    throw error;
+                }
+            }
+
+            if (stmt.increment !== null) {
+                this.evaluate(stmt.increment);
             }
         }
+        return null;
+    }
 
+    visitWhileStmt(stmt) {
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            try {
+                this.execute(stmt.body);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // do nothing and continue the loop
+                } else {
+                    throw error;
+                }
+            }
+        }
+        
         return null;
     }
 
@@ -473,6 +507,10 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitContinueStmt(stmt) {
+        throw new ContinueException();
+      }
+
     visitBreakStmt(stmt) {
         throw new BreakException();
     }
@@ -508,7 +546,7 @@ module.exports = class Interpreter {
         let obj = this.evaluate(expr.callee);
         if (!Array.isArray(obj) && obj.constructor !== Object)
             throw new RuntimeError(
-                expr.callee.name, 
+                expr.callee.name,
                 "Somente vetores e dicionário podem ser sobrescritos."
             );
 
@@ -523,7 +561,7 @@ module.exports = class Interpreter {
 
             if (index >= obj.length) {
                 throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
-        }
+            }
             return obj[index];
         } else if (obj.constructor == Object) {
             return obj[index];
@@ -535,7 +573,7 @@ module.exports = class Interpreter {
 
         if (!(obj instanceof DragonInstance) && obj.constructor !== Object) {
             throw new RuntimeError(
-                expr.object.name, 
+                expr.object.name,
                 "Somente instâncias e dicionários podem possuir campos."
             );
         }
@@ -565,7 +603,7 @@ module.exports = class Interpreter {
             superclass = this.evaluate(stmt.superclass);
             if (!(superclass instanceof EguaClass)) {
                 throw new RuntimeError(
-                    stmt.superclass.name, 
+                    stmt.superclass.name,
                     "Superclasse precisa ser uma classe."
                 );
             }
@@ -664,7 +702,7 @@ module.exports = class Interpreter {
 
     interpret(statements) {
         try {
-            for (let i = 0; i < statements.length; i++){
+            for (let i = 0; i < statements.length; i++) {
                 this.execute(statements[i]);
             }
         } catch (error) {

@@ -84,6 +84,20 @@ class Enquanto extends Stmt {
     }
 }
 
+class Para extends Stmt {
+    constructor(initializer, condition, increment, body) {
+      super();
+      this.initializer = initializer;
+      this.condition = condition;
+      this.increment = increment;
+      this.body = body;
+    }
+  
+    accept(visitor) {
+      return visitor.visitForStmt(this);
+    }
+  }
+
 class Se extends Stmt {
     constructor(condition, thenBranch, elseBranch) {
         super();
@@ -107,6 +121,16 @@ class Pausa extends Stmt {
     }
 }
 
+class Continua extends Stmt {
+    constructor() {
+      super();
+    }
+  
+    accept(visitor) {
+      return visitor.visitContinueStmt(this);
+    }
+  }
+
 class Var extends Stmt {
     constructor(name, initializer) {
         super();
@@ -127,7 +151,9 @@ module.exports = {
     Block,
     Escreva,
     Enquanto,
+    Para,
     Se,
     Pausa,
+    Continua,
     Var
 };
