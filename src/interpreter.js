@@ -451,34 +451,44 @@ module.exports = class Interpreter {
     }
 
     visitSubscriptExpr(expr) {
-        let list = this.evaluate(expr.callee);
-        if (!Array.isArray(list))
+        let obj = this.evaluate(expr.callee);
+        if (!Array.isArray(obj) && obj.constructor !== Object)
             throw new Error("Somente vetores podem ser subescritos.");
 
         let index = this.evaluate(expr.index);
-        if (!Number.isInteger(index)) {
-            throw new RuntimeError(
-                expr.closeBracket,
-                "Somente números podem ser usados para indexar um vetor."
-            );
-        }
+        if (Array.isArray(obj)) {
+            if (!Number.isInteger(index)) {
+                throw new RuntimeError(
+                    expr.closeBracket,
+                    "Somente números podem ser usados para indexar um vetor."
+                );
+            }
 
-        if (index >= list.length) {
-            throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
+            if (index >= obj.length) {
+                throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
         }
-        return list[index];
+            return obj[index];
+        } else if (obj.constructor == Object) {
+            return obj[index];
+        }
     }
 
     visitSetExpr(expr) {
         let obj = this.evaluate(expr.object);
 
-        if (!(obj instanceof EguaInstance)) {
-            throw new RuntimeError(expr.name + " Somente instâncias possuem campos.");
+        if (!(obj instanceof EguaInstance) && !obj.constructor == Object) {
+            throw new RuntimeError(
+                expr.name.lexeme + " - Somente instâncias e dicionários possuem campos."
+            );
         }
 
         let value = this.evaluate(expr.value);
-        obj.set(expr.name, value);
-        return value;
+        if (obj instanceof DragonInstance) {
+            obj.set(expr.name, value);
+            return value;
+        } else if (obj.constructor == Object) {
+            obj[expr.name] = value;
+        }
     }
 
     visitFunctionStmt(stmt) {
@@ -535,16 +545,26 @@ module.exports = class Interpreter {
         let object = this.evaluate(expr.object);
         if (object instanceof EguaInstance) {
             return object.get(expr.name);
+        } else if (object.constructor == Object) {
+            return object[expr.name];
         }
 
         throw new Error(
-            expr.name,
-            "Você só pode acessar métodos do objeto."
+            expr.name.lexeme +
+            " - Você só pode acessar métodos do objeto e dicionários."
         );
     }
 
     visitThisExpr(expr) {
         return this.lookupVar(expr.keyword, expr);
+    }
+
+    visitDictionaryExpr(expr) {
+        let dict = {};
+        for (let i = 0; i < expr.keys.length; i++) {
+            dict[this.evaluate(expr.keys[i])] = this.evaluate(expr.values[i]);
+        }
+        return dict;
     }
 
     visitArrayExpr(expr) {
@@ -572,6 +592,7 @@ module.exports = class Interpreter {
 
     stringify(object) {
         if (object === null) return "nil";
+        if (Array.isArray(object)) return object;
 
         return object.toString();
     }

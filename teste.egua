@@ -18,3 +18,6 @@ var test = Test();
 
 var a = [1, 2, 3];
 escreva(a[0]);
+
+var a = {'a': 1, 'b': 9};
+escreva(a['b']);

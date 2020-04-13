@@ -60,6 +60,7 @@ defineAst("Expr", {
     Grouping: "expression",
     Literal: "value",
     Array: "values",
+    Dictionary: "keys, values",
     Subscript: "callee, index, closeBracket",
     Assignsubscript: "obj, index, value",
     Logical: "left, operator, right",

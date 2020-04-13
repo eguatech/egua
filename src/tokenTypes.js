@@ -9,6 +9,7 @@ module.exports = {
     DOT: "DOT",
     MINUS: "MINUS",
     PLUS: "PLUS",
+    COLON: "COLON",
     SEMICOLON: "SEMICOLON",
     SLASH: "SLASH",
     STAR: "STAR",

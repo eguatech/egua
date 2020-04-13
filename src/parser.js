@@ -112,6 +112,32 @@ module.exports = class Parser {
             }
             return new Expr.Array(values);
         }
+        if (this.match(tokenTypes.LEFT_BRACE)) {
+            let keys = [];
+            let values = [];
+            if (this.match(tokenTypes.RIGHT_BRACE)) {
+                return new Expr.Dictionary([], []);
+            }
+            while (!this.match(tokenTypes.RIGHT_BRACE)) {
+                let key = this.assignment();
+                this.consume(
+                    tokenTypes.COLON,
+                    "Esperado ':' entre chave e valor."
+                );
+                let value = this.assignment();
+
+                keys.push(key);
+                values.push(value);
+
+                if (this.peek().type !== tokenTypes.RIGHT_BRACE) {
+                    this.consume(
+                        tokenTypes.COMMA,
+                        "Esperado vígula antes da próxima expressão."
+                    );
+                }
+            }
+            return new Expr.Dictionary(keys, values);
+        }
         if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);

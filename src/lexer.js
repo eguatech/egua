@@ -173,6 +173,9 @@ module.exports = class Lexer {
             case "+":
                 this.addToken(tokenTypes.PLUS);
                 break;
+            case ":":
+                this.addToken(tokenTypes.COLON);
+                break;
             case ";":
                 this.addToken(tokenTypes.SEMICOLON);
                 break;

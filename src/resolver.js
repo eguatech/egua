@@ -284,6 +284,14 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitDictionaryExpr(expr) {
+        for (let i = 0; i < expr.keys.length; i++) {
+            this.resolve(expr.keys[i]);
+            this.resolve(expr.values[i]);
+        }
+        return null;
+    }
+
     visitArrayExpr(expr) {
         for (let i = 0; i < expr.values.length; i++) {
             this.resolve(expr.values[i]);

@@ -97,6 +97,18 @@ class Array extends Expr {
     }
 }
 
+class Dictionary extends Expr {
+    constructor(keys, values) {
+        super();
+        this.keys = keys;
+        this.values = values;
+    }
+
+    accept(visitor) {
+        return visitor.visitDictionaryExpr(this);
+    }
+}
+
 class Subscript extends Expr {
     constructor(callee, index, closeBracket) {
         super();
@@ -204,6 +216,7 @@ module.exports = {
     Grouping,
     Literal,
     Array,
+    Dictionary,
     Subscript,
     Assignsubscript,
     Logical,
