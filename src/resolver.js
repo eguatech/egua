@@ -38,7 +38,8 @@ const FunctionType = {
 
 const ClassType = {
     NONE: "NONE",
-    CLASSE: "CLASSE"
+    CLASSE: "CLASSE",
+    SUBCLASS: "SUBCLASS"
 };
 
 module.exports = class Resolver {
@@ -165,6 +166,23 @@ module.exports = class Resolver {
         this.declare(stmt.name);
         this.define(stmt.name);
 
+        if (
+            stmt.superclass !== null &&
+            stmt.name.lexeme === stmt.superclass.name.lexeme
+        ) {
+            this.dragon.error("Uma classe não pode herdar de si mesma.");
+        }
+
+        if (stmt.superclass !== null) {
+            this.currentClass = ClassType.SUBCLASS;
+            this.resolve(stmt.superclass);
+        }
+
+        if (stmt.superclass !== null) {
+            this.beginScope();
+            this.scopes.peek()["super"] = true;
+        }
+
         this.beginScope();
         this.scopes.peek()["isto"] = true; // AQUI
 
@@ -181,7 +199,23 @@ module.exports = class Resolver {
 
         this.endScope();
 
+        if (stmt.superclass !== null) this.endScope();
+
         this.currentClass = enclosingClass;
+        return null;
+    }
+
+    visitSuperExpr(expr) {
+        if (this.currentClass === ClassType.NONE) {
+            this.egua.error(expr.keyword, "Não pode usar 'super' fora de uma classe.");
+        } else if (this.currentClass !== ClassType.SUBCLASS) {
+            this.egua.error(
+                expr.keyword,
+                "Não se usa 'super' numa classe sem superclasse."
+            );
+        }
+
+        this.resolveLocal(expr, expr.keyword);
         return null;
     }
 
@@ -212,7 +246,10 @@ module.exports = class Resolver {
         }
         if (stmt.value !== null) {
             if (this.currentFunction === FunctionType.CONSTRUTOR) {
-                this.egua.error(stmt.keyword, "Não pode retornar o valor do construtor.");
+                this.egua.error(
+                    stmt.keyword,
+                    "Não pode retornar o valor do construtor."
+                );
             }
             this.resolve(stmt.value);
         }

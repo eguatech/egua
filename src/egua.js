@@ -48,6 +48,8 @@ module.exports = class Egua {
         const parser = new Parser(tokens, this);
         const statements = parser.parse();
 
+        if (this.hadError === true) return;
+
         const resolver = new Resolver(interpreter, this);
         resolver.resolve(statements);
 

@@ -112,6 +112,18 @@ class Set extends Expr {
     }
 }
 
+class Super extends Expr {
+    constructor(keyword, method) {
+        super();
+        this.keyword = keyword;
+        this.method = method;
+    }
+
+    accept(visitor) {
+        return visitor.visitSuperExpr(this);
+    }
+}
+
 class Isto extends Expr {
     constructor(keyword) {
         super();
@@ -156,6 +168,7 @@ module.exports = {
     Literal,
     Logical,
     Set,
+    Super,
     Isto,
     Unary,
     Variable

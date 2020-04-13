@@ -38,9 +38,10 @@ class Retorna extends Stmt {
 }
 
 class Classe extends Stmt {
-    constructor(name, methods) {
+    constructor(name, superclass, methods) {
         super();
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 

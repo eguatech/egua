@@ -61,6 +61,7 @@ defineAst("Expr", {
     Literal: "value",
     Logical: "left, operator, right",
     Set: "object, name, value",
+    Super: "keyword, method",
     Isto: "keyword",
     Unary: "operator, right",
     Variable: "name"
@@ -70,7 +71,7 @@ defineAst("Stmt", {
     Expression: "expression",
     Funcao: "name, func",
     Retorna: "keyword, value",
-    Classe: "name, methods",
+    Classe: "name, superclass, methods",
     Block: "statements",
     Escreva: "expression",
     Enquanto: "condition, body",

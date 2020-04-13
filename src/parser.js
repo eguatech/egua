@@ -86,6 +86,15 @@ module.exports = class Parser {
     }
 
     primary() {
+        if (this.match(tokenTypes.SUPER)) {
+            let keyword = this.previous();
+            this.consume(tokenTypes.DOT, "Esperado '.' após 'super'.");
+            let method = this.consume(
+                tokenTypes.IDENTIFIER,
+                "Esperado nome do método da superclasse."
+            );
+            return new Expr.Super(keyword, method);
+        }
         if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
@@ -466,6 +475,13 @@ module.exports = class Parser {
 
     classDeclaration() {
         let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome da classe.");
+
+        let superclass = null;
+        if (this.match(tokenTypes.LESS)) {
+            this.consume(tokenTypes.IDENTIFIER, "Esperado nome da superclasse.");
+            superclass = new Expr.Variable(this.previous());
+        }
+
         this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' antes do escopo da classe.");
 
         let methods = [];
@@ -474,7 +490,7 @@ module.exports = class Parser {
         }
 
         this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
-        return new Stmt.Classe(name, methods);
+        return new Stmt.Classe(name, superclass, methods);
     }
 
     declaration() {
