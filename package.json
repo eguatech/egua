@@ -1,7 +1,7 @@
 {
   "name": "egua",
   "version": "1.0.0",
-  "description": "Linguagem de programação simples e moderna para aprender a programar",
+  "description": "Linguagem de programação simples e moderna para aprender a programar.",
   "main": "index.js",
   "scripts": {},
   "repository": "eguatech/egua",
