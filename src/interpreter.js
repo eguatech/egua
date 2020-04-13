@@ -190,11 +190,20 @@ module.exports = class Interpreter {
           this.globals.defineVar(
             "inteiro",
             new StandardFn(1, function(value) {
-                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-                throw new RuntimeError(
+                if (value === undefined || value === null) {
+                    throw new RuntimeError(
                   this.token,
                   "Somente números podem passar para inteiro."
                 );
+            }
+
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+              throw new RuntimeError(
+                this.token,
+                "Somente números podem passar para inteiro."
+              );
+            }
+
               return parseInt(value);
             })
           );
