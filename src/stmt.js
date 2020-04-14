@@ -111,6 +111,19 @@ class Se extends Stmt {
     }
 }
 
+class Escolha extends Stmt {
+    constructor(condition, branches, defaultBranch) {
+      super();
+      this.condition = condition;
+      this.branches = branches;
+      this.defaultBranch = defaultBranch;
+    }
+  
+    accept(visitor) {
+      return visitor.visitSwitchStmt(this);
+    }
+  }
+
 class Pausa extends Stmt {
     constructor() {
         super();
@@ -153,6 +166,7 @@ module.exports = {
     Enquanto,
     Para,
     Se,
+    Escolha,
     Pausa,
     Continua,
     Var

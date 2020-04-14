@@ -467,7 +467,90 @@ module.exports = class Parser {
         return new Stmt.Retorna(keyword, value);
     }
 
+    switchStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(
+                tokenTypes.LEFT_PAREN,
+                "Esperado '{' após 'escolha'."
+            );
+            let condition = this.expression();
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado '}' após a condição de 'escolha'."
+            );
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' antes do escopo do 'escolha'."
+            );
+
+            let branches = [];
+            let defaultBranch = null;
+            while (!this.match(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+                if (this.match(tokenTypes.CASO)) {
+                    let branchConditions = [this.expression()];
+                    this.consume(
+                        tokenTypes.COLON,
+                        "Esperado ':' após o 'caso'."
+                    );
+
+                    while (this.check(tokenTypes.CASO)) {
+                        this.consume(tokenTypes.CASO, null);
+                        branchConditions.push(this.expression());
+                        this.consume(
+                            tokenTypes.COLON,
+                            "Esperado ':' após declaração do 'caso'."
+                        );
+                    }
+
+                    let stmts = [];
+                    do {
+                        stmts.push(this.statement());
+                    } while (
+                        !this.check(tokenTypes.CASO) &&
+                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.RIGHT_BRACE)
+                    );
+
+                    branches.push({
+                        conditions: branchConditions,
+                        stmts
+                    });
+                } else if (this.match(tokenTypes.PADRAO)) {
+                    if (defaultBranch !== null)
+                        throw new ParserError(
+                            "Você só pode ter um 'padrao' em cada declaração de 'escolha'."
+                        );
+
+                    this.consume(
+                        tokenTypes.COLON,
+                        "Esperado ':' após declaração do 'padrao'."
+                    );
+
+                    let stmts = [];
+                    do {
+                        stmts.push(this.statement());
+                    } while (
+                        !this.check(tokenTypes.CASO) &&
+                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.RIGHT_BRACE)
+                    );
+
+                    defaultBranch = {
+                        stmts
+                    };
+                }
+            }
+
+            return new Stmt.Escolha(condition, branches, defaultBranch);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
     statement() {
+        if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
         if (this.match(tokenTypes.CONTINUA)) return this.continueStatement();
         if (this.match(tokenTypes.PAUSA)) return this.breakStatement();

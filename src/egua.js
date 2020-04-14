@@ -76,7 +76,7 @@ module.exports = class Egua {
     }
 
     runtimeError(error) {
-        let line = error.token.line || error.token.keyword.line;
+        let line = error.token.line;
         if (error.token && line) {
 
             console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);

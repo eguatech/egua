@@ -480,6 +480,49 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitSwitchStmt(stmt) {
+        let switchCondition = this.evaluate(stmt.condition);
+        let branches = stmt.branches;
+        let defaultBranch = stmt.defaultBranch;
+
+        let matched = false;
+        try {
+            for (let i = 0; i < branches.length; i++) {
+                let branch = branches[i];
+
+                for (let j = 0; j < branch.conditions.length; j++) {
+                    if (this.evaluate(branch.conditions[j]) === switchCondition) {
+                        matched = true;
+
+                        try {
+                            for (let k = 0; k < branch.stmts.length; k++) {
+                                this.execute(branch.stmts[k]);
+                            }
+                        } catch (error) {
+                            if (error instanceof ContinueException) {
+                                // 
+                            } else {
+                                throw error;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (defaultBranch !== null && matched === false) {
+                for (let i = 0; i < defaultBranch.stmts.length; i++) {
+                    this.execute(defaultBranch["stmts"][i]);
+                }
+            }
+        } catch (error) {
+            if (error instanceof BreakException) {
+                // 
+            } else {
+                throw error;
+            }
+        }
+    }
+
     visitWhileStmt(stmt) {
         while (this.isTruthy(this.evaluate(stmt.condition))) {
             try {
@@ -708,7 +751,10 @@ module.exports = class Interpreter {
         let method = superclass.findMethod(expr.method.lexeme);
 
         if (method === undefined) {
-            throw new RuntimeError(expr, "O objeto chamado pelo 'super' é indefinido.");
+            throw new RuntimeError(
+                expr.method,
+                "Método chamado indefinido."
+            );
         }
 
         return method.bind(object);
@@ -731,6 +777,7 @@ module.exports = class Interpreter {
                 this.execute(statements[i]);
             }
         } catch (error) {
+            console.log(error);
             this.Egua.runtimeError(error);
         }
     }

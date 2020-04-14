@@ -1,4 +1,4 @@
-const  tokenTypes = require("./tokenTypes.js");
+const tokenTypes = require("./tokenTypes.js");
 
 const reservedWords = {
     e: tokenTypes.E,
@@ -19,6 +19,9 @@ const reservedWords = {
     enquanto: tokenTypes.ENQUANTO,
     pausa: tokenTypes.PAUSA,
     continua: tokenTypes.CONTINUA,
+    escolha: tokenTypes.ESCOLHA,
+    caso: tokenTypes.CASO,
+    padrao: tokenTypes.PADRAO,
     herda: tokenTypes.HERDA
 };
 
@@ -193,7 +196,9 @@ module.exports = class Lexer {
                 this.addToken(tokenTypes.STAR);
                 break;
             case "!":
-                this.addToken(this.match("=") ? tokenTypes.ANG_EQUAL : tokenTypes.BANG);
+                this.addToken(
+                    this.match("=") ? tokenTypes.BANG_EQUAL : tokenTypes.BANG
+                );
                 break;
             case "=":
                 this.addToken(

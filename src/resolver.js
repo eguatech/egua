@@ -45,8 +45,9 @@ const ClassType = {
 const LoopType = {
     NONE: "NONE",
     ENQUANTO: "ENQUANTO",
+    ESCOLHA: "ESCOLHA",
     PARA: "PARA"
-  };
+};
 
 module.exports = class Resolver {
     constructor(interpreter, egua) {
@@ -262,6 +263,22 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitSwitchStmt(stmt) {
+        let enclosingType = this.currentLoop;
+        this.currentLoop = LoopType.ESCOLHA;
+
+        let branches = stmt.branches;
+        let defaultBranch = stmt.defaultBranch;
+
+        for (let i = 0; i < branches.length; i++) {
+            this.resolve(branches[i]["stmts"]);
+        }
+
+        if (defaultBranch !== null) this.resolve(defaultBranch["stmts"]);
+
+        this.currentLoop = enclosingType;
+    }
+
     visitWhileStmt(stmt) {
         this.resolve(stmt.condition);
         this.resolve(stmt.body);
@@ -270,15 +287,15 @@ module.exports = class Resolver {
 
     visitForStmt(stmt) {
         if (stmt.initializer !== null) {
-          this.resolve(stmt.initializer);
+            this.resolve(stmt.initializer);
         }
         if (stmt.condition !== null) {
-          this.resolve(stmt.condition);
+            this.resolve(stmt.condition);
         }
         if (stmt.increment !== null) {
-          this.resolve(stmt.increment);
+            this.resolve(stmt.increment);
         }
-    
+
         let enclosingType = this.currentLoop;
         this.currentLoop = LoopType.ENQUANTO;
         this.resolve(stmt.body);
@@ -331,8 +348,8 @@ module.exports = class Resolver {
 
     visitContinueStmt(stmt) {
         return null;
-      }
-    
+    }
+
     visitBreakStmt(stmt) {
         return null;
     }
