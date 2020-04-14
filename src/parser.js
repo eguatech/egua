@@ -3,7 +3,7 @@ const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
 const Environment = require("./environment.js");
 
-class ParserError extends Error {}
+class ParserError extends Error { }
 
 module.exports = class Parser {
     constructor(tokens, Egua) {
@@ -74,7 +74,7 @@ module.exports = class Parser {
     }
 
     match(...args) {
-        for (let i=0; i < args.length; i++) {
+        for (let i = 0; i < args.length; i++) {
             let currentType = args[i];
             if (this.check(currentType)) {
                 this.advance();
@@ -263,7 +263,7 @@ module.exports = class Parser {
                 tokenTypes.LESS,
                 tokenTypes.LESS_EQUAL
             )
-            ) {
+        ) {
             let operator = this.previous();
             let right = this.addition();
             expr = new Expr.Binary(expr, operator, right);
@@ -448,12 +448,12 @@ module.exports = class Parser {
 
     continueStatement() {
         if (this.loopDepth < 1) {
-          this.error(this.previous(), "'continua' precisa estar em um laço de repetição.");
+            this.error(this.previous(), "'continua' precisa estar em um laço de repetição.");
         }
-    
+
         this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'continua'.");
         return new Stmt.Continua();
-      }
+    }
 
     returnStatement() {
         let keyword = this.previous();
@@ -511,16 +511,26 @@ module.exports = class Parser {
 
                 let paramObj = {};
 
+                if (this.peek().type === tokenTypes.STAR) {
+                    this.consume(tokenTypes.STAR, null);
+                    paramObj["type"] = "wildcard";
+                } else {
+                    paramObj["type"] = "standard";
+                }
+
                 paramObj['name'] = this.consume(
-                    tokenTypes.IDENTIFIER, 
+                    tokenTypes.IDENTIFIER,
                     "Expect parameter name."
                 );
 
                 if (this.match(tokenTypes.EQUAL)) {
-                paramObj["default"] = this.primary();
+                    paramObj["default"] = this.primary();
                 }
 
                 parameters.push(paramObj);
+
+                // 
+                if (paramObj["type"] === "wildcard") break;
             } while (this.match(tokenTypes.COMMA));
         }
 

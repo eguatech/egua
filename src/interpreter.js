@@ -351,10 +351,33 @@ module.exports = class Interpreter {
             );
         }
 
+        let params;
+        if (callee instanceof EguaFunction) {
+            params = callee.declaration.params;
+        } else if (callee instanceof EguaClass) {
+            params = callee.methods.init ? callee.methods.init.declaration.params : [];
+        } else {
+            params = [];
+        }
+
+        //
         if (args.length < callee.arity()) {
             let diff = callee.arity() - args.length;
             for (let i = 0; i < diff; i++) {
                 args.push(null);
+            }
+        }
+
+        // 
+        else if (args.length >= callee.arity()) {
+            // 
+            if (
+                params.length > 0 &&
+                params[params.length - 1]["type"] === "wildcard"
+            ) {
+                let newArgs = args.slice(0, params.length - 1);
+                newArgs.push(args.slice(params.length - 1, args.length));
+                args = newArgs;
             }
         }
 
@@ -469,7 +492,7 @@ module.exports = class Interpreter {
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -509,7 +532,7 @@ module.exports = class Interpreter {
 
     visitContinueStmt(stmt) {
         throw new ContinueException();
-      }
+    }
 
     visitBreakStmt(stmt) {
         throw new BreakException();
