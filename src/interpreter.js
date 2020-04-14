@@ -1,6 +1,13 @@
 const tokenTypes = require("./tokenTypes.js");
 const RuntimeError = require("./runtimeError.js");
 const Environment = require("./environment.js");
+const loadGlobalLib = require("./lib/globalLib.js");
+
+const Callable = require("./structures/callable.js");
+const StandardFn = require("./structures/standardFn.js");
+const EguaClass = require("./structures/class.js");
+const EguaFunction = require("./structures/function.js");
+const EguaInstance = require("./structures/instance.js");
 
 class ContinueException extends Error { }
 class BreakException extends Error { }
@@ -11,151 +18,6 @@ class Retorna extends Error {
     }
 }
 
-class Callable {
-    arity() {
-        return this.arityValue;
-    }
-}
-
-class StandardFn extends Callable {
-    constructor(arityValue, func) {
-        super();
-        this.arityValue = arityValue;
-        this.func = func;
-    }
-
-    call(interpreter, args, token) {
-        this.token = token;
-        return this.func.apply(this, args);
-    }
-}
-
-class EguaFunction extends Callable {
-    constructor(name, declaration, closure, isInitializer = false) {
-        super();
-        this.name = name;
-        this.declaration = declaration;
-        this.closure = closure;
-        this.isInitializer = isInitializer;
-    }
-
-    arity() {
-        return this.declaration.params.length;
-    }
-
-    toString() {
-        if (this.name === null) return "<função anônima>";
-        return `<funcao ${this.name}>`;
-    }
-
-    call(interpreter, args) {
-        let environment = new Environment(this.closure);
-        let params = this.declaration.params;
-        for (let i = 0; i < params.length; i++) {
-            let param = params[i];
-
-            let name = param["name"].lexeme;
-            let value = args[i];
-            if (args[i] === null) {
-                value = param["default"] ? param["default"].value : null;
-            }
-            environment.defineVar(name, value);
-        }
-
-        try {
-            interpreter.executeBlock(this.declaration.body, environment);
-        } catch (error) {
-            if (error instanceof Retorna) {
-                if (this.isInitializer) return this.closure.getVarAt(0, "isto");
-                return error.value;
-            } else {
-                throw error;
-            }
-        }
-
-        if (this.isInitializer) return this.closure.getVarAt(0, "isto");
-        return null;
-    }
-
-    bind(instance) {
-        let environment = new Environment(this.closure);
-        environment.defineVar("isto", instance);
-        return new EguaFunction(
-            this.name,
-            this.declaration,
-            environment,
-            this.isInitializer
-        );
-    }
-}
-
-class EguaInstance {
-    constructor(creatorClass) {
-        this.creatorClass = creatorClass;
-        this.fields = {};
-    }
-
-    get(name) {
-        if (this.fields.hasOwnProperty(name.lexeme)) {
-            return this.fields[name.lexeme];
-        }
-
-        let method = this.creatorClass.findMethod(name.lexeme);
-        if (method) return method.bind(this);
-
-        throw new RuntimeError(name, "Método indefinido não recuperado.");
-    }
-
-    set(name, value) {
-        this.fields[name.lexeme] = value;
-    }
-
-    toString() {
-        return "<" + this.creatorClass.name + " instância>";
-    }
-}
-
-class EguaClass extends Callable {
-    constructor(name, superclass, methods) {
-        super();
-        this.name = name;
-        this.superclass = superclass;
-        this.methods = methods;
-    }
-
-    findMethod(name) {
-        if (this.methods.hasOwnProperty(name)) {
-            return this.methods[name];
-        }
-
-        if (this.superclass !== null) {
-            return this.superclass.findMethod(name);
-        }
-
-        return undefined;
-    }
-
-    toString() {
-        return this.name;
-    }
-
-    arity() {
-        let initializer = this.findMethod("construtor");
-        return initializer ? initializer.arity() : 0;
-    }
-
-    call(interpreter, args) {
-        let instance = new EguaInstance(this);
-
-        let initializer = this.findMethod("construtor");
-        if (initializer) {
-            initializer.bind(instance).call(interpreter, args);
-        }
-
-        return instance;
-    }
-}
-
 module.exports = class Interpreter {
     constructor(Egua) {
         this.Egua = Egua;
@@ -163,59 +25,7 @@ module.exports = class Interpreter {
         this.environment = this.globals;
         this.locals = new Map();
 
-        this.globals.defineVar(
-            "clock", // clock da standart function
-            new StandardFn(0, function () {
-                return Date.now() / 1000;
-            })
-        );
-
-        this.globals.defineVar(
-            "tamanho",
-            new StandardFn(1, function (obj) {
-                return obj.length;
-            })
-        );
-
-        this.globals.defineVar(
-            "texto",
-            new StandardFn(1, function (value) {
-                return `${value}`;
-            })
-        );
-
-        this.globals.defineVar(
-            "real",
-            new StandardFn(1, function (value) {
-                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-                    throw new RuntimeError(
-                        this.token,
-                        "Somente números podem passar para real."
-                    );
-                return parseFloat(value);
-            })
-        );
-
-        this.globals.defineVar(
-            "inteiro",
-            new StandardFn(1, function (value) {
-                if (value === undefined || value === null) {
-                    throw new RuntimeError(
-                        this.token,
-                        "Somente números podem passar para inteiro."
-                    );
-                }
-
-                if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
-                    throw new RuntimeError(
-                        this.token,
-                        "Somente números podem passar para inteiro."
-                    );
-                }
-
-                return parseInt(value);
-            })
-        );
+        this.globals = loadGlobalLib(this.globals);
     }
 
     resolve(expr, depth) {
@@ -639,7 +449,7 @@ module.exports = class Interpreter {
     visitSetExpr(expr) {
         let obj = this.evaluate(expr.object);
 
-        if (!(obj instanceof DragonInstance) && obj.constructor !== Object) {
+        if (!(obj instanceof EguaInstance) && obj.constructor !== Object) {
             throw new RuntimeError(
                 expr.object.name,
                 "Somente instâncias e dicionários podem possuir campos."
@@ -647,7 +457,7 @@ module.exports = class Interpreter {
         }
 
         let value = this.evaluate(expr.value);
-        if (obj instanceof DragonInstance) {
+        if (obj instanceof EguaInstance) {
             obj.set(expr.name, value);
             return value;
         } else if (obj.constructor == Object) {
