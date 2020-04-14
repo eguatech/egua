@@ -22,6 +22,7 @@ const reservedWords = {
     escolha: tokenTypes.ESCOLHA,
     caso: tokenTypes.CASO,
     padrao: tokenTypes.PADRAO,
+    importar: tokenTypes.IMPORTAR,
     herda: tokenTypes.HERDA
 };
 

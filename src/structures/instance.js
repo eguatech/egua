@@ -22,4 +22,4 @@ module.exports = class EguaInstance {
     toString() {
         return "<" + this.creatorClass.name + " instância>";
     }
-}
+};

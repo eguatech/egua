@@ -72,6 +72,17 @@ class Escreva extends Stmt {
     }
 }
 
+class Importar extends Stmt {
+    constructor(path) {
+        super();
+        this.path = path;
+    }
+
+    accept(visitor) {
+        return visitor.visitImportStmt(this);
+    }
+}
+
 class Enquanto extends Stmt {
     constructor(condition, body) {
         super();
@@ -163,6 +174,7 @@ module.exports = {
     Classe,
     Block,
     Escreva,
+    Importar,
     Enquanto,
     Para,
     Se,

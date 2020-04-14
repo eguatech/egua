@@ -57,4 +57,4 @@ module.exports =  class EguaFunction extends Callable {
             this.isInitializer
         );
     }
-}
+};

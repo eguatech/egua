@@ -48,5 +48,6 @@ module.exports = {
     PAUSA: "PAUSA",
     CONTINUA: "CONTINUA",
     HERDA: "HERDA",
+    IMPORTAR: "IMPORTAR",
     EOF: "EOF"
 };

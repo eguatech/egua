@@ -1,4 +1,4 @@
-const Egua = require("./src/egua.js");
+const Egua = require("./src/egua.js").Egua;
 
 const main = function() {
     let args = process.argv;

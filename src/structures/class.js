@@ -39,4 +39,4 @@ module.exports = class EguaClass extends Callable {
 
         return instance;
     }
-}
+};

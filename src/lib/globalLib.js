@@ -1,4 +1,5 @@
 const StandardFn = require("../structures/standardFn.js");
+const Expr = require("../expr.js");
 
 /**
  * 
@@ -58,5 +59,7 @@ module.exports = function(globals) {
     })
   );
 
+    globals.defineVar("exports", {});
+
   return globals;
-} 
+};

@@ -143,6 +143,8 @@ module.exports = class Parser {
         if (this.match(tokenTypes.NULO)) return new Expr.Literal(null);
         if (this.match(tokenTypes.ISTO)) return new Expr.Isto(this.previous());
 
+        if (this.match(tokenTypes.IMPORTAR)) return this.importStatement();
+
         if (this.match(tokenTypes.NUMBER, tokenTypes.STRING)) {
             return new Expr.Literal(this.previous().literal);
         }
@@ -546,6 +548,16 @@ module.exports = class Parser {
         } finally {
             this.loopDepth -= 1;
         }
+    }
+
+    importStatement() {
+        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após declaração.");
+
+        let path = this.expression();
+
+        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após declaração.");
+
+        return new Stmt.Importar(path);
     }
 
     statement() {

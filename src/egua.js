@@ -4,16 +4,17 @@ const Resolver = require("./resolver.js");
 const Interpreter = require("./interpreter.js");
 const tokenTypes = require("./tokenTypes.js");
 const fs = require("fs");
+const path = require("path");
 const readline = require("readline");
 
-module.exports = class Egua {
+module.exports.Egua = class Egua {
     constructor() {
         this.hadError = false;
         this.hadRuntimeError = false;
     }
 
     runPrompt() {
-        const interpreter = new Interpreter(this);
+        const interpreter = new Interpreter(this, process.cwd(), undefined);
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -32,7 +33,8 @@ module.exports = class Egua {
     }
 
     runfile(filename) {
-        const interpreter = new Interpreter(this);
+        let justFileName = path.basename(filename);
+        const interpreter = new Interpreter(this, process.cwd(), justFileName);
 
         const fileData = fs.readFileSync(filename).toString();
         this.run(fileData, interpreter);
@@ -75,11 +77,14 @@ module.exports = class Egua {
         throw new Error(`Line ${line}. ${error}`);
     }
 
-    runtimeError(error) {
+    runtimeError(error, fileName) {
         let line = error.token.line;
         if (error.token && line) {
-
-            console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
+            if (fileName)
+                console.error(
+                    `Erro: [Arquivo: ${fileName}] [Linha: ${error.token.line}] ${error.message}`
+                );
+            else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
         } else {
             console.error(error);
         }

@@ -1,7 +1,10 @@
 const tokenTypes = require("./tokenTypes.js");
 const RuntimeError = require("./runtimeError.js");
 const Environment = require("./environment.js");
+const Egua = require("./egua.js");
 const loadGlobalLib = require("./lib/globalLib.js");
+const path = require("path");
+const fs = require("fs");
 
 const Callable = require("./structures/callable.js");
 const StandardFn = require("./structures/standardFn.js");
@@ -19,8 +22,11 @@ class Retorna extends Error {
 }
 
 module.exports = class Interpreter {
-    constructor(Egua) {
+    constructor(Egua, baseDir, currentFile) {
         this.Egua = Egua;
+        this.baseDir = baseDir;
+        this.currentFile = currentFile;
+
         this.globals = new Environment();
         this.environment = this.globals;
         this.locals = new Map();
@@ -351,6 +357,26 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitImportStmt(stmt) {
+        let relativePath = this.evaluate(stmt.path);
+        let totalPath = path.join(this.baseDir, relativePath);
+        let totalFolder = path.dirname(totalPath);
+        let fileName = path.basename(totalPath);
+
+        if (!fs.existsSync(totalPath)) {
+            throw new RuntimeError(stmt, "Arquivo importado não foi encontrado.");
+        }
+
+        const data = fs.readFileSync(totalPath).toString();
+
+        const egua = new Egua.Egua();
+        const interpreter = new Interpreter(egua, totalFolder, fileName);
+
+        egua.run(data, interpreter);
+
+        return interpreter.globals.values.exports;
+    }
+
     visitEscrevaStmt(stmt) {
         let value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
@@ -587,8 +613,7 @@ module.exports = class Interpreter {
                 this.execute(statements[i]);
             }
         } catch (error) {
-            console.log(error);
-            this.Egua.runtimeError(error);
+            this.Egua.runtimeError(error, this.currentFile);
         }
     }
 };
