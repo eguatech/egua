@@ -1,4 +1,5 @@
 const Callable = require("./callable.js");
+const Environment = require("../environment.js");
 
 module.exports =  class EguaFunction extends Callable {
     constructor(name, declaration, closure, isInitializer = false) {

@@ -5,6 +5,7 @@ const Egua = require("./egua.js");
 const loadGlobalLib = require("./lib/globalLib.js");
 const path = require("path");
 const fs = require("fs");
+const checkStdLib = require("./lib/importStdlib.js");
 
 const Callable = require("./structures/callable.js");
 const StandardFn = require("./structures/standardFn.js");
@@ -363,11 +364,16 @@ module.exports = class Interpreter {
         let totalFolder = path.dirname(totalPath);
         let fileName = path.basename(totalPath);
 
-        if (!fs.existsSync(totalPath)) {
-            throw new RuntimeError(stmt, "Arquivo importado não foi encontrado.");
-        }
+        let data = checkStdLib(relativePath);
 
-        const data = fs.readFileSync(totalPath).toString();
+        //
+        if (data === null) {
+            if (!fs.existsSync(totalPath)) {
+                throw new RuntimeError(stmt, "Arquivo importado não foi encontrado.");
+            }
+
+            data = fs.readFileSync(totalPath).toString();
+        }
 
         const egua = new Egua.Egua();
         const interpreter = new Interpreter(egua, totalFolder, fileName);
