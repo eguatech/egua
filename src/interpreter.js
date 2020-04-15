@@ -365,15 +365,13 @@ module.exports = class Interpreter {
         let fileName = path.basename(totalPath);
 
         let data = checkStdLib(relativePath);
+        if (data !== null) return data;
 
-        //
-        if (data === null) {
-            if (!fs.existsSync(totalPath)) {
-                throw new RuntimeError(stmt, "Arquivo importado não foi encontrado.");
-            }
-
-            data = fs.readFileSync(totalPath).toString();
+        if (!fs.existsSync(totalPath)) {
+            throw new RuntimeError(stmt, "Arquivo importado não encontrado.");
         }
+
+        data = fs.readFileSync(totalPath).toString();
 
         const egua = new Egua.Egua();
         const interpreter = new Interpreter(egua, totalFolder, fileName);
@@ -493,7 +491,7 @@ module.exports = class Interpreter {
             obj.set(expr.name, value);
             return value;
         } else if (obj.constructor == Object) {
-            obj[expr.name] = value;
+            obj[expr.name.lexeme] = value;
         }
     }
 
@@ -555,7 +553,7 @@ module.exports = class Interpreter {
         if (object instanceof EguaInstance) {
             return object.get(expr.name);
         } else if (object.constructor == Object) {
-            return object[expr.name];
+            return object[expr.name.lexeme];
         }
 
         throw new RuntimeError(
