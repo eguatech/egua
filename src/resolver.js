@@ -247,6 +247,12 @@ module.exports = class Resolver {
     visitIfStmt(stmt) {
         this.resolve(stmt.condition);
         this.resolve(stmt.thenBranch);
+
+        for (let i = 0; i < stmt.elifBranches.length; i++) {
+            this.resolve(stmt.elifBranches[i].condition);
+            this.resolve(stmt.elifBranches[i].branch);
+        }
+
         if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
         return null;
     }

@@ -32,6 +32,7 @@ module.exports = {
     FUNCAO: "FUNCAO",
     PARA: "PARA",
     SE: "SE",
+    SENAOSE: "SENAOSE",
     SENAO: "SENAO",
     ESCOLHA: "ESCOLHA",
     CASO: "CASO",

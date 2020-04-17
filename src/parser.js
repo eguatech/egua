@@ -375,12 +375,30 @@ module.exports = class Parser {
         this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condição do se.");
 
         let thenBranch = this.statement();
+
+        let elifBranches = [];
+        while (this.match(tokenTypes.SENAOSE)) {
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+            let elifCondition = this.expression();
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado ')' apóes codição do 'senaose."
+            );
+
+            let branch = this.statement();
+
+            elifBranches.push({
+                condition: elifCondition,
+                branch
+            });
+        }
+
         let elseBranch = null;
         if (this.match(tokenTypes.SENAO)) {
             elseBranch = this.statement();
         }
 
-        return new Stmt.Se(condition, thenBranch, elseBranch);
+        return new Stmt.Se(condition, thenBranch, elifBranches, elseBranch);
     }
 
     whileStatement() {

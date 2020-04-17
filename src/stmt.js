@@ -124,10 +124,11 @@ class Tente extends Stmt {
 }
 
 class Se extends Stmt {
-    constructor(condition, thenBranch, elseBranch) {
+    constructor(condition, thenBranch, elifBranches, elseBranch) {
         super();
         this.condition = condition;
         this.thenBranch = thenBranch;
+        this.elifBranches = elifBranches;
         this.elseBranch = elseBranch;
     }
 

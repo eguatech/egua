@@ -260,7 +260,19 @@ module.exports = class Interpreter {
     visitIfStmt(stmt) {
         if (this.isTruthy(this.evaluate(stmt.condition))) {
             this.execute(stmt.thenBranch);
-        } else if (stmt.elseBranch !== null) {
+            return null;
+        }
+
+        for (let i = 0; i < stmt.elifBranches.length; i++) {
+            let current = stmt.elifBranches[i];
+
+            if (this.isTruthy(this.evaluate(current.condition))) {
+                this.execute(current.branch);
+                return null;
+            }
+        }
+
+        if (stmt.elseBranch !== null) {
             this.execute(stmt.elseBranch);
         }
 
