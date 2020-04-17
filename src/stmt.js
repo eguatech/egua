@@ -109,6 +109,20 @@ class Para extends Stmt {
     }
   }
 
+class Tente extends Stmt {
+    constructor(tryBranch, catchBranch, elseBranch, finallyBranch) {
+        super();
+        this.tryBranch = tryBranch;
+        this.catchBranch = catchBranch;
+        this.elseBranch = elseBranch;
+        this.finallyBranch = finallyBranch;
+    }
+
+    accept(visitor) {
+        return visitor.visitTryStmt(this);
+    }
+}
+
 class Se extends Stmt {
     constructor(condition, thenBranch, elseBranch) {
         super();
@@ -177,6 +191,7 @@ module.exports = {
     Importar,
     Enquanto,
     Para,
+    Tente,
     Se,
     Escolha,
     Pausa,

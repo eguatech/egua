@@ -49,5 +49,8 @@ module.exports = {
     CONTINUA: "CONTINUA",
     HERDA: "HERDA",
     IMPORTAR: "IMPORTAR",
+    TENTE: "TENTE",
+    PEGUE: "PEGUE",
+    FINALMENTE: "FINALMENTE",
     EOF: "EOF"
 };

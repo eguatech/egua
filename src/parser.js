@@ -560,7 +560,46 @@ module.exports = class Parser {
         return new Stmt.Importar(path);
     }
 
+    tryStatement() {
+        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' após a declaração 'tente'.");
+
+        let tryBlock = this.block();
+
+        let catchBlock = null;
+        if (this.match(tokenTypes.PEGUE)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            catchBlock = this.block();
+        }
+
+        let elseBlock = null;
+        if (this.match(tokenTypes.SENAO)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            elseBlock = this.block();
+        }
+
+        let finallyBlock = null;
+        if (this.match(tokenTypes.FINALMENTE)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            finallyBlock = this.block();
+        }
+
+        return new Stmt.Tente(tryBlock, catchBlock, elseBlock, finallyBlock);
+    }
+
     statement() {
+        if (this.match(tokenTypes.TENTE)) return this.tryStatement();
         if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
         if (this.match(tokenTypes.CONTINUA)) return this.continueStatement();

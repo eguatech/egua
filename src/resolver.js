@@ -166,6 +166,14 @@ module.exports = class Resolver {
         return null;
     }
 
+    visitTryStmt(stmt) {
+        this.resolve(stmt.tryBranch);
+
+        if (stmt.catchBranch !== null) this.resolve(stmt.catchBranch);
+        if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
+        if (stmt.finallyBranch !== null) this.resolve(stmt.finallyBranch);
+    }
+
     visitClassStmt(stmt) {
         let enclosingClass = this.currentClass;
         this.currentClass = ClassType.CLASSE;

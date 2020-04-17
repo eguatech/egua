@@ -23,6 +23,9 @@ const reservedWords = {
     caso: tokenTypes.CASO,
     padrao: tokenTypes.PADRAO,
     importar: tokenTypes.IMPORTAR,
+    tente: tokenTypes.TENTE,
+    pegue: tokenTypes.PEGUE,
+    finalmente: tokenTypes.FINALMENTE,
     herda: tokenTypes.HERDA
 };
 
@@ -107,7 +110,7 @@ module.exports = class Lexer {
         }
 
         if (this.endOfCode()) {
-            this.Egua.throw(this.line, "Unterminated string.");
+            this.Egua.throw(this.line, "Texto não finalizado.");
             return;
         }
 

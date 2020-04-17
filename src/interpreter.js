@@ -340,6 +340,34 @@ module.exports = class Interpreter {
         }
     }
 
+    visitTryStmt(stmt) {
+        try {
+            let successful = true;
+            try {
+                this.executeBlock(stmt.tryBranch, new Environment(this.environment));
+            } catch (error) {
+                successful = false;
+
+                if (stmt.catchBranch !== null) {
+                    this.executeBlock(
+                        stmt.catchBranch,
+                        new Environment(this.environment)
+                    );
+                }
+            }
+
+            if (successful && stmt.elseBranch !== null) {
+                this.executeBlock(stmt.elseBranch, new Environment(this.environment));
+            }
+        } finally {
+            if (stmt.finallyBranch !== null)
+                this.executeBlock(
+                    stmt.finallyBranch,
+                    new Environment(this.environment)
+                );
+        }
+    }
+
     visitWhileStmt(stmt) {
         while (this.isTruthy(this.evaluate(stmt.condition))) {
             try {
