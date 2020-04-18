@@ -1,5 +1,6 @@
 const Callable = require("./callable.js");
 const Environment = require("../environment.js");
+const ReturnExpection = require("../errors.js").ReturnException;
 
 module.exports =  class EguaFunction extends Callable {
     constructor(name, declaration, closure, isInitializer = false) {
@@ -36,7 +37,7 @@ module.exports =  class EguaFunction extends Callable {
         try {
             interpreter.executeBlock(this.declaration.body, environment);
         } catch (error) {
-            if (error instanceof Retorna) {
+            if (error instanceof ReturnExpection) {
                 if (this.isInitializer) return this.closure.getVarAt(0, "isto");
                 return error.value;
             } else {

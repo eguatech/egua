@@ -1,4 +1,4 @@
-const RuntimeError = require("./runtimeError.js");
+const RuntimeError = require("./errors.js").RuntimeError;
 
 module.exports = class Environment {
     constructor(enclosing) {
