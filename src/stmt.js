@@ -68,7 +68,7 @@ class Escreva extends Stmt {
     }
 
     accept(visitor) {
-        return visitor.visitEscrevaStmt(this);
+        return visitor.visitPrintStmt(this);
     }
 }
 

@@ -1,7 +1,6 @@
 const Callable = require("./callable.js");
 const EguaInstance = require("./instance.js");
 
-
 module.exports = class EguaClass extends Callable {
     constructor(name, superclass, methods) {
         super();
@@ -23,7 +22,7 @@ module.exports = class EguaClass extends Callable {
     }
 
     toString() {
-        return this.name;
+        return `<classe ${this.name}>`;
     }
 
     arity() {

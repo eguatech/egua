@@ -111,7 +111,7 @@ module.exports = class Lexer {
         }
 
         if (this.endOfCode()) {
-            this.Egua.throw(this.line, "Texto não finalizado.");
+            this.Egua.throw(this.line, "Unterminated string.");
             return;
         }
 

@@ -261,7 +261,7 @@ module.exports = class Resolver {
         this.resolve(stmt.path);
     }
 
-    visitEscrevaStmt(stmt) {
+    visitPrintStmt(stmt) {
         this.resolve(stmt.expression);
     }
 

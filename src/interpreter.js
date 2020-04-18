@@ -430,7 +430,7 @@ module.exports = class Interpreter {
         return newModule;
     }
 
-    visitEscrevaStmt(stmt) {
+    visitPrintStmt(stmt) {
         let value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
         return null;
