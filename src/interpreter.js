@@ -12,6 +12,7 @@ const StandardFn = require("./structures/standardFn.js");
 const EguaClass = require("./structures/class.js");
 const EguaFunction = require("./structures/function.js");
 const EguaInstance = require("./structures/instance.js");
+const EguaModule = require("./structures/module.js");
 
 class ContinueException extends Error { }
 class BreakException extends Error { }
@@ -418,7 +419,15 @@ module.exports = class Interpreter {
 
         egua.run(data, interpreter);
 
-        return interpreter.globals.values.exports;
+        let exported = interpreter.globals.values.exports;
+        let newModule = new EguaModule();
+
+        let keys = Object.keys(exported);
+        for (let i = 0; i < keys.length; i++) {
+            newModule[keys[i]] = exported[keys[i]];
+        }
+
+        return newModule;
     }
 
     visitEscrevaStmt(stmt) {
@@ -591,9 +600,11 @@ module.exports = class Interpreter {
     visitGetExpr(expr) {
         let object = this.evaluate(expr.object);
         if (object instanceof EguaInstance) {
-            return object.get(expr.name);
+            return object.get(expr.name) || null;
         } else if (object.constructor == Object) {
-            return object[expr.name.lexeme];
+            return object[expr.name.lexeme] || null;
+        } else if (object instanceof DragonModule) {
+            return object[expr.name.lexeme] || null;
         }
 
         throw new RuntimeError(

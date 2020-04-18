@@ -1,4 +1,6 @@
 const Callable = require("./callable.js");
+const EguaInstance = require("./instance.js");
+
 
 module.exports = class EguaClass extends Callable {
     constructor(name, superclass, methods) {

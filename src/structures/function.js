@@ -15,8 +15,8 @@ module.exports =  class EguaFunction extends Callable {
     }
 
     toString() {
-        if (this.name === null) return "<função anônima>";
-        return `<funcao ${this.name}>`;
+        if (this.name === null) return "<função>";
+        return `<função ${this.name}>`;
     }
 
     call(interpreter, args) {

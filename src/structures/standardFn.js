@@ -11,4 +11,8 @@ module.exports = class StandardFn extends Callable {
         this.token = token;
         return this.func.apply(this, args);
     }
+
+    toString() {
+        return "<function>";
+    }
 };

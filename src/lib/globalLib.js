@@ -1,17 +1,9 @@
 const StandardFn = require("../structures/standardFn.js");
-const Expr = require("../expr.js");
 
 /**
  * 
  */
 module.exports = function(globals) {
-  globals.defineVar(
-    "clock",
-    new StandardFn(0, function() {
-      return Date.now() / 1000;
-    })
-  );
-
   globals.defineVar(
     "tamanho",
     new StandardFn(1, function(obj) {
