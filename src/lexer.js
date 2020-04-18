@@ -158,9 +158,9 @@ module.exports = class Lexer {
     }
 
     scanToken() {
-        const c = this.advance();
+        const char = this.advance();
 
-        switch (c) {
+        switch (char) {
             case "[":
                 this.addToken(tokenTypes.LEFT_SQUARE_BRACKET);
                 break;
@@ -219,6 +219,18 @@ module.exports = class Lexer {
                 );
                 break;
 
+            case "&":
+                this.addToken(tokenTypes.BIT_AND);
+                break;
+
+            case "|":
+                this.addToken(tokenTypes.BIT_OR);
+                break;
+
+            case "^":
+                this.addToken(tokenTypes.BIT_XOR);
+                break;
+
             case "<":
                 if (this.match("=")) {
                     this.addToken(tokenTypes.LESS_EQUAL);
@@ -266,9 +278,9 @@ module.exports = class Lexer {
                 break;
 
             default:
-                if (this.isDigit(c)) this.parseNumber();
-                else if (this.isAlpha(c)) this.identifyKeyword();
-                else this.Egua.lexerError(this.line, c, "Caractere inesperado.");
+                if (this.isDigit(char)) this.parseNumber();
+                else if (this.isAlpha(char)) this.identifyKeyword();
+                else this.Egua.lexerError(this.line, char, "Caractere inesperado.");
         }
     }
 

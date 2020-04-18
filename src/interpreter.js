@@ -140,6 +140,26 @@ module.exports = class Interpreter {
                 this.checkNumberOperands(expr.operator, left, right);
                 return Number(left) % Number(right);
 
+            case tokenTypes.BIT_AND:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) & Number(right);
+
+            case tokenTypes.BIT_XOR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) ^ Number(right);
+
+            case tokenTypes.BIT_OR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) | Number(right);
+
+            case tokenTypes.LESSER_LESSER:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) << Number(right);
+
+            case tokenTypes.GREATER_GREATER:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) >> Number(right);
+
             case tokenTypes.BANG_EQUAL:
                 return !this.isEqual(left, right);
 

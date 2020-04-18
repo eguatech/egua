@@ -218,12 +218,12 @@ module.exports = class Parser {
         return this.call();
     }
 
-    addition() {
-        let expr = this.multiplication();
+    exponent() {
+        let expr = this.unary();
 
-        while (this.match(tokenTypes.MINUS, tokenTypes.PLUS)) {
+        while (this.match(tokenTypes.STAR_STAR)) {
             let operator = this.previous();
-            let right = this.multiplication();
+            let right = this.unary();
             expr = new Expr.Binary(expr, operator, right);
         }
 
@@ -242,12 +242,48 @@ module.exports = class Parser {
         return expr;
     }
 
-    exponent() {
-        let expr = this.unary();
+    addition() {
+        let expr = this.multiplication();
 
-        while (this.match(tokenTypes.STAR_STAR)) {
+        while (this.match(tokenTypes.MINUS, tokenTypes.PLUS)) {
             let operator = this.previous();
-            let right = this.unary();
+            let right = this.multiplication();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitFill() {
+        let expr = this.addition();
+
+        while (this.match(tokenTypes.LESSER_LESSER, tokenTypes.GREATER_GREATER)) {
+            let operator = this.previous();
+            let right = this.addition();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitAnd() {
+        let expr = this.bitFill();
+
+        while (this.match(tokenTypes.BIT_AND)) {
+            let operator = this.previous();
+            let right = this.bitFill();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitOr() {
+        let expr = this.bitAnd();
+
+        while (this.match(tokenTypes.BIT_OR, tokenTypes.BIT_XOR)) {
+            let operator = this.previous();
+            let right = this.bitAnd();
             expr = new Expr.Binary(expr, operator, right);
         }
 
@@ -255,7 +291,7 @@ module.exports = class Parser {
     }
 
     comparison() {
-        let expr = this.addition();
+        let expr = this.bitOr();
 
         while (
             this.match(
@@ -266,7 +302,7 @@ module.exports = class Parser {
             )
         ) {
             let operator = this.previous();
-            let right = this.addition();
+            let right = this.bitOr();
             expr = new Expr.Binary(expr, operator, right);
         }
 
@@ -576,7 +612,7 @@ module.exports = class Parser {
         let closeBracket = this.consume(
             tokenTypes.RIGHT_PAREN,
             "Esperado ')' após declaração."
-          );
+        );
 
         return new Stmt.Importar(path, closeBracket);
     }
