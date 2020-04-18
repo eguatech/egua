@@ -486,39 +486,102 @@ module.exports = class Interpreter {
         let value = this.evaluate(expr.value);
 
         if (Array.isArray(obj)) {
+            //
             if (index < 0 && obj.length !== 0) {
                 while (index < 0) {
                     index += obj.length;
                 }
             }
+
+            // 
+            while (obj.length < index) {
+                obj.push(null);
+            }
+
+            obj[index] = value;
+        } else if (
+            obj.constructor == Object ||
+            obj instanceof EguaInstance ||
+            obj instanceof EguaFunction ||
+            obj instanceof EguaClass ||
+            obj instanceof EguaModule
+        ) {
+            obj[index] = value;
         }
 
-        obj[index] = value;
+        //
+        else {
+            throw new RuntimeError(
+                expr.obj.name,
+                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
+            );
+        }
     }
 
     visitSubscriptExpr(expr) {
         let obj = this.evaluate(expr.callee);
-        if (!Array.isArray(obj) && obj.constructor !== Object)
-            throw new RuntimeError(
-                expr.callee.name,
-                "Somente vetores e dicionário podem ser sobrescritos."
-            );
 
         let index = this.evaluate(expr.index);
         if (Array.isArray(obj)) {
             if (!Number.isInteger(index)) {
                 throw new RuntimeError(
                     expr.closeBracket,
-                    "Somente números podem ser usados para indexar um vetor."
+                    "Somente inteiros podem ser usados para indexar um vetor."
                 );
+            }
+
+            // 
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
             }
 
             if (index >= obj.length) {
                 throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
             }
             return obj[index];
-        } else if (obj.constructor == Object) {
-            return obj[index];
+        }
+
+        // other data types
+        else if (
+            obj.constructor == Object ||
+            obj instanceof DragonInstance ||
+            obj instanceof DragonFunction ||
+            obj instanceof DragonClass ||
+            obj instanceof DragonModule
+        ) {
+            return obj[index] || null;
+        }
+
+        // 
+        else if (typeof obj === "string") {
+            // 
+            if (!Number.isInteger(index)) {
+                throw new RuntimeError(
+                    expr.closeBracket,
+                    "Somente inteiros podem ser usados para indexar um vetor."
+                );
+            }
+
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
+            }
+
+            if (index >= obj.length) {
+                throw new RuntimeError(expr.closeBracket, "Index fora do tamanho.");
+            }
+            return obj.charAt(index);
+        }
+
+        // 
+        else {
+            throw new RuntimeError(
+                expr.callee.name,
+                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
+            );
         }
     }
 
