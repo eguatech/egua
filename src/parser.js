@@ -573,9 +573,12 @@ module.exports = class Parser {
 
         let path = this.expression();
 
-        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após declaração.");
+        let closeBracket = this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após declaração."
+          );
 
-        return new Stmt.Importar(path);
+        return new Stmt.Importar(path, closeBracket);
     }
 
     tryStatement() {

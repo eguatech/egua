@@ -8,7 +8,9 @@ const path = require("path");
 const readline = require("readline");
 
 module.exports.Egua = class Egua {
-    constructor() {
+    constructor(filename) {
+        this.filename = filename;
+
         this.hadError = false;
         this.hadRuntimeError = false;
     }
@@ -33,8 +35,8 @@ module.exports.Egua = class Egua {
     }
 
     runfile(filename) {
-        let justFileName = path.basename(filename);
-        const interpreter = new Interpreter(this, process.cwd(), justFileName);
+        this.filename = path.basename(filename);
+        const interpreter = new Interpreter(this, process.cwd());
 
         const fileData = fs.readFileSync(filename).toString();
         this.run(fileData, interpreter);
@@ -46,6 +48,8 @@ module.exports.Egua = class Egua {
     run(code, interpreter) {
         const lexer = new Lexer(code, this);
         const tokens = lexer.scan();
+
+        if (this.hadError === true) return;
 
         const parser = new Parser(tokens, this);
         const statements = parser.parse();
@@ -61,7 +65,11 @@ module.exports.Egua = class Egua {
     }
 
     report(line, where, message) {
-        console.error(`[Linha: ${line}] Erro${where}: ${message}`);
+        if (this.filename)
+            console.error(
+                `[Arquivo: ${this.filename}] [Linha: ${line}] Erro${where}: ${message}`
+            );
+        else console.error(`[Linha: ${line}] Erro${where}: ${message}`);
         this.hadError = true;
     }
 
@@ -69,20 +77,20 @@ module.exports.Egua = class Egua {
         if (token.type === tokenTypes.EOF) {
             this.report(token.line, " no final", errorMessage);
         } else {
-            this.report(token.line, " no '" + token.lexeme + "'", errorMessage);
+            this.report(token.line, ` no '${token.lexeme}'`, errorMessage);
         }
     }
 
-    throw(line, error) {
-        throw new Error(`Line ${line}. ${error}`);
+    lexerError(line, char, msg) {
+        this.report(line, ` no '${char}'`, msg);
     }
 
-    runtimeError(error, fileName) {
+    runtimeError(error) {
         let line = error.token.line;
         if (error.token && line) {
-            if (fileName)
+            if (this.fileName)
                 console.error(
-                    `Erro: [Arquivo: ${fileName}] [Linha: ${error.token.line}] ${error.message}`
+                    `Erro: [Arquivo: ${this.fileName}] [Linha: ${error.token.line}] ${error.message}`
                 );
             else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
         } else {

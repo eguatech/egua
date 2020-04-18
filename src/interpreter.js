@@ -21,10 +21,9 @@ const {
 } = require("./errors.js");
 
 module.exports = class Interpreter {
-    constructor(Egua, baseDir, currentFile) {
+    constructor(Egua, baseDir) {
         this.Egua = Egua;
         this.baseDir = baseDir;
-        this.currentFile = currentFile;
 
         this.globals = new Environment();
         this.environment = this.globals;
@@ -400,19 +399,19 @@ module.exports = class Interpreter {
         let relativePath = this.evaluate(stmt.path);
         let totalPath = path.join(this.baseDir, relativePath);
         let totalFolder = path.dirname(totalPath);
-        let fileName = path.basename(totalPath);
+        let filename = path.basename(totalPath);
 
         let data = checkStdLib(relativePath);
         if (data !== null) return data;
 
         if (!fs.existsSync(totalPath)) {
-            throw new RuntimeError(stmt, "Arquivo importado não encontrado.");
+            throw new RuntimeError(stmt.closeBracket, "Arquivo importado não encontrado.");
         }
 
         data = fs.readFileSync(totalPath).toString();
 
-        const egua = new Egua.Egua();
-        const interpreter = new Interpreter(egua, totalFolder, fileName);
+        const egua = new Egua.Egua(filename);
+        const interpreter = new Interpreter(egua, totalFolder);
 
         egua.run(data, interpreter);
 
@@ -728,8 +727,7 @@ module.exports = class Interpreter {
                 this.execute(statements[i]);
             }
         } catch (error) {
-            console.log(error);
-            this.Egua.runtimeError(error, this.currentFile);
+            this.Egua.runtimeError(error);
         }
     }
 };

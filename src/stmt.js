@@ -1,5 +1,5 @@
 class Stmt {
-    accept(visitor) {}
+    accept(visitor) { }
 }
 
 class Expression extends Stmt {
@@ -73,9 +73,10 @@ class Escreva extends Stmt {
 }
 
 class Importar extends Stmt {
-    constructor(path) {
+    constructor(path, closeBracket) {
         super();
         this.path = path;
+        this.closeBracket = closeBracket;
     }
 
     accept(visitor) {
@@ -97,17 +98,17 @@ class Enquanto extends Stmt {
 
 class Para extends Stmt {
     constructor(initializer, condition, increment, body) {
-      super();
-      this.initializer = initializer;
-      this.condition = condition;
-      this.increment = increment;
-      this.body = body;
+        super();
+        this.initializer = initializer;
+        this.condition = condition;
+        this.increment = increment;
+        this.body = body;
     }
-  
+
     accept(visitor) {
-      return visitor.visitForStmt(this);
+        return visitor.visitForStmt(this);
     }
-  }
+}
 
 class Tente extends Stmt {
     constructor(tryBranch, catchBranch, elseBranch, finallyBranch) {
@@ -139,16 +140,16 @@ class Se extends Stmt {
 
 class Escolha extends Stmt {
     constructor(condition, branches, defaultBranch) {
-      super();
-      this.condition = condition;
-      this.branches = branches;
-      this.defaultBranch = defaultBranch;
+        super();
+        this.condition = condition;
+        this.branches = branches;
+        this.defaultBranch = defaultBranch;
     }
-  
+
     accept(visitor) {
-      return visitor.visitSwitchStmt(this);
+        return visitor.visitSwitchStmt(this);
     }
-  }
+}
 
 class Pausa extends Stmt {
     constructor() {
@@ -162,13 +163,13 @@ class Pausa extends Stmt {
 
 class Continua extends Stmt {
     constructor() {
-      super();
+        super();
     }
-  
+
     accept(visitor) {
-      return visitor.visitContinueStmt(this);
+        return visitor.visitContinueStmt(this);
     }
-  }
+}
 
 class Var extends Stmt {
     constructor(name, initializer) {
