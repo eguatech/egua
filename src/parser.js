@@ -219,9 +219,21 @@ module.exports = class Parser {
     }
 
     addition() {
-        let expr = this.exponent();
+        let expr = this.multiplication();
 
         while (this.match(tokenTypes.MINUS, tokenTypes.PLUS)) {
+            let operator = this.previous();
+            let right = this.multiplication();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    multiplication() {
+        let expr = this.exponent();
+
+        while (this.match(tokenTypes.SLASH, tokenTypes.STAR, tokenTypes.MODULUS)) {
             let operator = this.previous();
             let right = this.exponent();
             expr = new Expr.Binary(expr, operator, right);
@@ -230,24 +242,12 @@ module.exports = class Parser {
         return expr;
     }
 
-    multiplication() {
-        let expr = this.unary();
-
-        while (this.match(tokenTypes.SLASH, tokenTypes.STAR, tokenTypes.MODULUS)) {
-            let operator = this.previous();
-            let right = this.unary();
-            expr = new Expr.Binary(expr, operator, right);
-        }
-
-        return expr;
-    }
-
     exponent() {
-        let expr = this.multiplication();
+        let expr = this.unary();
 
         while (this.match(tokenTypes.STAR_STAR)) {
             let operator = this.previous();
-            let right = this.multiplication();
+            let right = this.unary();
             expr = new Expr.Binary(expr, operator, right);
         }
 
