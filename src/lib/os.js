@@ -1,5 +1,5 @@
 const fs = require("fs");
-const RuntimeError = require("../runtimeError.js");
+const RuntimeError = require("../errors.js").RuntimeError;
 
 module.exports.ler = function(filepath, encoding = "utf-8") {
     if (filepath === null)
