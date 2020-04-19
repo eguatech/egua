@@ -8,7 +8,7 @@ module.exports.aprox = function(num) {
     );
 
   return Math.round(num);
-}
+};
 
 module.exports.raizq = function(num) {
   if (isNaN(num) || num === null)
@@ -18,7 +18,7 @@ module.exports.raizq = function(num) {
     );
 
   return Math.sqrt(num);
-}
+};
 
 /* module.exports.floor = function(num) {
   if (isNaN(num) || num === null)
@@ -38,46 +38,46 @@ module.exports.sen = function(num) {
     );
 
   return Math.sin(num);
-}
+};
 
 module.exports.cos = function(num) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
       this.token,
-      "You must provide a number to math.cos(number)."
+      "Você deve prover um número para mat.cos(número)."
     );
 
   return Math.cos(num);
-}
+};
 
 module.exports.tan = function(num) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
       this.token,
-      "You must provide a number to math.tan(number)."
+      "Você deve prover um número para mat.tan(número)."
     );
 
   return Math.tan(num);
-}
+};
 
-module.exports.radians = function(angle) {
+module.exports.radiano = function(angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
       this.token,
-      "You must provide an angle to math.radians(angle)."
+      "Você deve prover um número para mat.radiano(Ângulo)."
     );
 
   return angle * (Math.PI / 180);
-}
+};
 
-module.exports.degrees = function(angle) {
+module.exports.graus = function(angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
       this.token,
-      "You must provide an angle to math.degrees(angle)."
+      "Você deve prover um número para mat.graus(ângulo)."
     );
 
   return angle * (180 / Math.PI);
-} 
+};
 
-module.exports.Pi = Math.PI; 
+module.exports.pi = Math.PI; 

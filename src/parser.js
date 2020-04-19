@@ -655,7 +655,36 @@ module.exports = class Parser {
         return new Stmt.Tente(tryBlock, catchBlock, elseBlock, finallyBlock);
     }
 
+    doStatement() {
+        try {
+          this.loopDepth += 1;
+    
+          let doBranch = this.statement();
+    
+          this.consume(
+            tokenTypes.ENQUANTO,
+            "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+          );
+          this.consume(
+            tokenTypes.LEFT_PAREN,
+            "Esperado '(' após declaração 'enquanto'."
+          );
+    
+          let whileCondition = this.expression();
+    
+          this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após declaração do 'enquanto'."
+          );
+    
+          return new Stmt.Faca(doBranch, whileCondition);
+        } finally {
+          this.loopDepth -= 1;
+        }
+      }
+
     statement() {
+        if (this.match(tokenTypes.FACA)) return this.doStatement();
         if (this.match(tokenTypes.TENTE)) return this.tryStatement();
         if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();

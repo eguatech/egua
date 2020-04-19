@@ -17,6 +17,7 @@ const reservedWords = {
     isto: tokenTypes.ISTO,
     verdadeiro: tokenTypes.VERDADEIRO,
     var: tokenTypes.VAR,
+    faca: tokenTypes.FACA,
     enquanto: tokenTypes.ENQUANTO,
     pausa: tokenTypes.PAUSA,
     continua: tokenTypes.CONTINUA,

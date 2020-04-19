@@ -326,6 +326,22 @@ module.exports = class Interpreter {
         return null;
     }
 
+    visitDoStmt(stmt) {
+        do {
+            try {
+                this.execute(stmt.doBranch);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // 
+                } else {
+                    throw error;
+                }
+            }
+        } while (this.isTruthy(this.evaluate(stmt.whileCondition)));
+    }
+
     visitSwitchStmt(stmt) {
         let switchCondition = this.evaluate(stmt.condition);
         let branches = stmt.branches;
@@ -747,6 +763,7 @@ module.exports = class Interpreter {
                 this.execute(statements[i]);
             }
         } catch (error) {
+            console.log(error);
             this.Egua.runtimeError(error);
         }
     }

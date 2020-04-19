@@ -84,6 +84,18 @@ class Importar extends Stmt {
     }
 }
 
+class Faca extends Stmt {
+    constructor(doBranch, whileCondition) {
+      super();
+      this.doBranch = doBranch;
+      this.whileCondition = whileCondition;
+    }
+  
+    accept(visitor) {
+      return visitor.visitDoStmt(this);
+    }
+  }
+
 class Enquanto extends Stmt {
     constructor(condition, body) {
         super();
@@ -191,6 +203,7 @@ module.exports = {
     Block,
     Escreva,
     Importar,
+    Faca,
     Enquanto,
     Para,
     Tente,
