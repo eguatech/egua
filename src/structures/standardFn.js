@@ -13,6 +13,6 @@ module.exports = class StandardFn extends Callable {
     }
 
     toString() {
-        return "<function>";
+        return "<função>";
     }
 };

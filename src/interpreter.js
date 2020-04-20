@@ -452,14 +452,21 @@ module.exports = class Interpreter {
         egua.run(data, interpreter);
 
         let exported = interpreter.globals.values.exports;
-        let newModule = new EguaModule();
+        
+        const isDict = obj => obj.constructor === Object;
 
-        let keys = Object.keys(exported);
-        for (let i = 0; i < keys.length; i++) {
-            newModule[keys[i]] = exported[keys[i]];
+        if (isDict(exported)) {
+            let newModule = new EguaModule();
+
+            let keys = Object.keys(exported);
+            for (let i = 0; i < keys.length; i++) {
+                newModule[keys[i]] = exported[keys[i]];
+            }
+
+            return newModule;
         }
 
-        return newModule;
+        return exported;
     }
 
     visitPrintStmt(stmt) {
@@ -488,7 +495,7 @@ module.exports = class Interpreter {
 
     visitVarStmt(stmt) {
         let value = null;
-        if (stmt.initializer !== undefined) {
+        if (stmt.initializer !== null) {
             value = this.evaluate(stmt.initializer);
         }
 
@@ -581,10 +588,10 @@ module.exports = class Interpreter {
         // other data types
         else if (
             obj.constructor == Object ||
-            obj instanceof DragonInstance ||
-            obj instanceof DragonFunction ||
-            obj instanceof DragonClass ||
-            obj instanceof DragonModule
+            obj instanceof EguaInstance ||
+            obj instanceof EguaFunction ||
+            obj instanceof EguaClass ||
+            obj instanceof EguaModule
         ) {
             return obj[index] || null;
         }
@@ -698,7 +705,7 @@ module.exports = class Interpreter {
             return object.get(expr.name) || null;
         } else if (object.constructor == Object) {
             return object[expr.name.lexeme] || null;
-        } else if (object instanceof DragonModule) {
+        } else if (object instanceof EguaModule) {
             return object[expr.name.lexeme] || null;
         }
 
@@ -763,7 +770,6 @@ module.exports = class Interpreter {
                 this.execute(statements[i]);
             }
         } catch (error) {
-            console.log(error);
             this.Egua.runtimeError(error);
         }
     }

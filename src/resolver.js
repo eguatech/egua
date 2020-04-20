@@ -186,7 +186,7 @@ module.exports = class Resolver {
             stmt.superclass !== null &&
             stmt.name.lexeme === stmt.superclass.name.lexeme
         ) {
-            this.dragon.error("Uma classe não pode herdar de si mesma.");
+            this.egua.error("Uma classe não pode herdar de si mesma.");
         }
 
         if (stmt.superclass !== null) {
