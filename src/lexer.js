@@ -204,8 +204,8 @@ module.exports = class Lexer {
                 break;
             case "*":
                 if (this.peek() === "*") {
-                    this.addToken(tokenTypes.STAR_STAR);
                     this.advance();
+                    this.addToken(tokenTypes.STAR_STAR);
                     break;
                 }
                 this.addToken(tokenTypes.STAR);
