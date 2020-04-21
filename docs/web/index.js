@@ -20,6 +20,7 @@ function getQueryVariable(variable) {
 console.log = console.error = function(msg) {
   const p = document.createElement("p");
   p.textContent = msg;
+  p.classList = " output";
   outputDiv.appendChild(p);
 };
 

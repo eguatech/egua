@@ -48,14 +48,9 @@ html {
 }
 
 .output {
-  color: black;
-  margin: 1px 0px;
+  margin: 1px 10px;
   padding-top: 0;
   font-size: 13px;
-}
-
-.outputError {
-  color: red;
 }
 
 * {

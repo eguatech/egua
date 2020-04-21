@@ -1,3 +1,4 @@
+const exemplos = '';
 const classe = `classe Test {
   a() {
     escreva("hello");
@@ -104,6 +105,7 @@ const tudo = `
   escreva('b' em ['b']);`
 
 const demos = {
+  exemplos,
   classe,
   tudo
 }
