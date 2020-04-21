@@ -81,3 +81,28 @@ module.exports.graus = function(angle) {
 };
 
 module.exports.pi = Math.PI; 
+
+module.exports.raiz = function(num, root) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Número dado a mat.raiz(numero, raiz) precisa ser um número."
+    );
+
+  if (isNaN(root) || root === null)
+    throw new RuntimeError(
+      this.token,
+      "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
+    );
+
+  let originalRoot = root;
+
+  let negateFlag = root % 2 == 1 && num < 0;
+  if (negateFlag) num = -num;
+  let possible = Math.pow(num, 1 / root);
+  root = Math.pow(possible, root);
+  if (Math.abs(num - root) < 1 && num > 0 == root > 0)
+    return negateFlag ? -possible : possible;
+
+  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${ originalRoot } de ${ num }.`)
+};

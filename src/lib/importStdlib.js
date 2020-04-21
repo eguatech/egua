@@ -19,14 +19,19 @@ const loadModule = function (moduleName, modulePath) {
     return newModule;
 };
 
+// browserify
+require("./time.js");
+require("./eguamat.js");
+require("./os.js");
+
 module.exports = function (name) {
     switch (name) {
         case "os":
             return loadModule("os", "./os.js");
         case "time":
             return loadModule("os", "./time.js");
-        case "eguamath":
-            return loadModule("eguamath", "./eguamath.js");
+        case "eguamat":
+            return loadModule("eguamat", "./eguamat.js");
     }
 
     return null;

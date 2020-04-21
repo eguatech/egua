@@ -261,7 +261,15 @@ module.exports = class Interpreter {
         let left = this.evaluate(expr.left);
 
         if (expr.operator.type === tokenTypes.EM) {
-            return this.evaluate(expr.right).includes(left);
+            let right = this.evaluate(expr.right);
+
+            if (Array.isArray(right) || typeof right === "string") {
+                return right.includes(left);
+            } else if (right.constructor == Object) {
+                return left in right;
+            } else {
+                throw new RuntimeError("Tipo de chamada inválida com 'em'."); //Invalid type called with in keyword
+            }
         }
 
         if (expr.operator.type === tokenTypes.OU) {
@@ -270,7 +278,6 @@ module.exports = class Interpreter {
         }
 
         if (expr.operator.type === tokenTypes.E) {
-
             // se um estado for falso, retorna falso
             if (!this.isTruthy(left)) return left;
         }
@@ -318,7 +325,7 @@ module.exports = class Interpreter {
                 if (error instanceof BreakException) {
                     break;
                 } else if (error instanceof ContinueException) {
-                    // do nothing and continue the loop
+                    // 
                 } else {
                     throw error;
                 }
@@ -426,7 +433,7 @@ module.exports = class Interpreter {
                 if (error instanceof BreakException) {
                     break;
                 } else if (error instanceof ContinueException) {
-                    // do nothing and continue the loop
+                    // 
                 } else {
                     throw error;
                 }
@@ -444,9 +451,12 @@ module.exports = class Interpreter {
 
         let data = checkStdLib(relativePath);
         if (data !== null) return data;
-
-        if (!fs.existsSync(totalPath)) {
-            throw new RuntimeError(stmt.closeBracket, "Arquivo importado não encontrado.");
+        try {
+            if (!fs.existsSync(totalPath)) {
+                throw new RuntimeError(stmt.closeBracket, "Não foi possível encontrar arquivo importado.");
+            }
+        } catch (error) {
+            throw new RuntimeError(stmt.closeBracket, "Não foi possível ler o arquivo.");
         }
 
         data = fs.readFileSync(totalPath).toString();
