@@ -1,0 +1,56 @@
+html {
+  font-family: "Roboto Mono";
+  color: black;
+}
+
+#runBtn {
+  background-color: #5cb85c;
+  color: white;
+  border: 2px solid #4cae4c;
+  margin-bottom: 3px;
+  display: inline-block;
+  border-radius: 10px;
+  padding: 6px 20px;
+  float: right;
+}
+
+#demoSelector {
+  background-color: #007bff;
+  color: white;
+  border: 2px solid #007bff;
+  margin-bottom: 3px;
+  display: inline-block;
+  border-radius: 10px;
+  padding: 5px 20px;
+}
+
+#editor {
+  width: 50%;
+  height: 100%;
+  height: calc(100% - 45px);
+  left: 0;
+  position: fixed;
+  border-right: 2px solid grey;
+  border-top: 2px solid grey;
+}
+
+#output {
+  width: calc(50% - 4px);
+  height: calc(100% - 45px);
+  right: 0;
+  position: fixed;
+  border-right: 2px solid grey;
+  border-top: 2px solid grey;
+  overflow-y: scroll;
+}
+
+.output {
+  color: black;
+  margin: 1px 0px;
+  padding-top: 0;
+  font-size: 13px;
+}
+
+.outputError {
+  color: red;
+}
