@@ -33,6 +33,7 @@ module.exports = {
     STRING: "STRING",
     NUMBER: "NUMBER",
     E: "E",
+    EM: "EM",
     CLASSE: "CLASSE",
     FALSO: "FALSO",
     FUNCAO: "FUNCAO",

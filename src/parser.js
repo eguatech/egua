@@ -321,12 +321,24 @@ module.exports = class Parser {
         return expr;
     }
 
-    e() {
+    em() {
         let expr = this.equality();
+
+        while (this.match(tokenTypes.EM)) {
+            let operator = this.previous();
+            let right = this.equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    e() {
+        let expr = this.em();
 
         while (this.match(tokenTypes.E)) {
             let operator = this.previous();
-            let right = this.equality();
+            let right = this.em();
             expr = new Expr.Logical(expr, operator, right);
         }
 
@@ -657,31 +669,31 @@ module.exports = class Parser {
 
     doStatement() {
         try {
-          this.loopDepth += 1;
-    
-          let doBranch = this.statement();
-    
-          this.consume(
-            tokenTypes.ENQUANTO,
-            "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
-          );
-          this.consume(
-            tokenTypes.LEFT_PAREN,
-            "Esperado '(' após declaração 'enquanto'."
-          );
-    
-          let whileCondition = this.expression();
-    
-          this.consume(
-            tokenTypes.RIGHT_PAREN,
-            "Esperado ')' após declaração do 'enquanto'."
-          );
-    
-          return new Stmt.Faca(doBranch, whileCondition);
+            this.loopDepth += 1;
+
+            let doBranch = this.statement();
+
+            this.consume(
+                tokenTypes.ENQUANTO,
+                "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+            );
+            this.consume(
+                tokenTypes.LEFT_PAREN,
+                "Esperado '(' após declaração 'enquanto'."
+            );
+
+            let whileCondition = this.expression();
+
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado ')' após declaração do 'enquanto'."
+            );
+
+            return new Stmt.Faca(doBranch, whileCondition);
         } finally {
-          this.loopDepth -= 1;
+            this.loopDepth -= 1;
         }
-      }
+    }
 
     statement() {
         if (this.match(tokenTypes.FACA)) return this.doStatement();

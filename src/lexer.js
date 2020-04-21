@@ -2,6 +2,7 @@ const tokenTypes = require("./tokenTypes.js");
 
 const reservedWords = {
     e: tokenTypes.E,
+    em: tokenTypes.EM,
     classe: tokenTypes.CLASSE,
     senao: tokenTypes.SENAO,
     falso: tokenTypes.FALSO,
