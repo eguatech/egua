@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./docs/web/egua.png" alt="egua">
+    <img src="./docs/web/egua.png" alt="egua" width="80px" height="80px">
 </p>
 
 ```js
