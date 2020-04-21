@@ -224,6 +224,10 @@ module.exports = class Lexer {
                 this.addToken(tokenTypes.BIT_AND);
                 break;
 
+            case "~":
+                this.addToken(tokenTypes.BIT_NOT);
+                break;
+
             case "|":
                 this.addToken(tokenTypes.BIT_OR);
                 break;
