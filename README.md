@@ -1,52 +1,26 @@
+<br />
 <p align="center">
-    <img src="./docs/web/egua.png" alt="egua" width="80px" height="80px">
+  <img src="./docs/web/egua.png" alt="egua" width="80px" height="80px">
+
+  <h3 align="center">Linguagem Egua</h3>
+
+  <p align="center">
+    Linguagem de programação simples e moderna.
+    <br />
+    <a href="https://egua.tech/docs"><strong>Documentação »</strong></a>
+    <br />
+    <br />
+    <a href="https://egua.tech/egua/">IDEgua</a>
+    ·
+    <a href="https://github.com/eguatech/egua/issues">Reportar Bug</a>
+    ·
+    <a href="https://github.com/eguatech/egua/issues">Solicitar Funcionalidade</a>
+    <br />
+    <br />
+    <img src="https://img.shields.io/github/issues/eguatech/egua" />
+    <img src="https://img.shields.io/github/stars/eguatech/egua" />
+    <img src="https://img.shields.io/github/forks/eguatech/egua" />
+    <img src="https://img.shields.io/github/license/eguatech/egua" />
+    <br />
+  </p>
 </p>
-
-```js
-classe Test {
-  a() {
-    escreva("hello");
-  }
-}
-
-var test = Test();
-test.a();
-
-
-classe Test {
-  construtor() {
-    escreva(isto);
-  }
-}
-
-var test = Test();
-
-classe A {
-  test() {
-    escreva("yes");
-  }
-}
-
-classe B herda A {
-    a() {
-        escreva("a");
-    }
-}
-
-var a = B();
-a.test();
-a.a();
-```
-
-```js
-var text = "oi";
-escreva(inteiro(text));
-```
-
-```js
-var a = [1, 2, 3];
-escreva(a[0]);
-
-var a = {'a': 1, 'b': 9};
-escreva(a['b']);
-```
