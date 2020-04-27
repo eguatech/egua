@@ -451,9 +451,13 @@ module.exports = class Interpreter {
 
         let data = checkStdLib(relativePath);
         if (data !== null) return data;
+
         try {
             if (!fs.existsSync(totalPath)) {
-                throw new RuntimeError(stmt.closeBracket, "Não foi possível encontrar arquivo importado.");
+                throw new RuntimeError(
+                    stmt.closeBracket,
+                    "Não foi possível encontrar arquivo importado."
+                );
             }
         } catch (error) {
             throw new RuntimeError(stmt.closeBracket, "Não foi possível ler o arquivo.");
