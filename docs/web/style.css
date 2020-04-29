@@ -9,7 +9,7 @@ html {
   border: 2px;
   margin-bottom: 3px;
   display: inline-block;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 15px 20px;
   float: right;
   margin-right: 10px;  
@@ -22,7 +22,7 @@ html {
   border: 2px;
   margin-bottom: 3px;
   display: inline-block;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 15px 20px;
   margin-left: 10px;
 }
