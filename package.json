@@ -3,9 +3,6 @@
   "version": "1.0.1",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
