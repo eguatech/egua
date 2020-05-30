@@ -7,7 +7,7 @@
   <p align="center">
     Linguagem de programação simples e moderna.
     <br />
-    <a href="https://egua.tech/docs"><strong>Documentação »</strong></a>
+    <a href="https://egua.tech/docs/egua"><strong>Documentação »</strong></a>
     <br />
     <br />
     <a href="https://egua.tech/egua/">IDEgua</a>
