@@ -22,7 +22,6 @@ const loadModule = function (moduleName, modulePath) {
 // browserify
 require("./time.js");
 require("./eguamat.js");
-require("./os.js");
 
 module.exports = function (name) {
     switch (name) {
