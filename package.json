@@ -1,17 +1,20 @@
 {
   "name": "egua",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eguatech/egua.git"
+    "url": "git://github.com/eguatech/egua.git"
   },
   "bin": {
-    "egua":"./bin/egua"
+    "egua": "./bin/egua"
   },
   "keywords": [
     "egua"
