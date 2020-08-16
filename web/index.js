@@ -29,9 +29,9 @@ const clearOutput = function() {
 };
 
 const editor = new CodeFlask("#editor", {
-  lineNumbers: true,
   language: 'js',
-  defaultTheme: false
+  lineNumbers: true,
+  defaultTheme: false 
 });
 
 clearOutput();
