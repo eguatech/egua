@@ -1,1 +1,4027 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{("undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this).Egua=e()}}(function(){var e=function(e){var t;return function(r){return t||e(t={exports:{},parent:r},t.exports),t.exports}},t=e(function(e,t){const i=r({}),{RuntimeError:n,ContinueException:o,BreakException:a,ReturnException:h}=q;e.exports=class e{constructor(e,t){this.Egua=e,this.baseDir=t,this.globals=new Z,this.environment=this.globals,this.locals=new Map,this.globals=Re(this.globals)}resolve(e,t){this.locals.set(e,t)}visitLiteralExpr(e){return e.value}evaluate(e){return e.accept(this)}visitGroupingExpr(e){return this.evaluate(e.expression)}isTruthy(e){return null!==e&&("boolean"!=typeof e||Boolean(e))}checkNumberOperand(e,t){if("number"!=typeof t)throw new n(e,"Operador precisa ser um n\xfamero.")}visitUnaryExpr(e){let t=this.evaluate(e.right);switch(e.operator.type){case s.MINUS:return this.checkNumberOperand(e.operator,t),-t;case s.BANG:return!this.isTruthy(t);case s.BIT_NOT:return~t}return null}isEqual(e,t){return null===e&&null===t||null!==e&&e===t}checkNumberOperands(e,t,r){if("number"!=typeof t||"number"!=typeof r)throw new n(e,"Operadores precisam ser n\xfameros.")}visitBinaryExpr(e){let t=this.evaluate(e.left),r=this.evaluate(e.right);switch(e.operator.type){case s.STAR_STAR:return this.checkNumberOperands(e.operator,t,r),Math.pow(t,r);case s.GREATER:return this.checkNumberOperands(e.operator,t,r),Number(t)>Number(r);case s.GREATER_EQUAL:return this.checkNumberOperands(e.operator,t,r),Number(t)>=Number(r);case s.LESS:return this.checkNumberOperands(e.operator,t,r),Number(t)<Number(r);case s.LESS_EQUAL:return this.checkNumberOperands(e.operator,t,r),Number(t)<=Number(r);case s.MINUS:return this.checkNumberOperands(e.operator,t,r),Number(t)-Number(r);case s.PLUS:if("number"==typeof t&&"number"==typeof r)return Number(t)+Number(r);if("string"==typeof t&&"string"==typeof r)return String(t)+String(r);throw new n(e.operator,"Operadores precisam ser dois n\xfameros ou duas strings.");case s.SLASH:return this.checkNumberOperands(e.operator,t,r),Number(t)/Number(r);case s.STAR:return this.checkNumberOperands(e.operator,t,r),Number(t)*Number(r);case s.MODULUS:return this.checkNumberOperands(e.operator,t,r),Number(t)%Number(r);case s.BIT_AND:return this.checkNumberOperands(e.operator,t,r),Number(t)&Number(r);case s.BIT_XOR:return this.checkNumberOperands(e.operator,t,r),Number(t)^Number(r);case s.BIT_OR:return this.checkNumberOperands(e.operator,t,r),Number(t)|Number(r);case s.LESSER_LESSER:return this.checkNumberOperands(e.operator,t,r),Number(t)<<Number(r);case s.GREATER_GREATER:return this.checkNumberOperands(e.operator,t,r),Number(t)>>Number(r);case s.BANG_EQUAL:return!this.isEqual(t,r);case s.EQUAL_EQUAL:return this.isEqual(t,r)}return null}visitCallExpr(e){let t,r=this.evaluate(e.callee),s=[];for(let i=0;i<e.args.length;i++)s.push(this.evaluate(e.args[i]));if(!(r instanceof me))throw new n(e.paren,"S\xf3 pode chamar fun\xe7\xe3o ou classe.");if(t=r instanceof Ee?r.declaration.params:r instanceof Ae&&r.methods.init?r.methods.init.declaration.params:[],s.length<r.arity()){let e=r.arity()-s.length;for(let t=0;t<e;t++)s.push(null)}else if(s.length>=r.arity()&&t.length>0&&"wildcard"===t[t.length-1].type){let e=s.slice(0,t.length-1);e.push(s.slice(t.length-1,s.length)),s=e}return r instanceof ve?r.call(this,s,e.callee.name):r.call(this,s)}visitAssignExpr(e){let t=this.evaluate(e.value),r=this.locals.get(e);return void 0!==r?this.environment.assignVarAt(r,e.name,t):this.environment.assignVar(e.name,t),t}lookupVar(e,t){let r=this.locals.get(t);return void 0!==r?this.environment.getVarAt(r,e.lexeme):this.globals.getVar(e)}visitVariableExpr(e){return this.lookupVar(e.name,e)}visitExpressionStmt(e){return this.evaluate(e.expression),null}visitLogicalExpr(e){let t=this.evaluate(e.left);if(e.operator.type===s.EM){let r=this.evaluate(e.right);if(Array.isArray(r)||"string"==typeof r)return r.includes(t);if(r.constructor==Object)return t in r;throw new n("Tipo de chamada inv\xe1lida com 'em'.")}return e.operator.type===s.OU&&this.isTruthy(t)?t:e.operator.type!==s.E||this.isTruthy(t)?this.evaluate(e.right):t}visitIfStmt(e){if(this.isTruthy(this.evaluate(e.condition)))return this.execute(e.thenBranch),null;for(let t=0;t<e.elifBranches.length;t++){let r=e.elifBranches[t];if(this.isTruthy(this.evaluate(r.condition)))return this.execute(r.branch),null}return null!==e.elseBranch&&this.execute(e.elseBranch),null}visitForStmt(e){for(null!==e.initializer&&this.evaluate(e.initializer);null===e.condition||this.isTruthy(this.evaluate(e.condition));){try{this.execute(e.body)}catch(error){if(error instanceof a)break;if(!(error instanceof o))throw error}null!==e.increment&&this.evaluate(e.increment)}return null}visitDoStmt(e){do{try{this.execute(e.doBranch)}catch(error){if(error instanceof a)break;if(!(error instanceof o))throw error}}while(this.isTruthy(this.evaluate(e.whileCondition)))}visitSwitchStmt(e){let t=this.evaluate(e.condition),r=e.branches,s=e.defaultBranch,i=!1;try{for(let e=0;e<r.length;e++){let s=r[e];for(let e=0;e<s.conditions.length;e++)if(this.evaluate(s.conditions[e])===t){i=!0;try{for(let e=0;e<s.stmts.length;e++)this.execute(s.stmts[e])}catch(error){if(!(error instanceof o))throw error}}}if(null!==s&&!1===i)for(let e=0;e<s.stmts.length;e++)this.execute(s.stmts[e])}catch(error){if(!(error instanceof a))throw error}}visitTryStmt(e){try{let t=!0;try{this.executeBlock(e.tryBranch,new Z(this.environment))}catch(error){t=!1,null!==e.catchBranch&&this.executeBlock(e.catchBranch,new Z(this.environment))}t&&null!==e.elseBranch&&this.executeBlock(e.elseBranch,new Z(this.environment))}finally{null!==e.finallyBranch&&this.executeBlock(e.finallyBranch,new Z(this.environment))}}visitWhileStmt(e){for(;this.isTruthy(this.evaluate(e.condition));)try{this.execute(e.body)}catch(error){if(error instanceof a)break;if(!(error instanceof o))throw error}return null}visitImportStmt(t){let r=this.evaluate(t.path),s=ue.join(this.baseDir,r),o=ue.dirname(s),a=ue.basename(s),h=xe(r);if(null!==h)return h;try{if(!pe.existsSync(s))throw new n(t.closeBracket,"N\xe3o foi poss\xedvel encontrar arquivo importado.")}catch(error){throw new n(t.closeBracket,"N\xe3o foi poss\xedvel ler o arquivo.")}h=pe.readFileSync(s).toString();const c=new i.Egua(a),l=new e(c,o);c.run(h,l);let u=l.globals.values.exports;if((e=>e.constructor===Object)(u)){let e=new Te,t=Object.keys(u);for(let r=0;r<t.length;r++)e[t[r]]=u[t[r]];return e}return u}visitPrintStmt(e){let t=this.evaluate(e.expression);return console.log(this.stringify(t)),null}executeBlock(e,t){let r=this.environment;try{this.environment=t;for(let t=0;t<e.length;t++)this.execute(e[t])}finally{this.environment=r}}visitBlockStmt(e){return this.executeBlock(e.statements,new Z(this.environment)),null}visitVarStmt(e){let t=null;return null!==e.initializer&&(t=this.evaluate(e.initializer)),this.environment.defineVar(e.name.lexeme,t),null}visitContinueStmt(e){throw new o}visitBreakStmt(e){throw new a}visitReturnStmt(e){let t=null;throw null!=e.value&&(t=this.evaluate(e.value)),new h(t)}visitFunctionExpr(e){return new Ee(null,e,this.environment,!1)}visitAssignsubscriptExpr(e){let t=this.evaluate(e.obj),r=this.evaluate(e.index),s=this.evaluate(e.value);if(Array.isArray(t)){if(r<0&&0!==t.length)for(;r<0;)r+=t.length;for(;t.length<r;)t.push(null);t[r]=s}else{if(!(t.constructor==Object||t instanceof fe||t instanceof Ee||t instanceof Ae||t instanceof Te))throw new n(e.obj.name,"Somente listas, dicion\xe1rios, classes e objetos podem ser mudados por sobrescrita.");t[r]=s}}visitSubscriptExpr(e){let t=this.evaluate(e.callee),r=this.evaluate(e.index);if(Array.isArray(t)){if(!Number.isInteger(r))throw new n(e.closeBracket,"Somente inteiros podem ser usados para indexar um vetor.");if(r<0&&0!==t.length)for(;r<0;)r+=t.length;if(r>=t.length)throw new n(e.closeBracket,"Index do vetor fora do intervalo.");return t[r]}if(t.constructor==Object||t instanceof fe||t instanceof Ee||t instanceof Ae||t instanceof Te)return t[r]||null;if("string"==typeof t){if(!Number.isInteger(r))throw new n(e.closeBracket,"Somente inteiros podem ser usados para indexar um vetor.");if(r<0&&0!==t.length)for(;r<0;)r+=t.length;if(r>=t.length)throw new n(e.closeBracket,"Index fora do tamanho.");return t.charAt(r)}throw new n(e.callee.name,"Somente listas, dicion\xe1rios, classes e objetos podem ser mudados por sobrescrita.")}visitSetExpr(e){let t=this.evaluate(e.object);if(!(t instanceof fe)&&t.constructor!==Object)throw new n(e.object.name,"Somente inst\xe2ncias e dicion\xe1rios podem possuir campos.");let r=this.evaluate(e.value);if(t instanceof fe)return t.set(e.name,r),r;t.constructor==Object&&(t[e.name.lexeme]=r)}visitFunctionStmt(e){let t=new Ee(e.name.lexeme,e.func,this.environment,!1);this.environment.defineVar(e.name.lexeme,t)}visitClassStmt(e){let t=null;if(null!==e.superclass&&!((t=this.evaluate(e.superclass))instanceof Ae))throw new n(e.superclass.name,"Superclasse precisa ser uma classe.");this.environment.defineVar(e.name.lexeme,null),null!==e.superclass&&(this.environment=new Z(this.environment),this.environment.defineVar("super",t));let r={},s=e.methods;for(let n=0;n<e.methods.length;n++){let e=s[n],t="construtor"===e.name.lexeme,i=new Ee(e.name.lexeme,e.func,this.environment,t);r[e.name.lexeme]=i}let i=new Ae(e.name.lexeme,t,r);return null!==t&&(this.environment=this.environment.enclosing),this.environment.assignVar(e.name,i),null}visitGetExpr(e){let t=this.evaluate(e.object);if(t instanceof fe)return t.get(e.name)||null;if(t.constructor==Object)return t[e.name.lexeme]||null;if(t instanceof Te)return t[e.name.lexeme]||null;throw new n(e.name,"Voc\xea s\xf3 pode acessar m\xe9todos do objeto e dicion\xe1rios.")}visitThisExpr(e){return this.lookupVar(e.keyword,e)}visitDictionaryExpr(e){let t={};for(let r=0;r<e.keys.length;r++)t[this.evaluate(e.keys[r])]=this.evaluate(e.values[r]);return t}visitArrayExpr(e){let t=[];for(let r=0;r<e.values.length;r++)t.push(this.evaluate(e.values[r]));return t}visitSuperExpr(e){let t=this.locals.get(e),r=this.environment.getVarAt(t,"super"),s=this.environment.getVarAt(t-1,"isto"),i=r.findMethod(e.method.lexeme);if(void 0===i)throw new n(e.method,"M\xe9todo chamado indefinido.");return i.bind(s)}stringify(e){return null===e?"nulo":Array.isArray(e)?e:e.toString()}execute(e){e.accept(this)}interpret(e){try{for(let t=0;t<e.length;t++)this.execute(e[t])}catch(error){this.Egua.runtimeError(error)}}}}),r=e(function(e,r){(function(r){const i=t({});e.exports.Egua=class{constructor(e){this.filename=e,this.hadError=!1,this.hadRuntimeError=!1}runPrompt(){const e=new i(this,r.cwd(),void 0),t=pe.createInterface({input:r.stdin,output:r.stdout,prompt:">>> "});t.prompt(),t.on("line",r=>{this.hadError=!1,this.hadRuntimeError=!1,this.run(r,e),t.prompt()})}runfile(e){this.filename=ue.basename(e);const t=new i(this,r.cwd()),s=pe.readFileSync(e).toString();this.run(s,t),this.hadError&&r.exit(65),this.hadRuntimeError&&r.exit(70)}run(e,t){const r=new o(e,this).scan();if(!0===this.hadError)return;const s=new Q(r,this).parse();!0!==this.hadError&&(new z(t,this).resolve(s),!0!==this.hadError&&t.interpret(s))}report(e,t,r){this.filename?console.error(`[Arquivo: ${this.filename}] [Linha: ${e}] Erro${t}: ${r}`):console.error(`[Linha: ${e}] Erro${t}: ${r}`),this.hadError=!0}error(e,t){e.type===s.EOF?this.report(e.line," no final",t):this.report(e.line,` no '${e.lexeme}'`,t)}lexerError(e,t,r){this.report(e,` no '${t}'`,r)}runtimeError(e){let t=e.token.line;e.token&&t?this.fileName?console.error(`Erro: [Arquivo: ${this.fileName}] [Linha: ${e.token.line}] ${e.message}`):console.error(`Erro: [Linha: ${e.token.line}] ${e.message}`):console.error(e),this.hadRuntimeError=!0}}}).call(this,J)}),s={LEFT_PAREN:"LEFT_PAREN",RIGHT_PAREN:"RIGHT_PAREN",LEFT_BRACE:"LEFT_BRACE",RIGHT_BRACE:"RIGHT_BRACE",LEFT_SQUARE_BRACKET:"LEFT_SQUARE_BRACKET",RIGHT_SQUARE_BRACKET:"RIGHT_SQUARE_BRACKET",COMMA:"COMMA",DOT:"DOT",MINUS:"MINUS",PLUS:"PLUS",BIT_AND:"BIT_AND",BIT_OR:"BIT_OR",BIT_XOR:"BIT_XOR",BIT_NOT:"BIT_NOT",COLON:"COLON",SEMICOLON:"SEMICOLON",SLASH:"SLASH",STAR:"STAR",STAR_STAR:"STAR_STAR",MODULUS:"MODULUS",BANG:"BANG",BANG_EQUAL:"BANG_EQUAL",EQUAL:"EQUAL",EQUAL_EQUAL:"EQUAL_EQUAL",GREATER:"GREATER",GREATER_EQUAL:"GREATER_EQUAL",LESS:"LESS",LESS_EQUAL:"LESS_EQUAL",GREATER_GREATER:"GREATER_GREATER",LESSER_LESSER:"LESSER_LESSER",IDENTIFIER:"IDENTIFIER",STRING:"STRING",NUMBER:"NUMBER",E:"E",EM:"EM",CLASSE:"CLASSE",FALSO:"FALSO",FUNCAO:"FUNCAO",PARA:"PARA",SE:"SE",SENAOSE:"SENAOSE",SENAO:"SENAO",ESCOLHA:"ESCOLHA",CASO:"CASO",PADRAO:"PADRAO",NULO:"NULO",OU:"OU",ESCREVA:"ESCREVA",RETORNA:"RETORNA",SUPER:"SUPER",ISTO:"ISTO",VERDADEIRO:"VERDADEIRO",VAR:"VAR",ENQUANTO:"ENQUANTO",PAUSA:"PAUSA",CONTINUA:"CONTINUA",HERDA:"HERDA",IMPORTAR:"IMPORTAR",FACA:"FACA",TENTE:"TENTE",PEGUE:"PEGUE",FINALMENTE:"FINALMENTE",EOF:"EOF"};const i={e:s.E,em:s.EM,classe:s.CLASSE,senao:s.SENAO,falso:s.FALSO,para:s.PARA,funcao:s.FUNCAO,se:s.SE,senaose:s.SENAOSE,nulo:s.NULO,ou:s.OU,escreva:s.ESCREVA,retorna:s.RETORNA,super:s.SUPER,isto:s.ISTO,verdadeiro:s.VERDADEIRO,var:s.VAR,faca:s.FACA,enquanto:s.ENQUANTO,pausa:s.PAUSA,continua:s.CONTINUA,escolha:s.ESCOLHA,caso:s.CASO,padrao:s.PADRAO,importar:s.IMPORTAR,tente:s.TENTE,pegue:s.PEGUE,finalmente:s.FINALMENTE,herda:s.HERDA};class n{constructor(e,t,r,s){this.type=e,this.lexeme=t,this.literal=r,this.line=s}toString(){return this.type+" "+this.lexeme+" "+this.literal}}var o=class{constructor(e,t){this.Egua=t,this.code=e,this.tokens=[],this.start=0,this.current=0,this.line=1}isDigit(e){return e>="0"&&e<="9"}isAlpha(e){return e>="a"&&e<="z"||e>="A"&&e<="Z"||"_"==e}isAlphaNumeric(e){return this.isDigit(e)||this.isAlpha(e)}endOfCode(){return this.current>=this.code.length}advance(){return this.current+=1,this.code[this.current-1]}addToken(e,t=null){const r=this.code.substring(this.start,this.current);this.tokens.push(new n(e,r,t,this.line))}match(e){return!this.endOfCode()&&this.code[this.current]===e&&(this.current+=1,!0)}peek(){return this.endOfCode()?"\0":this.code.charAt(this.current)}peekNext(){return this.current+1>=this.code.length?"\0":this.code.charAt(this.current+1)}previous(){return this.code.charAt(this.current-1)}parseString(e='"'){for(;this.peek()!==e&&!this.endOfCode();)"\n"===this.peek()&&(this.line=1),this.advance();if(this.endOfCode())return void this.Egua.lexerError(this.line,this.previous(),"Texto n\xe3o finalizado.");this.advance();let t=this.code.substring(this.start+1,this.current-1);this.addToken(s.STRING,t)}parseNumber(){for(;this.isDigit(this.peek());)this.advance();if("."==this.peek()&&this.isDigit(this.peekNext()))for(this.advance();this.isDigit(this.peek());)this.advance();const e=this.code.substring(this.start,this.current);this.addToken(s.NUMBER,parseFloat(e))}identifyKeyword(){for(;this.isAlphaNumeric(this.peek());)this.advance();const e=this.code.substring(this.start,this.current),t=e in i?i[e]:s.IDENTIFIER;this.addToken(t)}scanToken(){const e=this.advance();switch(e){case"[":this.addToken(s.LEFT_SQUARE_BRACKET);break;case"]":this.addToken(s.RIGHT_SQUARE_BRACKET);break;case"(":this.addToken(s.LEFT_PAREN);break;case")":this.addToken(s.RIGHT_PAREN);break;case"{":this.addToken(s.LEFT_BRACE);break;case"}":this.addToken(s.RIGHT_BRACE);break;case",":this.addToken(s.COMMA);break;case".":this.addToken(s.DOT);break;case"-":this.addToken(s.MINUS);break;case"+":this.addToken(s.PLUS);break;case":":this.addToken(s.COLON);break;case";":this.addToken(s.SEMICOLON);break;case"%":this.addToken(s.MODULUS);break;case"*":if("*"===this.peek()){this.advance(),this.addToken(s.STAR_STAR);break}this.addToken(s.STAR);break;case"!":this.addToken(this.match("=")?s.BANG_EQUAL:s.BANG);break;case"=":this.addToken(this.match("=")?s.EQUAL_EQUAL:s.EQUAL);break;case"&":this.addToken(s.BIT_AND);break;case"~":this.addToken(s.BIT_NOT);break;case"|":this.addToken(s.BIT_OR);break;case"^":this.addToken(s.BIT_XOR);break;case"<":this.match("=")?this.addToken(s.LESS_EQUAL):this.match("<")?this.addToken(s.LESSER_LESSER):this.addToken(s.LESS);break;case">":this.match("=")?this.addToken(s.GREATER_EQUAL):this.match(">")?this.addToken(s.GREATER_GREATER):this.addToken(s.GREATER);break;case"/":if(this.match("/"))for(;"\n"!=this.peek()&&!this.endOfCode();)this.advance();else this.addToken(s.SLASH);break;case" ":case"\r":case"\t":break;case"\n":this.line+=1;break;case'"':this.parseString('"');break;case"'":this.parseString("'");break;default:this.isDigit(e)?this.parseNumber():this.isAlpha(e)?this.identifyKeyword():this.Egua.lexerError(this.line,e,"Caractere inesperado.")}}scan(){for(;!this.endOfCode();)this.start=this.current,this.scanToken();return this.tokens.push(new n(s.EOF,"",null,this.line)),this.tokens}};class a{accept(e){}}var h=class extends a{constructor(e,t){super(),this.name=e,this.value=t}accept(e){return e.visitAssignExpr(this)}},c=class extends a{constructor(e,t,r){super(),this.left=e,this.operator=t,this.right=r}accept(e){return e.visitBinaryExpr(this)}},l=class extends a{constructor(e,t){super(),this.params=e,this.body=t}accept(e){return e.visitFunctionExpr(this)}},u=class extends a{constructor(e,t,r){super(),this.callee=e,this.paren=t,this.args=r}accept(e){return e.visitCallExpr(this)}},p=class extends a{constructor(e,t){super(),this.object=e,this.name=t}accept(e){return e.visitGetExpr(this)}},m=class extends a{constructor(e){super(),this.expression=e}accept(e){return e.visitGroupingExpr(this)}},d=class extends a{constructor(e){super(),this.value=e}accept(e){return e.visitLiteralExpr(this)}},E=class extends a{constructor(e){super(),this.values=e}accept(e){return e.visitArrayExpr(this)}},f=class extends a{constructor(e,t){super(),this.keys=e,this.values=t}accept(e){return e.visitDictionaryExpr(this)}},v=class extends a{constructor(e,t,r){super(),this.callee=e,this.index=t,this.closeBracket=r}accept(e){return e.visitSubscriptExpr(this)}},A=class extends a{constructor(e,t,r){super(),this.obj=e,this.index=t,this.value=r}accept(e){return e.visitAssignsubscriptExpr(this)}},S=class extends a{constructor(e,t,r){super(),this.left=e,this.operator=t,this.right=r}accept(e){return e.visitLogicalExpr(this)}},R=class extends a{constructor(e,t,r){super(),this.object=e,this.name=t,this.value=r}accept(e){return e.visitSetExpr(this)}},T=class extends a{constructor(e,t){super(),this.keyword=e,this.method=t}accept(e){return e.visitSuperExpr(this)}},w=class extends a{constructor(e){super(),this.keyword=e}accept(e){return e.visitThisExpr(this)}},N=class extends a{constructor(e,t){super(),this.operator=e,this.right=t}accept(e){return e.visitUnaryExpr(this)}},k=class extends a{constructor(e){super(),this.name=e}accept(e){return e.visitVariableExpr(this)}};class g{accept(e){}}var x=class extends g{constructor(e){super(),this.expression=e}accept(e){return e.visitExpressionStmt(this)}},O=class extends g{constructor(e,t){super(),this.name=e,this.func=t}accept(e){return e.visitFunctionStmt(this)}},y=class extends g{constructor(e,t){super(),this.keyword=e,this.value=t}accept(e){return e.visitReturnStmt(this)}},b=class extends g{constructor(e,t,r){super(),this.name=e,this.superclass=t,this.methods=r}accept(e){return e.visitClassStmt(this)}},L=class extends g{constructor(e){super(),this.statements=e}accept(e){return e.visitBlockStmt(this)}},I=class extends g{constructor(e){super(),this.expression=e}accept(e){return e.visitPrintStmt(this)}},C=class extends g{constructor(e,t){super(),this.path=e,this.closeBracket=t}accept(e){return e.visitImportStmt(this)}},B=class extends g{constructor(e,t){super(),this.doBranch=e,this.whileCondition=t}accept(e){return e.visitDoStmt(this)}},_=class extends g{constructor(e,t){super(),this.condition=e,this.body=t}accept(e){return e.visitWhileStmt(this)}},U=class extends g{constructor(e,t,r,s){super(),this.initializer=e,this.condition=t,this.increment=r,this.body=s}accept(e){return e.visitForStmt(this)}},F=class extends g{constructor(e,t,r,s){super(),this.tryBranch=e,this.catchBranch=t,this.elseBranch=r,this.finallyBranch=s}accept(e){return e.visitTryStmt(this)}},G=class extends g{constructor(e,t,r,s){super(),this.condition=e,this.thenBranch=t,this.elifBranches=r,this.elseBranch=s}accept(e){return e.visitIfStmt(this)}},M=class extends g{constructor(e,t,r){super(),this.condition=e,this.branches=t,this.defaultBranch=r}accept(e){return e.visitSwitchStmt(this)}},D=class extends g{constructor(){super()}accept(e){return e.visitBreakStmt(this)}},P=class extends g{constructor(){super()}accept(e){return e.visitContinueStmt(this)}},V=class extends g{constructor(e,t){super(),this.name=e,this.initializer=t}accept(e){return e.visitVarStmt(this)}};class H extends Error{}var Q=class{constructor(e,t){this.tokens=e,this.Egua=t,this.current=0,this.loopDepth=0}synchronize(){for(this.advance();!this.isAtEnd();){if(this.previous().type==s.SEMICOLON)return;switch(this.peek().type){case s.CLASSE:case s.FUNCAO:case s.VAR:case s.PARA:case s.SE:case s.ENQUANTO:case s.ESCREVA:case s.RETORNA:return}this.advance()}}error(e,t){return this.Egua.error(e,t),new H}consume(e,t){if(this.check(e))return this.advance();throw this.error(this.peek(),t)}check(e){return!this.isAtEnd()&&this.peek().type===e}checkNext(e){return!this.isAtEnd()&&this.tokens[this.current+1].type===e}peek(){return this.tokens[this.current]}previous(){return this.tokens[this.current-1]}isAtEnd(){return this.peek().type==s.EOF}advance(){return this.isAtEnd()||(this.current+=1),this.previous()}match(...e){for(let t=0;t<e.length;t++){let r=e[t];if(this.check(r))return this.advance(),!0}return!1}primary(){if(this.match(s.SUPER)){let e=this.previous();this.consume(s.DOT,"Esperado '.' ap\xf3s 'super'.");let t=this.consume(s.IDENTIFIER,"Esperado nome do m\xe9todo da superclasse.");return new T(e,t)}if(this.match(s.LEFT_SQUARE_BRACKET)){let e=[];if(this.match(s.RIGHT_SQUARE_BRACKET))return new E([]);for(;!this.match(s.RIGHT_SQUARE_BRACKET);){let t=this.assignment();e.push(t),this.peek().type!==s.RIGHT_SQUARE_BRACKET&&this.consume(s.COMMA,"Esperado v\xedrgula antes da pr\xf3xima express\xe3o.")}return new E(e)}if(this.match(s.LEFT_BRACE)){let e=[],t=[];if(this.match(s.RIGHT_BRACE))return new f([],[]);for(;!this.match(s.RIGHT_BRACE);){let r=this.assignment();this.consume(s.COLON,"Esperado ':' entre chave e valor.");let i=this.assignment();e.push(r),t.push(i),this.peek().type!==s.RIGHT_BRACE&&this.consume(s.COMMA,"Esperado v\xedgula antes da pr\xf3xima express\xe3o.")}return new f(e,t)}if(this.match(s.FUNCAO))return this.functionBody("funcao");if(this.match(s.FALSO))return new d(!1);if(this.match(s.VERDADEIRO))return new d(!0);if(this.match(s.NULO))return new d(null);if(this.match(s.ISTO))return new w(this.previous());if(this.match(s.IMPORTAR))return this.importStatement();if(this.match(s.NUMBER,s.STRING))return new d(this.previous().literal);if(this.match(s.IDENTIFIER))return new k(this.previous());if(this.match(s.LEFT_PAREN)){let e=this.expression();return this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s a express\xe3o."),new m(e)}throw this.error(this.peek(),"Esperado express\xe3o.")}finishCall(e){let t=[];if(!this.check(s.RIGHT_PAREN))do{t.length>=255&&error(this.peek(),"N\xe3o pode haver mais de 255 argumentos."),t.push(this.expression())}while(this.match(s.COMMA));let r=this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s os argumentos.");return new u(e,r,t)}call(){let e=this.primary();for(;;)if(this.match(s.LEFT_PAREN))e=this.finishCall(e);else if(this.match(s.DOT)){let t=this.consume(s.IDENTIFIER,"Esperado nome do m\xe9todo ap\xf3s '.'.");e=new p(e,t)}else{if(!this.match(s.LEFT_SQUARE_BRACKET))break;{let t=this.expression(),r=this.consume(s.RIGHT_SQUARE_BRACKET,"Esperado ']' ap\xf3s escrita de index.");e=new v(e,t,r)}}return e}unary(){if(this.match(s.BANG,s.MINUS,s.BIT_NOT)){let e=this.previous(),t=this.unary();return new N(e,t)}return this.call()}exponent(){let e=this.unary();for(;this.match(s.STAR_STAR);){let t=this.previous(),r=this.unary();e=new c(e,t,r)}return e}multiplication(){let e=this.exponent();for(;this.match(s.SLASH,s.STAR,s.MODULUS);){let t=this.previous(),r=this.exponent();e=new c(e,t,r)}return e}addition(){let e=this.multiplication();for(;this.match(s.MINUS,s.PLUS);){let t=this.previous(),r=this.multiplication();e=new c(e,t,r)}return e}bitFill(){let e=this.addition();for(;this.match(s.LESSER_LESSER,s.GREATER_GREATER);){let t=this.previous(),r=this.addition();e=new c(e,t,r)}return e}bitAnd(){let e=this.bitFill();for(;this.match(s.BIT_AND);){let t=this.previous(),r=this.bitFill();e=new c(e,t,r)}return e}bitOr(){let e=this.bitAnd();for(;this.match(s.BIT_OR,s.BIT_XOR);){let t=this.previous(),r=this.bitAnd();e=new c(e,t,r)}return e}comparison(){let e=this.bitOr();for(;this.match(s.GREATER,s.GREATER_EQUAL,s.LESS,s.LESS_EQUAL);){let t=this.previous(),r=this.bitOr();e=new c(e,t,r)}return e}equality(){let e=this.comparison();for(;this.match(s.BANG_EQUAL,s.EQUAL_EQUAL);){let t=this.previous(),r=this.comparison();e=new c(e,t,r)}return e}em(){let e=this.equality();for(;this.match(s.EM);){let t=this.previous(),r=this.equality();e=new S(e,t,r)}return e}e(){let e=this.em();for(;this.match(s.E);){let t=this.previous(),r=this.em();e=new S(e,t,r)}return e}ou(){let e=this.e();for(;this.match(s.OU);){let t=this.previous(),r=this.e();e=new S(e,t,r)}return e}assignment(){let e=this.ou();if(this.match(s.EQUAL)){let t=this.previous(),r=this.assignment();if(e instanceof k){let t=e.name;return new h(t,r)}if(e instanceof p){let t=e;return new R(t.object,t.name,r)}if(e instanceof v)return new A(e.callee,e.index,r);this.error(t,"Tarefa de atribui\xe7\xe3o inv\xe1lida")}return e}expression(){return this.assignment()}printStatement(){this.consume(s.LEFT_PAREN,"Esperado '(' antes dos valores em escreva.");let e=this.expression();return this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s os valores em escreva."),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s o valor."),new I(e)}expressionStatement(){let e=this.expression();return this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s express\xe3o."),new x(e)}block(){let e=[];for(;!this.check(s.RIGHT_BRACE)&&!this.isAtEnd();)e.push(this.declaration());return this.consume(s.RIGHT_BRACE,"Esperado '}' ap\xf3s o bloco."),e}ifStatement(){this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s 'se'.");let e=this.expression();this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s condi\xe7\xe3o do se.");let t=this.statement(),r=[];for(;this.match(s.SENAOSE);){this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s 'senaose'.");let e=this.expression();this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3es codi\xe7\xe3o do 'senaose.");let t=this.statement();r.push({condition:e,branch:t})}let i=null;return this.match(s.SENAO)&&(i=this.statement()),new G(e,t,r,i)}whileStatement(){try{this.loopDepth+=1,this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s 'enquanto'.");let e=this.expression();this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s condicional.");let t=this.statement();return new _(e,t)}finally{this.loopDepth-=1}}forStatement(){try{let e;this.loopDepth+=1,this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s 'para'."),e=this.match(s.SEMICOLON)?null:this.match(s.VAR)?this.varDeclaration():this.expressionStatement();let t=null;this.check(s.SEMICOLON)||(t=this.expression()),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s valores da condicional");let r=null;this.check(s.RIGHT_PAREN)||(r=this.expression()),this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s cl\xe1usulas");let i=this.statement();return new U(e,t,r,i)}finally{this.loopDepth-=1}}breakStatement(){return this.loopDepth<1&&this.error(this.previous(),"'pausa' deve estar dentro de um loop."),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s 'pausa'."),new D}continueStatement(){return this.loopDepth<1&&this.error(this.previous(),"'continua' precisa estar em um la\xe7o de repeti\xe7\xe3o."),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s 'continua'."),new P}returnStatement(){let e=this.previous(),t=null;return this.check(s.SEMICOLON)||(t=this.expression()),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s o retorno."),new y(e,t)}switchStatement(){try{this.loopDepth+=1,this.consume(s.LEFT_PAREN,"Esperado '{' ap\xf3s 'escolha'.");let e=this.expression();this.consume(s.RIGHT_PAREN,"Esperado '}' ap\xf3s a condi\xe7\xe3o de 'escolha'."),this.consume(s.LEFT_BRACE,"Esperado '{' antes do escopo do 'escolha'.");let t=[],r=null;for(;!this.match(s.RIGHT_BRACE)&&!this.isAtEnd();)if(this.match(s.CASO)){let e=[this.expression()];for(this.consume(s.COLON,"Esperado ':' ap\xf3s o 'caso'.");this.check(s.CASO);)this.consume(s.CASO,null),e.push(this.expression()),this.consume(s.COLON,"Esperado ':' ap\xf3s declara\xe7\xe3o do 'caso'.");let r=[];do{r.push(this.statement())}while(!this.check(s.CASO)&&!this.check(s.PADRAO)&&!this.check(s.RIGHT_BRACE));t.push({conditions:e,stmts:r})}else if(this.match(s.PADRAO)){if(null!==r)throw new H("Voc\xea s\xf3 pode ter um 'padrao' em cada declara\xe7\xe3o de 'escolha'.");this.consume(s.COLON,"Esperado ':' ap\xf3s declara\xe7\xe3o do 'padrao'.");let e=[];do{e.push(this.statement())}while(!this.check(s.CASO)&&!this.check(s.PADRAO)&&!this.check(s.RIGHT_BRACE));r={stmts:e}}return new M(e,t,r)}finally{this.loopDepth-=1}}importStatement(){this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s declara\xe7\xe3o.");let e=this.expression(),t=this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s declara\xe7\xe3o.");return new C(e,t)}tryStatement(){this.consume(s.LEFT_BRACE,"Esperado '{' ap\xf3s a declara\xe7\xe3o 'tente'.");let e=this.block(),t=null;this.match(s.PEGUE)&&(this.consume(s.LEFT_BRACE,"Esperado '{' ap\xf3s a declara\xe7\xe3o 'pegue'."),t=this.block());let r=null;this.match(s.SENAO)&&(this.consume(s.LEFT_BRACE,"Esperado '{' ap\xf3s a declara\xe7\xe3o 'pegue'."),r=this.block());let i=null;return this.match(s.FINALMENTE)&&(this.consume(s.LEFT_BRACE,"Esperado '{' ap\xf3s a declara\xe7\xe3o 'pegue'."),i=this.block()),new F(e,t,r,i)}doStatement(){try{this.loopDepth+=1;let e=this.statement();this.consume(s.ENQUANTO,"Esperado delcara\xe7\xe3o do 'enquanto' ap\xf3s o escopo do 'faca'."),this.consume(s.LEFT_PAREN,"Esperado '(' ap\xf3s declara\xe7\xe3o 'enquanto'.");let t=this.expression();return this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s declara\xe7\xe3o do 'enquanto'."),new B(e,t)}finally{this.loopDepth-=1}}statement(){return this.match(s.FACA)?this.doStatement():this.match(s.TENTE)?this.tryStatement():this.match(s.ESCOLHA)?this.switchStatement():this.match(s.RETORNA)?this.returnStatement():this.match(s.CONTINUA)?this.continueStatement():this.match(s.PAUSA)?this.breakStatement():this.match(s.PARA)?this.forStatement():this.match(s.ENQUANTO)?this.whileStatement():this.match(s.SE)?this.ifStatement():this.match(s.ESCREVA)?this.printStatement():this.match(s.LEFT_BRACE)?new L(this.block()):this.expressionStatement()}varDeclaration(){let e=this.consume(s.IDENTIFIER,"Esperado nome de vari\xe1vel."),t=null;return this.match(s.EQUAL)&&(t=this.expression()),this.consume(s.SEMICOLON,"Esperado ';' ap\xf3s a declara\xe7\xe3o da vari\xe1vel."),new V(e,t)}function(e){let t=this.consume(s.IDENTIFIER,`Esperado nome ${e}.`);return new O(t,this.functionBody(e))}functionBody(e){this.consume(s.LEFT_PAREN,`Esperado '(' ap\xf3s o nome ${e}.`);let t=[];if(!this.check(s.RIGHT_PAREN))do{t.length>=255&&this.error(this.peek(),"N\xe3o pode haver mais de 255 par\xe2metros");let e={};if(this.peek().type===s.STAR?(this.consume(s.STAR,null),e.type="wildcard"):e.type="standard",e.name=this.consume(s.IDENTIFIER,"Expect parameter name."),this.match(s.EQUAL)&&(e.default=this.primary()),t.push(e),"wildcard"===e.type)break}while(this.match(s.COMMA));this.consume(s.RIGHT_PAREN,"Esperado ')' ap\xf3s par\xe2metros."),this.consume(s.LEFT_BRACE,`Esperado '{' antes do escopo ${e}.`);let r=this.block();return new l(t,r)}classDeclaration(){let e=this.consume(s.IDENTIFIER,"Esperado nome da classe."),t=null;this.match(s.HERDA)&&(this.consume(s.IDENTIFIER,"Esperado nome da superclasse."),t=new k(this.previous())),this.consume(s.LEFT_BRACE,"Esperado '{' antes do escopo da classe.");let r=[];for(;!this.check(s.RIGHT_BRACE)&&!this.isAtEnd();)r.push(this.function("method"));return this.consume(s.RIGHT_BRACE,"Esperado '}' ap\xf3s o escopo da classe."),new b(e,t,r)}declaration(){try{return this.check(s.FUNCAO)&&this.checkNext(s.IDENTIFIER)?(this.consume(s.FUNCAO,null),this.function("funcao")):this.match(s.VAR)?this.varDeclaration():this.match(s.CLASSE)?this.classDeclaration():this.statement()}catch(error){return this.synchronize(),null}}parse(){let e=[];for(;!this.isAtEnd();)e.push(this.declaration());return e}};class $ extends Error{constructor(e){super(e),this.message=e}}class j{constructor(){this.stack=[]}push(e){this.stack.push(e)}isEmpty(){return 0===this.stack.length}peek(){if(this.isEmpty())throw new Error("Pilha vazia.");return this.stack[this.stack.length-1]}pop(){if(this.isEmpty())throw new Error("Pilha vazia.");return this.stack.pop()}}var z=class{constructor(e,t){this.interpreter=e,this.egua=t,this.scopes=new j,this.currentFunction="NONE",this.currentClass="NONE",this.currentLoop="NONE"}define(e){this.scopes.isEmpty()||(this.scopes.peek()[e.lexeme]=!0)}declare(e){if(this.scopes.isEmpty())return;let t=this.scopes.peek();t.hasOwnProperty(e.lexeme)&&this.egua.error(e,"Vari\xe1vel com esse nome j\xe1 declarada neste escopo."),t[e.lexeme]=!1}beginScope(){this.scopes.push({})}endScope(){this.scopes.pop()}resolve(e){if(Array.isArray(e))for(let t=0;t<e.length;t++)e[t].accept(this);else e.accept(this)}resolveLocal(e,t){for(let r=this.scopes.stack.length-1;r>=0;r--)this.scopes.stack[r].hasOwnProperty(t.lexeme)&&this.interpreter.resolve(e,this.scopes.stack.length-1-r)}visitBlockStmt(e){return this.beginScope(),this.resolve(e.statements),this.endScope(),null}visitVariableExpr(e){if(!this.scopes.isEmpty()&&!1===this.scopes.peek()[e.name.lexeme])throw new $("N\xe3o \xe9 poss\xedvel ler a vari\xe1vel local em seu pr\xf3prio inicializador.");return this.resolveLocal(e,e.name),null}visitVarStmt(e){return this.declare(e.name),null!==e.initializer&&this.resolve(e.initializer),this.define(e.name),null}visitAssignExpr(e){return this.resolve(e.value),this.resolveLocal(e,e.name),null}resolveFunction(e,t){let r=this.currentFunction;this.currentFunction=t,this.beginScope();let s=e.params;for(let i=0;i<s.length;i++)this.declare(s[i].name),this.define(s[i].name);this.resolve(e.body),this.endScope(),this.currentFunction=r}visitFunctionStmt(e){return this.declare(e.name),this.define(e.name),this.resolveFunction(e.func,"FUNCAO"),null}visitFunctionExpr(e){return this.resolveFunction(e,"FUNCAO"),null}visitTryStmt(e){this.resolve(e.tryBranch),null!==e.catchBranch&&this.resolve(e.catchBranch),null!==e.elseBranch&&this.resolve(e.elseBranch),null!==e.finallyBranch&&this.resolve(e.finallyBranch)}visitClassStmt(e){let t=this.currentClass;this.currentClass="CLASSE",this.declare(e.name),this.define(e.name),null!==e.superclass&&e.name.lexeme===e.superclass.name.lexeme&&this.egua.error("Uma classe n\xe3o pode herdar de si mesma."),null!==e.superclass&&(this.currentClass="SUBCLASS",this.resolve(e.superclass)),null!==e.superclass&&(this.beginScope(),this.scopes.peek().super=!0),this.beginScope(),this.scopes.peek().isto=!0;let r=e.methods;for(let s=0;s<r.length;s++){let e="METHOD";"isto"===r[s].name.lexeme&&(e="CONSTRUTOR"),this.resolveFunction(r[s].func,e)}return this.endScope(),null!==e.superclass&&this.endScope(),this.currentClass=t,null}visitSuperExpr(e){return"NONE"===this.currentClass?this.egua.error(e.keyword,"N\xe3o pode usar 'super' fora de uma classe."):"SUBCLASS"!==this.currentClass&&this.egua.error(e.keyword,"N\xe3o se usa 'super' numa classe sem superclasse."),this.resolveLocal(e,e.keyword),null}visitGetExpr(e){return this.resolve(e.object),null}visitExpressionStmt(e){return this.resolve(e.expression),null}visitIfStmt(e){this.resolve(e.condition),this.resolve(e.thenBranch);for(let t=0;t<e.elifBranches.length;t++)this.resolve(e.elifBranches[t].condition),this.resolve(e.elifBranches[t].branch);return null!==e.elseBranch&&this.resolve(e.elseBranch),null}visitImportStmt(e){this.resolve(e.path)}visitPrintStmt(e){this.resolve(e.expression)}visitReturnStmt(e){return"NONE"===this.currentFunction&&this.egua.error(e.keyword,"N\xe3o \xe9 poss\xedvel retornar do c\xf3digo do escopo superior."),null!==e.value&&("CONSTRUTOR"===this.currentFunction&&this.egua.error(e.keyword,"N\xe3o pode retornar o valor do construtor."),this.resolve(e.value)),null}visitSwitchStmt(e){let t=this.currentLoop;this.currentLoop="ESCOLHA";let r=e.branches,s=e.defaultBranch;for(let i=0;i<r.length;i++)this.resolve(r[i].stmts);null!==s&&this.resolve(s.stmts),this.currentLoop=t}visitWhileStmt(e){return this.resolve(e.condition),this.resolve(e.body),null}visitForStmt(e){null!==e.initializer&&this.resolve(e.initializer),null!==e.condition&&this.resolve(e.condition),null!==e.increment&&this.resolve(e.increment);let t=this.currentLoop;return this.currentLoop="ENQUANTO",this.resolve(e.body),this.currentLoop=t,null}visitDoStmt(e){this.resolve(e.whileCondition);let t=this.currentLoop;return this.currentLoop="FACA",this.resolve(e.doBranch),this.currentLoop=t,null}visitBinaryExpr(e){return this.resolve(e.left),this.resolve(e.right),null}visitCallExpr(e){this.resolve(e.callee);let t=e.args;for(let r=0;r<t.length;r++)this.resolve(t[r]);return null}visitGroupingExpr(e){return this.resolve(e.expression),null}visitDictionaryExpr(e){for(let t=0;t<e.keys.length;t++)this.resolve(e.keys[t]),this.resolve(e.values[t]);return null}visitArrayExpr(e){for(let t=0;t<e.values.length;t++)this.resolve(e.values[t]);return null}visitSubscriptExpr(e){return this.resolve(e.callee),this.resolve(e.index),null}visitContinueStmt(e){return null}visitBreakStmt(e){return null}visitAssignsubscriptExpr(e){return null}visitLiteralExpr(e){return null}visitLogicalExpr(e){return this.resolve(e.left),this.resolve(e.right),null}visitUnaryExpr(e){return this.resolve(e.right),null}visitSetExpr(e){return this.resolve(e.value),this.resolve(e.object),null}visitThisExpr(e){return"NONE"==this.currentClass&&this.egua.error(e.keyword,"N\xe3o pode usar 'isto' fora da classe."),this.resolveLocal(e,e.keyword),null}},q={};q.RuntimeError=class extends Error{constructor(e,t){super(t),this.token=e}},q.ContinueException=class extends Error{},q.BreakException=class extends Error{},q.ReturnException=class extends Error{constructor(e){super(e),this.value=e}};const K=q.RuntimeError;var X,W,Z=class{constructor(e){this.enclosing=e||null,this.values={}}defineVar(e,t){this.values[e]=t}assignVarAt(e,t,r){this.ancestor(e).values[t.lexeme]=r}assignVar(e,t){if(void 0===this.values[e.lexeme]){if(null==this.enclosing)throw new K(e,"Vari\xe1vel n\xe3o definida '"+e.lexeme+"'.");this.enclosing.assignVar(e,t)}else this.values[e.lexeme]=t}ancestor(e){let t=this;for(let r=0;r<e;r++)t=t.enclosing;return t}getVarAt(e,t){return this.ancestor(e).values[t]}getVar(e){if(void 0!==this.values[e.lexeme])return this.values[e.lexeme];if(null!==this.enclosing)return this.enclosing.getVar(e);throw new K(e,"Vari\xe1vel n\xe3o definida '"+e.lexeme+"'.")}},J={},Y=J={};function ee(){throw new Error("setTimeout has not been defined")}function te(){throw new Error("clearTimeout has not been defined")}function re(e){if(X===setTimeout)return setTimeout(e,0);if((X===ee||!X)&&setTimeout)return X=setTimeout,setTimeout(e,0);try{return X(e,0)}catch(t){try{return X.call(null,e,0)}catch(t){return X.call(this,e,0)}}}!function(){try{X="function"==typeof setTimeout?setTimeout:ee}catch(e){X=ee}try{W="function"==typeof clearTimeout?clearTimeout:te}catch(e){W=te}}();var se,ie=[],ne=!1,oe=-1;function ae(){ne&&se&&(ne=!1,se.length?ie=se.concat(ie):oe=-1,ie.length&&he())}function he(){if(!ne){var e=re(ae);ne=!0;for(var t=ie.length;t;){for(se=ie,ie=[];++oe<t;)se&&se[oe].run();oe=-1,t=ie.length}se=null,ne=!1,function(e){if(W===clearTimeout)return clearTimeout(e);if((W===te||!W)&&clearTimeout)return W=clearTimeout,clearTimeout(e);try{W(e)}catch(t){try{return W.call(null,e)}catch(t){return W.call(this,e)}}}(e)}}function ce(e,t){this.fun=e,this.array=t}function le(){}Y.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)t[r-1]=arguments[r];ie.push(new ce(e,t)),1!==ie.length||ne||re(he)},ce.prototype.run=function(){this.fun.apply(null,this.array)},Y.title="browser",Y.browser=!0,Y.env={},Y.argv=[],Y.version="",Y.versions={},Y.on=le,Y.addListener=le,Y.once=le,Y.off=le,Y.removeListener=le,Y.removeAllListeners=le,Y.emit=le,Y.prependListener=le,Y.prependOnceListener=le,Y.listeners=function(e){return[]},Y.binding=function(e){throw new Error("process.binding is not supported")},Y.cwd=function(){return"/"},Y.chdir=function(e){throw new Error("process.chdir is not supported")},Y.umask=function(){return 0};var ue={};(function(e){function t(e,t){for(var r=0,s=e.length-1;s>=0;s--){var i=e[s];"."===i?e.splice(s,1):".."===i?(e.splice(s,1),r++):r&&(e.splice(s,1),r--)}if(t)for(;r--;r)e.unshift("..");return e}function r(e,t){if(e.filter)return e.filter(t);for(var r=[],s=0;s<e.length;s++)t(e[s],s,e)&&r.push(e[s]);return r}ue.resolve=function(){for(var s="",i=!1,n=arguments.length-1;n>=-1&&!i;n--){var o=n>=0?arguments[n]:e.cwd();if("string"!=typeof o)throw new TypeError("Arguments to path.resolve must be strings");o&&(s=o+"/"+s,i="/"===o.charAt(0))}return(i?"/":"")+(s=t(r(s.split("/"),function(e){return!!e}),!i).join("/"))||"."},ue.normalize=function(e){var i=ue.isAbsolute(e),n="/"===s(e,-1);return(e=t(r(e.split("/"),function(e){return!!e}),!i).join("/"))||i||(e="."),e&&n&&(e+="/"),(i?"/":"")+e},ue.isAbsolute=function(e){return"/"===e.charAt(0)},ue.join=function(){var e=Array.prototype.slice.call(arguments,0);return ue.normalize(r(e,function(e,t){if("string"!=typeof e)throw new TypeError("Arguments to path.join must be strings");return e}).join("/"))},ue.relative=function(e,t){function r(e){for(var t=0;t<e.length&&""===e[t];t++);for(var r=e.length-1;r>=0&&""===e[r];r--);return t>r?[]:e.slice(t,r-t+1)}e=ue.resolve(e).substr(1),t=ue.resolve(t).substr(1);for(var s=r(e.split("/")),i=r(t.split("/")),n=Math.min(s.length,i.length),o=n,a=0;a<n;a++)if(s[a]!==i[a]){o=a;break}var h=[];for(a=o;a<s.length;a++)h.push("..");return(h=h.concat(i.slice(o))).join("/")},ue.sep="/",ue.delimiter=":",ue.dirname=function(e){if("string"!=typeof e&&(e+=""),0===e.length)return".";for(var t=e.charCodeAt(0),r=47===t,s=-1,i=!0,n=e.length-1;n>=1;--n)if(47===(t=e.charCodeAt(n))){if(!i){s=n;break}}else i=!1;return-1===s?r?"/":".":r&&1===s?"/":e.slice(0,s)},ue.basename=function(e,t){var r=function(e){"string"!=typeof e&&(e+="");var t,r=0,s=-1,i=!0;for(t=e.length-1;t>=0;--t)if(47===e.charCodeAt(t)){if(!i){r=t+1;break}}else-1===s&&(i=!1,s=t+1);return-1===s?"":e.slice(r,s)}(e);return t&&r.substr(-1*t.length)===t&&(r=r.substr(0,r.length-t.length)),r},ue.extname=function(e){"string"!=typeof e&&(e+="");for(var t=-1,r=0,s=-1,i=!0,n=0,o=e.length-1;o>=0;--o){var a=e.charCodeAt(o);if(47!==a)-1===s&&(i=!1,s=o+1),46===a?-1===t?t=o:1!==n&&(n=1):-1!==t&&(n=-1);else if(!i){r=o+1;break}}return-1===t||-1===s||0===n||1===n&&t===s-1&&t===r+1?"":e.slice(t,s)};var s="b"==="ab".substr(-1)?function(e,t,r){return e.substr(t,r)}:function(e,t,r){return t<0&&(t=e.length+t),e.substr(t,r)}}).call(this,J);var pe={},me=class{arity(){return this.arityValue}};const de=q.ReturnException;var Ee=class e extends me{constructor(e,t,r,s=!1){super(),this.name=e,this.declaration=t,this.closure=r,this.isInitializer=s}arity(){return this.declaration.params.length}toString(){return null===this.name?"<fun\xe7\xe3o>":`<fun\xe7\xe3o ${this.name}>`}call(e,t){let r=new Z(this.closure),s=this.declaration.params;for(let i=0;i<s.length;i++){let e=s[i],n=e.name.lexeme,o=t[i];null===t[i]&&(o=e.default?e.default.value:null),r.defineVar(n,o)}try{e.executeBlock(this.declaration.body,r)}catch(error){if(error instanceof de)return this.isInitializer?this.closure.getVarAt(0,"isto"):error.value;throw error}return this.isInitializer?this.closure.getVarAt(0,"isto"):null}bind(t){let r=new Z(this.closure);return r.defineVar("isto",t),new e(this.name,this.declaration,r,this.isInitializer)}},fe=class{constructor(e){this.creatorClass=e,this.fields={}}get(e){if(this.fields.hasOwnProperty(e.lexeme))return this.fields[e.lexeme];let t=this.creatorClass.findMethod(e.lexeme);if(t)return t.bind(this);throw new RuntimeError(e,"M\xe9todo indefinido n\xe3o recuperado.")}set(e,t){this.fields[e.lexeme]=t}toString(){return"<"+this.creatorClass.name+" inst\xe2ncia>"}},ve=class extends me{constructor(e,t){super(),this.arityValue=e,this.func=t}call(e,t,r){return this.token=r,this.func.apply(this,t)}toString(){return"<fun\xe7\xe3o>"}},Ae=class extends me{constructor(e,t,r){super(),this.name=e,this.superclass=t,this.methods=r}findMethod(e){return this.methods.hasOwnProperty(e)?this.methods[e]:null!==this.superclass?this.superclass.findMethod(e):void 0}toString(){return`<classe ${this.name}>`}arity(){let e=this.findMethod("construtor");return e?e.arity():0}call(e,t){let r=new fe(this),s=this.findMethod("construtor");return s&&s.bind(r).call(e,t),r}};const Se=q.RuntimeError;var Re=function(e){return e.defineVar("tamanho",new ve(1,function(e){if(!isNaN(e))throw new Se(this.token,"N\xe3o \xe9 poss\xedvel encontrar o tamanho de um n\xfamero.");if(e instanceof fe)throw new Se(this.token,"Voc\xea n\xe3o pode encontrar o tamanho de uma declara\xe7\xe3o.");if(e instanceof Ee)return e.declaration.params.length;if(e instanceof ve)return e.arityValue;if(e instanceof Ae){let t=e.methods,r=0;return t.init&&t.init.isInitializer&&(r=t.init.declaration.params.length),r}return e.length})),e.defineVar("texto",new ve(1,function(e){return`${e}`})),e.defineVar("real",new ve(1,function(e){if(!/^-{0,1}\d+$/.test(e)&&!/^\d+\.\d+$/.test(e))throw new Se(this.token,"Somente n\xfameros podem passar para real.");return parseFloat(e)})),e.defineVar("inteiro",new ve(1,function(e){if(null==e)throw new Se(this.token,"Somente n\xfameros podem passar para inteiro.");if(!/^-{0,1}\d+$/.test(e)&&!/^\d+\.\d+$/.test(e))throw new Se(this.token,"Somente n\xfameros podem passar para inteiro.");return parseInt(e)})),e.defineVar("exports",{}),e},Te=class{constructor(e){void 0!==e&&(this.name=e)}toString(){return this.name?`<module ${this.name}>`:"<module>"}},we={};const Ne=q.RuntimeError;we.aprox=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.aprox(n\xfamero).");return Math.round(e)},we.raizq=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.raizq(n\xfamero).");return Math.sqrt(e)},we.sen=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.sen(n\xfamero).");return Math.sin(e)},we.cos=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.cos(n\xfamero).");return Math.cos(e)},we.tan=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.tan(n\xfamero).");return Math.tan(e)},we.radiano=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.radiano(\xc2ngulo).");return e*(Math.PI/180)},we.graus=function(e){if(isNaN(e)||null===e)throw new Ne(this.token,"Voc\xea deve prover um n\xfamero para mat.graus(\xe2ngulo).");return e*(180/Math.PI)},we.pi=Math.PI,we.raiz=function(e,t){if(isNaN(e)||null===e)throw new Ne(this.token,"N\xfamero dado a mat.raiz(numero, raiz) precisa ser um n\xfamero.");if(isNaN(t)||null===t)throw new Ne(this.token,"Raiz dada a mat.raiz(numero, raiz) precisa ser um n\xfamero.");let r=t,s=t%2==1&&e<0;s&&(e=-e);let i=Math.pow(e,1/t);if(t=Math.pow(i,t),Math.abs(e-t)<1&&e>0==t>0)return s?-i:i;throw new Ne(this.token,`Erro ao encontrar a raiz ${r} de ${e}.`)};var ke={};const ge=q.RuntimeError;ke.ler=function(e,t="utf-8"){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do arquivo para os.ler(caminho).");try{return pe.readFileSync(e,t)}catch(error){throw new ge(this.token,`Erro ao ler o arquivo - ${error.code}.`)}},ke.escreva=function(e,t="",r="utf-8"){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do arquivo para os.escreva(arquivo).");try{return pe.writeFileSync(e,t,r),null}catch(error){throw new ge(this.token,`Erro ao escrever o arquivo - ${error.code}.`)}},ke.apagar=function(e){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do arquivo para os.apagar(arquivo).");try{return pe.unlinkSync(e),null}catch(error){throw new ge(this.token,`Erro ao apagar o arquivo - ${error.code}.`)}},ke.criardir=function(e){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do diret\xf3rio para os.criardir(arquivo).");try{return pe.mkdirSync(e),null}catch(error){throw new ge(this.token,`Erro ao criar o diret\xf3rio - ${error.code}.`)}},ke.apagardir=function(e){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do diret\xf3rio para os.apagardir(arquivo).");try{return pe.rmdirSync(e,{recursive:!0}),null}catch(error){throw new ge(this.token,`Erro ao apagar o diret\xf3rio - ${error.code}.`)}},ke.listardir=function(e){if(null===e)throw new ge(this.token,"Voc\xea deve prover o caminho do diret\xf3rio para os.listdir(listardir).");try{return pe.readdirSync(e)}catch(error){throw new ge(this.token,`Erro ao listar o conte\xfado do diret\xf3rio - ${error.code}.`)}};var xe={};const Oe=function(e,t){let r=require(t),s=new Te(e),i=Object.keys(r);for(let n=0;n<i.length;n++){let e=r[i[n]];s[i[n]]="function"==typeof e?new ve(e.length,e):e}return s};xe=function(e){switch(e){case"os":return Oe("os","./os.js");case"time":return Oe("os","./time.js");case"eguamat":return Oe("eguamat","./eguamat.js")}return null};var ye={};return function(e){const r=t({});ye.Egua=class{constructor(e){this.filename=e,this.hadError=!1,this.hadRuntimeError=!1}runBlock(t){const s=new r(this,e.cwd()),i=new o(t,this).scan();if(!0===this.hadError)return;const n=new Q(i,this).parse();!0!==this.hadError&&(new z(s,this).resolve(n),!0!==this.hadError&&s.interpret(n))}report(e,t,r){this.filename?console.error(`[Arquivo: ${this.filename}] [Linha: ${e}] Erro${t}: ${r}`):console.error(`[Linha: ${e}] Erro${t}: ${r}`),this.hadError=!0}error(e,t){e.type===s.EOF?this.report(e.line," no fim",t):this.report(e.line,` no '${e.lexeme}'`,t)}lexerError(e,t,r){this.report(e,` no '${t}'`,r)}runtimeError(e){let t=e.token.line;e.token&&t?this.filename?console.error(`Erro: [Arquivo: ${this.filename}] [Linha: ${e.token.line}] ${e.message}`):console.error(`Erro: [Linha: ${e.token.line}] ${e.message}`):console.error(e),this.hadRuntimeError=!0}}}.call(this,J),ye});
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Egua = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+
+},{}],2:[function(require,module,exports){
+(function (process){
+// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
+// backported and transplited with Babel, with backwards-compat fixes
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  if (path.length === 0) return '.';
+  var code = path.charCodeAt(0);
+  var hasRoot = code === 47 /*/*/;
+  var end = -1;
+  var matchedSlash = true;
+  for (var i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        if (!matchedSlash) {
+          end = i;
+          break;
+        }
+      } else {
+      // We saw the first non-path separator
+      matchedSlash = false;
+    }
+  }
+
+  if (end === -1) return hasRoot ? '/' : '.';
+  if (hasRoot && end === 1) {
+    // return '//';
+    // Backwards-compat fix:
+    return '/';
+  }
+  return path.slice(0, end);
+};
+
+function basename(path) {
+  if (typeof path !== 'string') path = path + '';
+
+  var start = 0;
+  var end = -1;
+  var matchedSlash = true;
+  var i;
+
+  for (i = path.length - 1; i >= 0; --i) {
+    if (path.charCodeAt(i) === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          start = i + 1;
+          break;
+        }
+      } else if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // path component
+      matchedSlash = false;
+      end = i + 1;
+    }
+  }
+
+  if (end === -1) return '';
+  return path.slice(start, end);
+}
+
+// Uses a mixed approach for backwards-compatibility, as ext behavior changed
+// in new Node.js versions, so only basename() above is backported here
+exports.basename = function (path, ext) {
+  var f = basename(path);
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  var startDot = -1;
+  var startPart = 0;
+  var end = -1;
+  var matchedSlash = true;
+  // Track the state of characters (if any) we see before our first dot and
+  // after any path separator we find
+  var preDotState = 0;
+  for (var i = path.length - 1; i >= 0; --i) {
+    var code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          startPart = i + 1;
+          break;
+        }
+        continue;
+      }
+    if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // extension
+      matchedSlash = false;
+      end = i + 1;
+    }
+    if (code === 46 /*.*/) {
+        // If this is our first dot, mark it as the start of our extension
+        if (startDot === -1)
+          startDot = i;
+        else if (preDotState !== 1)
+          preDotState = 1;
+    } else if (startDot !== -1) {
+      // We saw a non-dot and non-path separator before our dot, so we should
+      // have a good chance at having a non-empty extension
+      preDotState = -1;
+    }
+  }
+
+  if (startDot === -1 || end === -1 ||
+      // We saw a non-dot character immediately before the dot
+      preDotState === 0 ||
+      // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+    return '';
+  }
+  return path.slice(startDot, end);
+};
+
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
+    }
+;
+
+}).call(this,require('_process'))
+},{"_process":3}],3:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],4:[function(require,module,exports){
+(function (process){
+const Lexer = require("./lexer.js");
+const Parser = require("./parser.js");
+const Resolver = require("./resolver.js");
+const Interpreter = require("./interpreter.js");
+const tokenTypes = require("./tokenTypes.js");
+const fs = require("fs");
+const path = require("path");
+const readline = require("readline");
+
+module.exports.Egua = class Egua {
+    constructor(filename) {
+        this.filename = filename;
+
+        this.hadError = false;
+        this.hadRuntimeError = false;
+    }
+
+    runPrompt() {
+        const interpreter = new Interpreter(this, process.cwd(), undefined);
+        console.log("Console da Linguagem Egua v1.0.4");
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            prompt: "\negua> "
+        });
+
+        rl.prompt();
+
+        rl.on("line", line => {
+            this.hadError = false;
+            this.hadRuntimeError = false;
+
+            this.run(line, interpreter);
+            rl.prompt();
+        });
+    }
+
+    runfile(filename) {
+        this.filename = path.basename(filename);
+        const interpreter = new Interpreter(this, process.cwd());
+
+        const fileData = fs.readFileSync(filename).toString();
+        this.run(fileData, interpreter);
+
+        if (this.hadError) process.exit(65);
+        if (this.hadRuntimeError) process.exit(70);
+    }
+
+    run(code, interpreter) {
+        const lexer = new Lexer(code, this);
+        const tokens = lexer.scan();
+
+        if (this.hadError === true) return;
+
+        const parser = new Parser(tokens, this);
+        const statements = parser.parse();
+
+        if (this.hadError === true) return;
+
+        const resolver = new Resolver(interpreter, this);
+        resolver.resolve(statements);
+
+        if (this.hadError === true) return;
+
+        interpreter.interpret(statements);
+    }
+
+    report(line, where, message) {
+        if (this.filename)
+            console.error(
+                `[Arquivo: ${this.filename}] [Linha: ${line}] Erro${where}: ${message}`
+            );
+        else console.error(`[Linha: ${line}] Erro${where}: ${message}`);
+        this.hadError = true;
+    }
+
+    error(token, errorMessage) {
+        if (token.type === tokenTypes.EOF) {
+            this.report(token.line, " no final", errorMessage);
+        } else {
+            this.report(token.line, ` no '${token.lexeme}'`, errorMessage);
+        }
+    }
+
+    lexerError(line, char, msg) {
+        this.report(line, ` no '${char}'`, msg);
+    }
+
+    runtimeError(error) {
+        let line = error.token.line;
+        if (error.token && line) {
+            if (this.fileName)
+                console.error(
+                    `Erro: [Arquivo: ${this.fileName}] [Linha: ${error.token.line}] ${error.message}`
+                );
+            else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
+        } else {
+            console.error(error);
+        }
+        this.hadRuntimeError = true;
+    }
+};
+}).call(this,require('_process'))
+},{"./interpreter.js":8,"./lexer.js":9,"./parser.js":14,"./resolver.js":15,"./tokenTypes.js":23,"_process":3,"fs":1,"path":2,"readline":1}],5:[function(require,module,exports){
+const RuntimeError = require("./errors.js").RuntimeError;
+
+module.exports = class Environment {
+    constructor(enclosing) {
+        this.enclosing = enclosing || null;
+        this.values = {};
+    }
+
+    defineVar(varName, value) {
+        this.values[varName] = value;
+    }
+
+    assignVarAt(distance, name, value) {
+        this.ancestor(distance).values[name.lexeme] = value;
+    }
+
+    assignVar(name, value) {
+        if (this.values[name.lexeme] !== undefined) {
+            this.values[name.lexeme] = value;
+            return;
+        }
+
+        if (this.enclosing != null) {
+            this.enclosing.assignVar(name, value);
+            return;
+        }
+
+        throw new RuntimeError(name, "Variável não definida '" + name.lexeme + "'.");
+    }
+
+    ancestor(distance) {
+        let environment = this;
+        for (let i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+
+        return environment;
+    }
+
+    getVarAt(distance, name) {
+        return this.ancestor(distance).values[name];
+    }
+
+    getVar(token) {
+        if (this.values[token.lexeme] !== undefined) {
+            return this.values[token.lexeme];
+        }
+
+        if (this.enclosing !== null) return this.enclosing.getVar(token);
+
+        throw new RuntimeError(token, "Variável não definida '" + token.lexeme + "'.");
+    }
+};
+},{"./errors.js":6}],6:[function(require,module,exports){
+module.exports.RuntimeError = class RuntimeError extends Error {
+  constructor(token, message) {
+    super(message);
+    this.token = token;
+  }
+};
+
+module.exports.ContinueException = class ContinueException extends Error { };
+
+module.exports.BreakException = class BreakException extends Error { };
+
+module.exports.ReturnException = class ReturnException extends Error {
+  constructor(value) {
+    super(value);
+    this.value = value;
+  }
+};
+},{}],7:[function(require,module,exports){
+class Expr {
+    accept(visitor) {}
+}
+
+class Assign extends Expr {
+    constructor(name, value) {
+        super();
+        this.name = name;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitAssignExpr(this);
+    }
+}
+
+class Binary extends Expr {
+    constructor(left, operator, right) {
+        super();
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
+
+    accept(visitor) {
+        return visitor.visitBinaryExpr(this);
+    }
+}
+
+class Funcao extends Expr {
+    constructor(params, body) {
+        super();
+        this.params = params;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitFunctionExpr(this);
+    }
+}
+
+class Call extends Expr {
+    constructor(callee, paren, args) {
+        super();
+        this.callee = callee;
+        this.paren = paren;
+        this.args = args;
+    }
+
+    accept(visitor) {
+        return visitor.visitCallExpr(this);
+    }
+}
+
+class Get extends Expr {
+    constructor(object, name) {
+        super();
+        this.object = object;
+        this.name = name;
+    }
+
+    accept(visitor) {
+        return visitor.visitGetExpr(this);
+    }
+}
+
+class Grouping extends Expr {
+    constructor(expression) {
+        super();
+        this.expression = expression;
+    }
+
+    accept(visitor) {
+        return visitor.visitGroupingExpr(this);
+    }
+}
+
+class Literal extends Expr {
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitLiteralExpr(this);
+    }
+}
+
+class Array extends Expr {
+    constructor(values) {
+        super();
+        this.values = values;
+    }
+
+    accept(visitor) {
+        return visitor.visitArrayExpr(this);
+    }
+}
+
+class Dictionary extends Expr {
+    constructor(keys, values) {
+        super();
+        this.keys = keys;
+        this.values = values;
+    }
+
+    accept(visitor) {
+        return visitor.visitDictionaryExpr(this);
+    }
+}
+
+class Subscript extends Expr {
+    constructor(callee, index, closeBracket) {
+        super();
+        this.callee = callee;
+        this.index = index;
+        this.closeBracket = closeBracket;
+    }
+
+    accept(visitor) {
+        return visitor.visitSubscriptExpr(this);
+    }
+}
+
+class Assignsubscript extends Expr {
+    constructor(obj, index, value) {
+        super();
+        this.obj = obj;
+        this.index = index;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitAssignsubscriptExpr(this);
+    }
+}
+
+class Logical extends Expr {
+    constructor(left, operator, right) {
+        super();
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
+
+    accept(visitor) {
+        return visitor.visitLogicalExpr(this);
+    }
+}
+
+class Set extends Expr {
+    constructor(object, name, value) {
+        super();
+        this.object = object;
+        this.name = name;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitSetExpr(this);
+    }
+}
+
+class Super extends Expr {
+    constructor(keyword, method) {
+        super();
+        this.keyword = keyword;
+        this.method = method;
+    }
+
+    accept(visitor) {
+        return visitor.visitSuperExpr(this);
+    }
+}
+
+class Isto extends Expr {
+    constructor(keyword) {
+        super();
+        this.keyword = keyword;
+    }
+
+    accept(visitor) {
+        return visitor.visitThisExpr(this);
+    }
+}
+
+class Unary extends Expr {
+    constructor(operator, right) {
+        super();
+        this.operator = operator;
+        this.right = right;
+    }
+
+    accept(visitor) {
+        return visitor.visitUnaryExpr(this);
+    }
+}
+
+class Variable extends Expr {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+
+    accept(visitor) {
+        return visitor.visitVariableExpr(this);
+    }
+}
+
+module.exports = {
+    Assign,
+    Binary,
+    Funcao,
+    Call,
+    Get,
+    Grouping,
+    Literal,
+    Array,
+    Dictionary,
+    Subscript,
+    Assignsubscript,
+    Logical,
+    Set,
+    Super,
+    Isto,
+    Unary,
+    Variable
+};
+},{}],8:[function(require,module,exports){
+const tokenTypes = require("./tokenTypes.js");
+const Environment = require("./environment.js");
+const Egua = require("./egua.js");
+const loadGlobalLib = require("./lib/globalLib.js");
+const path = require("path");
+const fs = require("fs");
+const checkStdLib = require("./lib/importStdlib.js");
+
+const Callable = require("./structures/callable.js");
+const StandardFn = require("./structures/standardFn.js");
+const EguaClass = require("./structures/class.js");
+const EguaFunction = require("./structures/function.js");
+const EguaInstance = require("./structures/instance.js");
+const EguaModule = require("./structures/module.js");
+
+const {
+    RuntimeError,
+    ContinueException,
+    BreakException,
+    ReturnException
+} = require("./errors.js");
+
+module.exports = class Interpreter {
+    constructor(Egua, baseDir) {
+        this.Egua = Egua;
+        this.baseDir = baseDir;
+
+        this.globals = new Environment();
+        this.environment = this.globals;
+        this.locals = new Map();
+
+        this.globals = loadGlobalLib(this.globals);
+    }
+
+    resolve(expr, depth) {
+        this.locals.set(expr, depth);
+    }
+
+    visitLiteralExpr(expr) {
+        return expr.value;
+    }
+
+    evaluate(expr) {
+        return expr.accept(this);
+    }
+
+    visitGroupingExpr(expr) {
+        return this.evaluate(expr.expression);
+    }
+
+    isTruthy(object) {
+        if (object === null) return false;
+        else if (typeof object === "boolean") return Boolean(object);
+        else return true;
+    }
+
+    checkNumberOperand(operator, operand) {
+        if (typeof operand === "number") return;
+        throw new RuntimeError(operator, "Operador precisa ser um número.");
+    }
+
+    visitUnaryExpr(expr) {
+        let right = this.evaluate(expr.right);
+
+        switch (expr.operator.type) {
+            case tokenTypes.MINUS:
+                this.checkNumberOperand(expr.operator, right);
+                return -right;
+            case tokenTypes.BANG:
+                return !this.isTruthy(right);
+            case tokenTypes.BIT_NOT:
+                return ~right;
+        }
+
+        return null;
+    }
+
+    isEqual(left, right) {
+        if (left === null && right === null) return true;
+        else if (left === null) return false;
+
+        return left === right;
+    }
+
+    checkNumberOperands(operator, left, right) {
+        if (typeof left === "number" && typeof right === "number") return;
+        throw new RuntimeError(operator, "Operadores precisam ser números.");
+    }
+
+    visitBinaryExpr(expr) {
+        let left = this.evaluate(expr.left);
+        let right = this.evaluate(expr.right);
+
+        switch (expr.operator.type) {
+            case tokenTypes.STAR_STAR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Math.pow(left, right);
+
+            case tokenTypes.GREATER:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) > Number(right);
+
+            case tokenTypes.GREATER_EQUAL:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) >= Number(right);
+
+            case tokenTypes.LESS:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) < Number(right);
+
+            case tokenTypes.LESS_EQUAL:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) <= Number(right);
+
+            case tokenTypes.MINUS:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) - Number(right);
+
+            case tokenTypes.PLUS:
+                if (typeof left === "number" && typeof right === "number") {
+                    return Number(left) + Number(right);
+                }
+
+                if (typeof left === "string" && typeof right === "string") {
+                    return String(left) + String(right);
+                }
+
+                throw new RuntimeError(
+                    expr.operator,
+                    "Operadores precisam ser dois números ou duas strings."
+                );
+
+            case tokenTypes.SLASH:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) / Number(right);
+
+            case tokenTypes.STAR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) * Number(right);
+
+            case tokenTypes.MODULUS:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) % Number(right);
+
+            case tokenTypes.BIT_AND:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) & Number(right);
+
+            case tokenTypes.BIT_XOR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) ^ Number(right);
+
+            case tokenTypes.BIT_OR:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) | Number(right);
+
+            case tokenTypes.LESSER_LESSER:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) << Number(right);
+
+            case tokenTypes.GREATER_GREATER:
+                this.checkNumberOperands(expr.operator, left, right);
+                return Number(left) >> Number(right);
+
+            case tokenTypes.BANG_EQUAL:
+                return !this.isEqual(left, right);
+
+            case tokenTypes.EQUAL_EQUAL:
+                return this.isEqual(left, right);
+        }
+
+        return null;
+    }
+
+    visitCallExpr(expr) {
+        let callee = this.evaluate(expr.callee);
+
+        let args = [];
+        for (let i = 0; i < expr.args.length; i++) {
+            args.push(this.evaluate(expr.args[i]));
+        }
+
+        if (!(callee instanceof Callable)) {
+            throw new RuntimeError(
+                expr.paren,
+                "Só pode chamar função ou classe."
+            );
+        }
+
+        let params;
+        if (callee instanceof EguaFunction) {
+            params = callee.declaration.params;
+        } else if (callee instanceof EguaClass) {
+            params = callee.methods.init
+                ? callee.methods.init.declaration.params
+                : [];
+        } else {
+            params = [];
+        }
+
+        //
+        if (args.length < callee.arity()) {
+            let diff = callee.arity() - args.length;
+            for (let i = 0; i < diff; i++) {
+                args.push(null);
+            }
+        }
+
+        // 
+        else if (args.length >= callee.arity()) {
+            // 
+            if (
+                params.length > 0 &&
+                params[params.length - 1]["type"] === "wildcard"
+            ) {
+                let newArgs = args.slice(0, params.length - 1);
+                newArgs.push(args.slice(params.length - 1, args.length));
+                args = newArgs;
+            }
+        }
+
+        if (callee instanceof StandardFn) {
+            return callee.call(this, args, expr.callee.name);
+        }
+
+        return callee.call(this, args);
+    }
+
+    visitAssignExpr(expr) {
+        let value = this.evaluate(expr.value);
+
+        let distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            this.environment.assignVarAt(distance, expr.name, value);
+        } else {
+            this.environment.assignVar(expr.name, value);
+        }
+
+        return value;
+    }
+
+    lookupVar(name, expr) {
+        let distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            return this.environment.getVarAt(distance, name.lexeme);
+        } else {
+            return this.globals.getVar(name);
+        }
+    }
+
+    visitVariableExpr(expr) {
+        return this.lookupVar(expr.name, expr);
+    }
+
+    visitExpressionStmt(stmt) {
+        this.evaluate(stmt.expression);
+        return null;
+    }
+
+    visitLogicalExpr(expr) {
+        let left = this.evaluate(expr.left);
+
+        if (expr.operator.type === tokenTypes.EM) {
+            let right = this.evaluate(expr.right);
+
+            if (Array.isArray(right) || typeof right === "string") {
+                return right.includes(left);
+            } else if (right.constructor == Object) {
+                return left in right;
+            } else {
+                throw new RuntimeError("Tipo de chamada inválida com 'em'."); //Invalid type called with in keyword
+            }
+        }
+
+        if (expr.operator.type === tokenTypes.OU) {
+            // se um estado for verdadeiro, retorna verdadeiro
+            if (this.isTruthy(left)) return left;
+        }
+
+        if (expr.operator.type === tokenTypes.E) {
+            // se um estado for falso, retorna falso
+            if (!this.isTruthy(left)) return left;
+        }
+
+        //
+        return this.evaluate(expr.right);
+    }
+
+    visitIfStmt(stmt) {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+            return null;
+        }
+
+        for (let i = 0; i < stmt.elifBranches.length; i++) {
+            let current = stmt.elifBranches[i];
+
+            if (this.isTruthy(this.evaluate(current.condition))) {
+                this.execute(current.branch);
+                return null;
+            }
+        }
+
+        if (stmt.elseBranch !== null) {
+            this.execute(stmt.elseBranch);
+        }
+
+        return null;
+    }
+
+    visitForStmt(stmt) {
+        if (stmt.initializer !== null) {
+            this.evaluate(stmt.initializer);
+        }
+        while (true) {
+            if (stmt.condition !== null) {
+                if (!this.isTruthy(this.evaluate(stmt.condition))) {
+                    break;
+                }
+            }
+
+            try {
+                this.execute(stmt.body);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // 
+                } else {
+                    throw error;
+                }
+            }
+
+            if (stmt.increment !== null) {
+                this.evaluate(stmt.increment);
+            }
+        }
+        return null;
+    }
+
+    visitDoStmt(stmt) {
+        do {
+            try {
+                this.execute(stmt.doBranch);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // 
+                } else {
+                    throw error;
+                }
+            }
+        } while (this.isTruthy(this.evaluate(stmt.whileCondition)));
+    }
+
+    visitSwitchStmt(stmt) {
+        let switchCondition = this.evaluate(stmt.condition);
+        let branches = stmt.branches;
+        let defaultBranch = stmt.defaultBranch;
+
+        let matched = false;
+        try {
+            for (let i = 0; i < branches.length; i++) {
+                let branch = branches[i];
+
+                for (let j = 0; j < branch.conditions.length; j++) {
+                    if (this.evaluate(branch.conditions[j]) === switchCondition) {
+                        matched = true;
+
+                        try {
+                            for (let k = 0; k < branch.stmts.length; k++) {
+                                this.execute(branch.stmts[k]);
+                            }
+                        } catch (error) {
+                            if (error instanceof ContinueException) {
+                                // 
+                            } else {
+                                throw error;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (defaultBranch !== null && matched === false) {
+                for (let i = 0; i < defaultBranch.stmts.length; i++) {
+                    this.execute(defaultBranch["stmts"][i]);
+                }
+            }
+        } catch (error) {
+            if (error instanceof BreakException) {
+                // 
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    visitTryStmt(stmt) {
+        try {
+            let successful = true;
+            try {
+                this.executeBlock(stmt.tryBranch, new Environment(this.environment));
+            } catch (error) {
+                successful = false;
+
+                if (stmt.catchBranch !== null) {
+                    this.executeBlock(
+                        stmt.catchBranch,
+                        new Environment(this.environment)
+                    );
+                }
+            }
+
+            if (successful && stmt.elseBranch !== null) {
+                this.executeBlock(stmt.elseBranch, new Environment(this.environment));
+            }
+        } finally {
+            if (stmt.finallyBranch !== null)
+                this.executeBlock(
+                    stmt.finallyBranch,
+                    new Environment(this.environment)
+                );
+        }
+    }
+
+    visitWhileStmt(stmt) {
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            try {
+                this.execute(stmt.body);
+            } catch (error) {
+                if (error instanceof BreakException) {
+                    break;
+                } else if (error instanceof ContinueException) {
+                    // 
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    visitImportStmt(stmt) {
+        let relativePath = this.evaluate(stmt.path);
+        let totalPath = path.join(this.baseDir, relativePath);
+        let totalFolder = path.dirname(totalPath);
+        let filename = path.basename(totalPath);
+
+        let data = checkStdLib(relativePath);
+        if (data !== null) return data;
+
+        try {
+            if (!fs.existsSync(totalPath)) {
+                throw new RuntimeError(
+                    stmt.closeBracket,
+                    "Não foi possível encontrar arquivo importado."
+                );
+            }
+        } catch (error) {
+            throw new RuntimeError(stmt.closeBracket, "Não foi possível ler o arquivo.");
+        }
+
+        data = fs.readFileSync(totalPath).toString();
+
+        const egua = new Egua.Egua(filename);
+        const interpreter = new Interpreter(egua, totalFolder);
+
+        egua.run(data, interpreter);
+
+        let exported = interpreter.globals.values.exports;
+
+        const isDict = obj => obj.constructor === Object;
+
+        if (isDict(exported)) {
+            let newModule = new EguaModule();
+
+            let keys = Object.keys(exported);
+            for (let i = 0; i < keys.length; i++) {
+                newModule[keys[i]] = exported[keys[i]];
+            }
+
+            return newModule;
+        }
+
+        return exported;
+    }
+
+    visitPrintStmt(stmt) {
+        let value = this.evaluate(stmt.expression);
+        console.log(this.stringify(value));
+        return null;
+    }
+
+    executeBlock(statements, environment) {
+        let previous = this.environment;
+        try {
+            this.environment = environment;
+
+            for (let i = 0; i < statements.length; i++) {
+                this.execute(statements[i]);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
+    visitBlockStmt(stmt) {
+        this.executeBlock(stmt.statements, new Environment(this.environment));
+        return null;
+    }
+
+    visitVarStmt(stmt) {
+        let value = null;
+        if (stmt.initializer !== null) {
+            value = this.evaluate(stmt.initializer);
+        }
+
+        this.environment.defineVar(stmt.name.lexeme, value);
+        return null;
+    }
+
+    visitContinueStmt(stmt) {
+        throw new ContinueException();
+    }
+
+    visitBreakStmt(stmt) {
+        throw new BreakException();
+    }
+
+    visitReturnStmt(stmt) {
+        let value = null;
+        if (stmt.value != null) value = this.evaluate(stmt.value);
+
+        throw new ReturnException(value);
+    }
+
+    visitFunctionExpr(expr) {
+        return new EguaFunction(null, expr, this.environment, false);
+    }
+
+    visitAssignsubscriptExpr(expr) {
+        let obj = this.evaluate(expr.obj);
+        let index = this.evaluate(expr.index);
+        let value = this.evaluate(expr.value);
+
+        if (Array.isArray(obj)) {
+            //
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
+            }
+
+            // 
+            while (obj.length < index) {
+                obj.push(null);
+            }
+
+            obj[index] = value;
+        } else if (
+            obj.constructor == Object ||
+            obj instanceof EguaInstance ||
+            obj instanceof EguaFunction ||
+            obj instanceof EguaClass ||
+            obj instanceof EguaModule
+        ) {
+            obj[index] = value;
+        }
+
+        //
+        else {
+            throw new RuntimeError(
+                expr.obj.name,
+                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
+            );
+        }
+    }
+
+    visitSubscriptExpr(expr) {
+        let obj = this.evaluate(expr.callee);
+
+        let index = this.evaluate(expr.index);
+        if (Array.isArray(obj)) {
+            if (!Number.isInteger(index)) {
+                throw new RuntimeError(
+                    expr.closeBracket,
+                    "Somente inteiros podem ser usados para indexar um vetor."
+                );
+            }
+
+            // 
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
+            }
+
+            if (index >= obj.length) {
+                throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
+            }
+            return obj[index];
+        }
+
+        // other data types
+        else if (
+            obj.constructor == Object ||
+            obj instanceof EguaInstance ||
+            obj instanceof EguaFunction ||
+            obj instanceof EguaClass ||
+            obj instanceof EguaModule
+        ) {
+            return obj[index] || null;
+        }
+
+        // 
+        else if (typeof obj === "string") {
+            // 
+            if (!Number.isInteger(index)) {
+                throw new RuntimeError(
+                    expr.closeBracket,
+                    "Somente inteiros podem ser usados para indexar um vetor."
+                );
+            }
+
+            if (index < 0 && obj.length !== 0) {
+                while (index < 0) {
+                    index += obj.length;
+                }
+            }
+
+            if (index >= obj.length) {
+                throw new RuntimeError(expr.closeBracket, "Index fora do tamanho.");
+            }
+            return obj.charAt(index);
+        }
+
+        // 
+        else {
+            throw new RuntimeError(
+                expr.callee.name,
+                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
+            );
+        }
+    }
+
+    visitSetExpr(expr) {
+        let obj = this.evaluate(expr.object);
+
+        if (!(obj instanceof EguaInstance) && obj.constructor !== Object) {
+            throw new RuntimeError(
+                expr.object.name,
+                "Somente instâncias e dicionários podem possuir campos."
+            );
+        }
+
+        let value = this.evaluate(expr.value);
+        if (obj instanceof EguaInstance) {
+            obj.set(expr.name, value);
+            return value;
+        } else if (obj.constructor == Object) {
+            obj[expr.name.lexeme] = value;
+        }
+    }
+
+    visitFunctionStmt(stmt) {
+        let func = new EguaFunction(
+            stmt.name.lexeme,
+            stmt.func,
+            this.environment,
+            false
+        );
+        this.environment.defineVar(stmt.name.lexeme, func);
+    }
+
+    visitClassStmt(stmt) {
+        let superclass = null;
+        if (stmt.superclass !== null) {
+            superclass = this.evaluate(stmt.superclass);
+            if (!(superclass instanceof EguaClass)) {
+                throw new RuntimeError(
+                    stmt.superclass.name,
+                    "Superclasse precisa ser uma classe."
+                );
+            }
+        }
+
+        this.environment.defineVar(stmt.name.lexeme, null);
+
+        if (stmt.superclass !== null) {
+            this.environment = new Environment(this.environment);
+            this.environment.defineVar("super", superclass);
+        }
+
+        let methods = {};
+        let definedMethods = stmt.methods;
+        for (let i = 0; i < stmt.methods.length; i++) {
+            let currentMethod = definedMethods[i];
+            let isInitializer = currentMethod.name.lexeme === "construtor";
+            let func = new EguaFunction(
+                currentMethod.name.lexeme,
+                currentMethod.func,
+                this.environment,
+                isInitializer
+            );
+            methods[currentMethod.name.lexeme] = func;
+        }
+
+        let created = new EguaClass(stmt.name.lexeme, superclass, methods);
+
+        if (superclass !== null) {
+            this.environment = this.environment.enclosing;
+        }
+
+        this.environment.assignVar(stmt.name, created);
+        return null;
+    }
+
+    visitGetExpr(expr) {
+        let object = this.evaluate(expr.object);
+        if (object instanceof EguaInstance) {
+            return object.get(expr.name) || null;
+        } else if (object.constructor == Object) {
+            return object[expr.name.lexeme] || null;
+        } else if (object instanceof EguaModule) {
+            return object[expr.name.lexeme] || null;
+        }
+
+        throw new RuntimeError(
+            expr.name,
+            "Você só pode acessar métodos do objeto e dicionários."
+        );
+    }
+
+    visitThisExpr(expr) {
+        return this.lookupVar(expr.keyword, expr);
+    }
+
+    visitDictionaryExpr(expr) {
+        let dict = {};
+        for (let i = 0; i < expr.keys.length; i++) {
+            dict[this.evaluate(expr.keys[i])] = this.evaluate(expr.values[i]);
+        }
+        return dict;
+    }
+
+    visitArrayExpr(expr) {
+        let values = [];
+        for (let i = 0; i < expr.values.length; i++) {
+            values.push(this.evaluate(expr.values[i]));
+        }
+        return values;
+    }
+
+    visitSuperExpr(expr) {
+        let distance = this.locals.get(expr);
+        let superclass = this.environment.getVarAt(distance, "super");
+
+        let object = this.environment.getVarAt(distance - 1, "isto");
+
+        let method = superclass.findMethod(expr.method.lexeme);
+
+        if (method === undefined) {
+            throw new RuntimeError(
+                expr.method,
+                "Método chamado indefinido."
+            );
+        }
+
+        return method.bind(object);
+    }
+
+    stringify(object) {
+        if (object === null) return "nulo";
+        if (Array.isArray(object)) return object;
+
+        return object.toString();
+    }
+
+    execute(stmt) {
+        stmt.accept(this);
+    }
+
+    interpret(statements) {
+        try {
+            for (let i = 0; i < statements.length; i++) {
+                this.execute(statements[i]);
+            }
+        } catch (error) {
+            this.Egua.runtimeError(error);
+        }
+    }
+};
+},{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":11,"./lib/importStdlib.js":12,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
+const tokenTypes = require("./tokenTypes.js");
+
+const reservedWords = {
+    e: tokenTypes.E,
+    em: tokenTypes.EM,
+    classe: tokenTypes.CLASSE,
+    senao: tokenTypes.SENAO,
+    falso: tokenTypes.FALSO,
+    para: tokenTypes.PARA,
+    funcao: tokenTypes.FUNCAO,
+    se: tokenTypes.SE,
+    senaose: tokenTypes.SENAOSE,
+    nulo: tokenTypes.NULO,
+    ou: tokenTypes.OU,
+    escreva: tokenTypes.ESCREVA,
+    retorna: tokenTypes.RETORNA,
+    super: tokenTypes.SUPER,
+    isto: tokenTypes.ISTO,
+    verdadeiro: tokenTypes.VERDADEIRO,
+    var: tokenTypes.VAR,
+    faca: tokenTypes.FACA,
+    enquanto: tokenTypes.ENQUANTO,
+    pausa: tokenTypes.PAUSA,
+    continua: tokenTypes.CONTINUA,
+    escolha: tokenTypes.ESCOLHA,
+    caso: tokenTypes.CASO,
+    padrao: tokenTypes.PADRAO,
+    importar: tokenTypes.IMPORTAR,
+    tente: tokenTypes.TENTE,
+    pegue: tokenTypes.PEGUE,
+    finalmente: tokenTypes.FINALMENTE,
+    herda: tokenTypes.HERDA
+};
+
+class Token {
+    constructor(type, lexeme, literal, line) {
+        this.type = type;
+        this.lexeme = lexeme;
+        this.literal = literal;
+        this.line = line;
+    }
+
+    toString() {
+        return this.type + " " + this.lexeme + " " + this.literal;
+    }
+}
+
+module.exports = class Lexer {
+    constructor(code, Egua) {
+        this.Egua = Egua;
+        this.code = code;
+
+        this.tokens = [];
+
+        this.start = 0;
+        this.current = 0;
+        this.line = 1;
+    }
+
+    isDigit(c) {
+        return c >= "0" && c <= "9";
+    }
+
+    isAlpha(c) {
+        return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
+    }
+
+    isAlphaNumeric(c) {
+        return this.isDigit(c) || this.isAlpha(c);
+    }
+
+    endOfCode() {
+        return this.current >= this.code.length;
+    }
+
+    advance() {
+        this.current += 1;
+        return this.code[this.current - 1];
+    }
+
+    addToken(type, literal = null) {
+        const text = this.code.substring(this.start, this.current);
+        this.tokens.push(new Token(type, text, literal, this.line));
+    }
+
+    match(expected) {
+        if (this.endOfCode()) {
+            return false;
+        }
+
+        if (this.code[this.current] !== expected) {
+            return false;
+        }
+
+        this.current += 1;
+        return true;
+    }
+
+    peek() {
+        if (this.endOfCode()) return "\0";
+        return this.code.charAt(this.current);
+    }
+
+    peekNext() {
+        if (this.current + 1 >= this.code.length) return "\0";
+        return this.code.charAt(this.current + 1);
+    }
+
+    previous() {
+        return this.code.charAt(this.current - 1);
+    }
+
+    parseString(stringChar = '"') {
+        while (this.peek() !== stringChar && !this.endOfCode()) {
+            if (this.peek() === "\n") this.line = +1;
+            this.advance();
+        }
+
+        if (this.endOfCode()) {
+            this.Egua.lexerError(
+                this.line,
+                this.previous(),
+                "Texto não finalizado."
+            );
+            return;
+        }
+
+        this.advance();
+
+        let value = this.code.substring(this.start + 1, this.current - 1);
+        this.addToken(tokenTypes.STRING, value);
+    }
+
+    parseNumber() {
+        while (this.isDigit(this.peek())) {
+            this.advance();
+        }
+
+        if (this.peek() == "." && this.isDigit(this.peekNext())) {
+            this.advance();
+
+            while (this.isDigit(this.peek())) {
+                this.advance();
+            }
+        }
+
+        const fullNumber = this.code.substring(this.start, this.current);
+        this.addToken(tokenTypes.NUMBER, parseFloat(fullNumber));
+    }
+
+    identifyKeyword() {
+        while (this.isAlphaNumeric(this.peek())) {
+            this.advance();
+        }
+
+        const c = this.code.substring(this.start, this.current);
+        const type = c in reservedWords ? reservedWords[c] : tokenTypes.IDENTIFIER;
+
+        this.addToken(type);
+    }
+
+    scanToken() {
+        const char = this.advance();
+
+        switch (char) {
+            case "[":
+                this.addToken(tokenTypes.LEFT_SQUARE_BRACKET);
+                break;
+            case "]":
+                this.addToken(tokenTypes.RIGHT_SQUARE_BRACKET);
+                break;
+            case "(":
+                this.addToken(tokenTypes.LEFT_PAREN);
+                break;
+            case ")":
+                this.addToken(tokenTypes.RIGHT_PAREN);
+                break;
+            case "{":
+                this.addToken(tokenTypes.LEFT_BRACE);
+                break;
+            case "}":
+                this.addToken(tokenTypes.RIGHT_BRACE);
+                break;
+            case ",":
+                this.addToken(tokenTypes.COMMA);
+                break;
+            case ".":
+                this.addToken(tokenTypes.DOT);
+                break;
+            case "-":
+                this.addToken(tokenTypes.MINUS);
+                break;
+            case "+":
+                this.addToken(tokenTypes.PLUS);
+                break;
+            case ":":
+                this.addToken(tokenTypes.COLON);
+                break;
+            case ";":
+                this.addToken(tokenTypes.SEMICOLON);
+                break;
+            case "%":
+                this.addToken(tokenTypes.MODULUS);
+                break;
+            case "*":
+                if (this.peek() === "*") {
+                    this.advance();
+                    this.addToken(tokenTypes.STAR_STAR);
+                    break;
+                }
+                this.addToken(tokenTypes.STAR);
+                break;
+            case "!":
+                this.addToken(
+                    this.match("=") ? tokenTypes.BANG_EQUAL : tokenTypes.BANG
+                );
+                break;
+            case "=":
+                this.addToken(
+                    this.match("=") ? tokenTypes.EQUAL_EQUAL : tokenTypes.EQUAL
+                );
+                break;
+
+            case "&":
+                this.addToken(tokenTypes.BIT_AND);
+                break;
+
+            case "~":
+                this.addToken(tokenTypes.BIT_NOT);
+                break;
+
+            case "|":
+                this.addToken(tokenTypes.BIT_OR);
+                break;
+
+            case "^":
+                this.addToken(tokenTypes.BIT_XOR);
+                break;
+
+            case "<":
+                if (this.match("=")) {
+                    this.addToken(tokenTypes.LESS_EQUAL);
+                } else if (this.match("<")) {
+                    this.addToken(tokenTypes.LESSER_LESSER);
+                } else {
+                    this.addToken(tokenTypes.LESS);
+                }
+                break;
+
+            case ">":
+                if (this.match("=")) {
+                    this.addToken(tokenTypes.GREATER_EQUAL);
+                } else if (this.match(">")) {
+                    this.addToken(tokenTypes.GREATER_GREATER);
+                } else {
+                    this.addToken(tokenTypes.GREATER);
+                }
+                break;
+
+            case "/":
+                if (this.match("/")) {
+                    while (this.peek() != "\n" && !this.endOfCode()) this.advance();
+                } else {
+                    this.addToken(tokenTypes.SLASH);
+                }
+                break;
+
+            case " ":
+            case "\r":
+            case "\t":
+                // Ignore whitespace.
+                break;
+
+            case "\n":
+                this.line += 1;
+                break;
+
+            case '"':
+                this.parseString('"');
+                break;
+
+            case "'":
+                this.parseString("'");
+                break;
+
+            default:
+                if (this.isDigit(char)) this.parseNumber();
+                else if (this.isAlpha(char)) this.identifyKeyword();
+                else this.Egua.lexerError(this.line, char, "Caractere inesperado.");
+        }
+    }
+
+    scan() {
+        while (!this.endOfCode()) {
+            this.start = this.current;
+            this.scanToken();
+        }
+
+        this.tokens.push(new Token(tokenTypes.EOF, "", null, this.line));
+        return this.tokens;
+    }
+};
+},{"./tokenTypes.js":23}],10:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError;
+
+module.exports.aprox = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.aprox(número)."
+    );
+
+  return Math.round(num);
+};
+
+module.exports.raizq = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.raizq(número)."
+    );
+
+  return Math.sqrt(num);
+};
+
+/* module.exports.floor = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.floor(número)."
+    );
+
+  return Math.floor(num);
+} */
+
+module.exports.sen = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.sen(número)."
+    );
+
+  return Math.sin(num);
+};
+
+module.exports.cos = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.cos(número)."
+    );
+
+  return Math.cos(num);
+};
+
+module.exports.tan = function(num) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.tan(número)."
+    );
+
+  return Math.tan(num);
+};
+
+module.exports.radiano = function(angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.radiano(Ângulo)."
+    );
+
+  return angle * (Math.PI / 180);
+};
+
+module.exports.graus = function(angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.graus(ângulo)."
+    );
+
+  return angle * (180 / Math.PI);
+};
+
+module.exports.pi = Math.PI; 
+
+module.exports.raiz = function(num, root) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Número dado a mat.raiz(numero, raiz) precisa ser um número."
+    );
+
+  if (isNaN(root) || root === null)
+    throw new RuntimeError(
+      this.token,
+      "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
+    );
+
+  let originalRoot = root;
+
+  let negateFlag = root % 2 == 1 && num < 0;
+  if (negateFlag) num = -num;
+  let possible = Math.pow(num, 1 / root);
+  root = Math.pow(possible, root);
+  if (Math.abs(num - root) < 1 && num > 0 == root > 0)
+    return negateFlag ? -possible : possible;
+
+  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${ originalRoot } de ${ num }.`)
+};
+},{"../errors.js":6}],11:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError;
+const EguaFunction = require("../structures/function.js");
+const EguaInstance = require("../structures/instance.js");
+const StandardFn = require("../structures/standardFn.js");
+const EguaClass = require("../structures/class.js");
+
+/**
+ * 
+ */
+module.exports = function (globals) {
+  globals.defineVar(
+    "tamanho",
+    new StandardFn(1, function (obj) {
+      // 
+      if (!isNaN(obj)) {
+        throw new RuntimeError(
+          this.token,
+          "Não é possível encontrar o tamanho de um número."
+        );
+      }
+
+      // 
+      if (obj instanceof EguaInstance) {
+        throw new RuntimeError(
+          this.token,
+          "Você não pode encontrar o tamanho de uma declaração."
+        );
+      }
+
+      if (obj instanceof EguaFunction) {
+        return obj.declaration.params.length;
+      }
+
+      if (obj instanceof StandardFn) {
+        return obj.arityValue;
+      }
+
+      if (obj instanceof EguaClass) {
+        let methods = obj.methods;
+        let length = 0;
+
+        if (methods.init && methods.init.isInitializer) {
+          length = methods.init.declaration.params.length;
+        }
+
+        return length;
+      }
+
+      return obj.length;
+    })
+  );
+
+  globals.defineVar(
+    "texto",
+    new StandardFn(1, function (value) {
+      return `${value}`;
+    })
+  );
+
+  globals.defineVar(
+    "real",
+    new StandardFn(1, function (value) {
+      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+        throw new RuntimeError(
+          this.token,
+          "Somente números podem passar para real."
+        );
+      return parseFloat(value);
+    })
+  );
+
+  globals.defineVar(
+    "inteiro",
+    new StandardFn(1, function (value) {
+      if (value === undefined || value === null) {
+        throw new RuntimeError(
+          this.token,
+          "Somente números podem passar para inteiro."
+        );
+      }
+
+      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+        throw new RuntimeError(
+          this.token,
+          "Somente números podem passar para inteiro."
+        );
+      }
+
+      return parseInt(value);
+    })
+  );
+
+  globals.defineVar("exports", {});
+
+  return globals;
+};
+},{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],12:[function(require,module,exports){
+const StandardFn = require("../structures/standardFn.js");
+const EguaModule = require("../structures/module.js");
+
+const loadModule = function (moduleName, modulePath) {
+    let moduleData = require(modulePath);
+    let newModule = new EguaModule(moduleName);
+
+    let keys = Object.keys(moduleData);
+    for (let i = 0; i < keys.length; i++) {
+        let currentItem = moduleData[keys[i]];
+
+        if (typeof currentItem === "function") {
+            newModule[keys[i]] = new StandardFn(currentItem.length, currentItem);
+        } else {
+            newModule[keys[i]] = currentItem;
+        }
+    }
+
+    return newModule;
+};
+
+// browserify
+require("./time.js");
+require("./eguamat.js");
+
+module.exports = function (name) {
+    switch (name) {
+        case "os":
+            return loadModule("os", "./os.js");
+        case "time":
+            return loadModule("os", "./time.js");
+        case "eguamat":
+            return loadModule("eguamat", "./eguamat.js");
+    }
+
+    return null;
+};
+},{"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./time.js":13}],13:[function(require,module,exports){
+module.exports.time = function () {
+    return +new Date();
+};
+
+module.exports.hora = function (timestamp) {
+    let timeFormatted = timestamp !== null ? new Date(timestamp) : new Date();
+    return timeFormatted;
+};
+
+module.exports.dormir = function (ms) {
+    let now = new Date().getTime();
+    while (new Date().getTime() < now + ms) { }
+    return null;
+};
+},{}],14:[function(require,module,exports){
+const tokenTypes = require("./tokenTypes.js");
+const Expr = require("./expr.js");
+const Stmt = require("./stmt.js");
+
+class ParserError extends Error { }
+
+module.exports = class Parser {
+    constructor(tokens, Egua) {
+        this.tokens = tokens;
+        this.Egua = Egua;
+
+        this.current = 0;
+        this.loopDepth = 0;
+    }
+
+    synchronize() {
+        this.advance();
+
+        while (!this.isAtEnd()) {
+            if (this.previous().type == tokenTypes.SEMICOLON) return;
+
+            switch (this.peek().type) {
+                case tokenTypes.CLASSE:
+                case tokenTypes.FUNCAO:
+                case tokenTypes.VAR:
+                case tokenTypes.PARA:
+                case tokenTypes.SE:
+                case tokenTypes.ENQUANTO:
+                case tokenTypes.ESCREVA:
+                case tokenTypes.RETORNA:
+                    return;
+            }
+
+            this.advance();
+        }
+    }
+
+    error(token, errorMessage) {
+        this.Egua.error(token, errorMessage);
+        return new ParserError();
+    }
+
+    consume(type, errorMessage) {
+        if (this.check(type)) return this.advance();
+        else throw this.error(this.peek(), errorMessage);
+    }
+
+    check(type) {
+        if (this.isAtEnd()) return false;
+        return this.peek().type === type;
+    }
+
+    checkNext(type) {
+        if (this.isAtEnd()) return false;
+        return this.tokens[this.current + 1].type === type;
+    }
+
+    peek() {
+        return this.tokens[this.current];
+    }
+
+    previous() {
+        return this.tokens[this.current - 1];
+    }
+
+    isAtEnd() {
+        return this.peek().type == tokenTypes.EOF;
+    }
+
+    advance() {
+        if (!this.isAtEnd()) this.current += 1;
+        return this.previous();
+    }
+
+    match(...args) {
+        for (let i = 0; i < args.length; i++) {
+            let currentType = args[i];
+            if (this.check(currentType)) {
+                this.advance();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    primary() {
+        if (this.match(tokenTypes.SUPER)) {
+            let keyword = this.previous();
+            this.consume(tokenTypes.DOT, "Esperado '.' após 'super'.");
+            let method = this.consume(
+                tokenTypes.IDENTIFIER,
+                "Esperado nome do método da superclasse."
+            );
+            return new Expr.Super(keyword, method);
+        }
+        if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
+            let values = [];
+            if (this.match(tokenTypes.RIGHT_SQUARE_BRACKET)) {
+                return new Expr.Array([]);
+            }
+            while (!this.match(tokenTypes.RIGHT_SQUARE_BRACKET)) {
+                let value = this.assignment();
+                values.push(value);
+                if (this.peek().type !== tokenTypes.RIGHT_SQUARE_BRACKET) {
+                    this.consume(
+                        tokenTypes.COMMA,
+                        "Esperado vírgula antes da próxima expressão."
+                    );
+                }
+            }
+            return new Expr.Array(values);
+        }
+        if (this.match(tokenTypes.LEFT_BRACE)) {
+            let keys = [];
+            let values = [];
+            if (this.match(tokenTypes.RIGHT_BRACE)) {
+                return new Expr.Dictionary([], []);
+            }
+            while (!this.match(tokenTypes.RIGHT_BRACE)) {
+                let key = this.assignment();
+                this.consume(
+                    tokenTypes.COLON,
+                    "Esperado ':' entre chave e valor."
+                );
+                let value = this.assignment();
+
+                keys.push(key);
+                values.push(value);
+
+                if (this.peek().type !== tokenTypes.RIGHT_BRACE) {
+                    this.consume(
+                        tokenTypes.COMMA,
+                        "Esperado vígula antes da próxima expressão."
+                    );
+                }
+            }
+            return new Expr.Dictionary(keys, values);
+        }
+        if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
+        if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
+        if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
+        if (this.match(tokenTypes.NULO)) return new Expr.Literal(null);
+        if (this.match(tokenTypes.ISTO)) return new Expr.Isto(this.previous());
+
+        if (this.match(tokenTypes.IMPORTAR)) return this.importStatement();
+
+        if (this.match(tokenTypes.NUMBER, tokenTypes.STRING)) {
+            return new Expr.Literal(this.previous().literal);
+        }
+
+        if (this.match(tokenTypes.IDENTIFIER)) {
+            return new Expr.Variable(this.previous());
+        }
+
+        if (this.match(tokenTypes.LEFT_PAREN)) {
+            let expr = this.expression();
+            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após a expressão.");
+            return new Expr.Grouping(expr);
+        }
+
+        throw this.error(this.peek(), "Esperado expressão.");
+    }
+
+    finishCall(callee) {
+        let args = [];
+        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+            do {
+                if (args.length >= 255) {
+                    error(this.peek(), "Não pode haver mais de 255 argumentos.");
+                }
+                args.push(this.expression());
+            } while (this.match(tokenTypes.COMMA));
+        }
+
+        let paren = this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após os argumentos."
+        );
+
+        return new Expr.Call(callee, paren, args);
+    }
+
+    call() {
+        let expr = this.primary();
+
+        while (true) {
+            if (this.match(tokenTypes.LEFT_PAREN)) {
+                expr = this.finishCall(expr);
+            } else if (this.match(tokenTypes.DOT)) {
+                let name = this.consume(
+                    tokenTypes.IDENTIFIER,
+                    "Esperado nome do método após '.'."
+                );
+                expr = new Expr.Get(expr, name);
+            } else if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
+                let index = this.expression();
+                let closeBracket = this.consume(
+                    tokenTypes.RIGHT_SQUARE_BRACKET,
+                    "Esperado ']' após escrita de index."
+                );
+                expr = new Expr.Subscript(expr, index, closeBracket);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    unary() {
+        if (this.match(tokenTypes.BANG, tokenTypes.MINUS, tokenTypes.BIT_NOT)) {
+            let operator = this.previous();
+            let right = this.unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return this.call();
+    }
+
+    exponent() {
+        let expr = this.unary();
+
+        while (this.match(tokenTypes.STAR_STAR)) {
+            let operator = this.previous();
+            let right = this.unary();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    multiplication() {
+        let expr = this.exponent();
+
+        while (this.match(tokenTypes.SLASH, tokenTypes.STAR, tokenTypes.MODULUS)) {
+            let operator = this.previous();
+            let right = this.exponent();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    addition() {
+        let expr = this.multiplication();
+
+        while (this.match(tokenTypes.MINUS, tokenTypes.PLUS)) {
+            let operator = this.previous();
+            let right = this.multiplication();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitFill() {
+        let expr = this.addition();
+
+        while (this.match(tokenTypes.LESSER_LESSER, tokenTypes.GREATER_GREATER)) {
+            let operator = this.previous();
+            let right = this.addition();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitAnd() {
+        let expr = this.bitFill();
+
+        while (this.match(tokenTypes.BIT_AND)) {
+            let operator = this.previous();
+            let right = this.bitFill();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    bitOr() {
+        let expr = this.bitAnd();
+
+        while (this.match(tokenTypes.BIT_OR, tokenTypes.BIT_XOR)) {
+            let operator = this.previous();
+            let right = this.bitAnd();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    comparison() {
+        let expr = this.bitOr();
+
+        while (
+            this.match(
+                tokenTypes.GREATER,
+                tokenTypes.GREATER_EQUAL,
+                tokenTypes.LESS,
+                tokenTypes.LESS_EQUAL
+            )
+        ) {
+            let operator = this.previous();
+            let right = this.bitOr();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    equality() {
+        let expr = this.comparison();
+
+        while (this.match(tokenTypes.BANG_EQUAL, tokenTypes.EQUAL_EQUAL)) {
+            let operator = this.previous();
+            let right = this.comparison();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    em() {
+        let expr = this.equality();
+
+        while (this.match(tokenTypes.EM)) {
+            let operator = this.previous();
+            let right = this.equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    e() {
+        let expr = this.em();
+
+        while (this.match(tokenTypes.E)) {
+            let operator = this.previous();
+            let right = this.em();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    ou() {
+        let expr = this.e();
+
+        while (this.match(tokenTypes.OU)) {
+            let operator = this.previous();
+            let right = this.e();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    assignment() {
+        let expr = this.ou();
+
+        if (this.match(tokenTypes.EQUAL)) {
+            let equals = this.previous();
+            let value = this.assignment();
+
+            if (expr instanceof Expr.Variable) {
+                let name = expr.name;
+                return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                let get = expr;
+                return new Expr.Set(get.object, get.name, value);
+            } else if (expr instanceof Expr.Subscript) {
+                return new Expr.Assignsubscript(expr.callee, expr.index, value);
+            }
+            this.error(equals, "Tarefa de atribuição inválida");
+        }
+
+        return expr;
+    }
+
+    expression() {
+        return this.assignment();
+    }
+
+    printStatement() {
+        this.consume(
+            tokenTypes.LEFT_PAREN,
+            "Esperado '(' antes dos valores em escreva."
+        );
+
+        let value = this.expression();
+
+        this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após os valores em escreva."
+        );
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o valor.");
+
+        return new Stmt.Escreva(value);
+    }
+
+    expressionStatement() {
+        let expr = this.expression();
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após expressão.");
+        return new Stmt.Expression(expr);
+    }
+
+    block() {
+        let statements = [];
+
+        while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+            statements.push(this.declaration());
+        }
+
+        this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o bloco.");
+        return statements;
+    }
+
+    ifStatement() {
+        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'se'.");
+        let condition = this.expression();
+        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condição do se.");
+
+        let thenBranch = this.statement();
+
+        let elifBranches = [];
+        while (this.match(tokenTypes.SENAOSE)) {
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+            let elifCondition = this.expression();
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado ')' apóes codição do 'senaose."
+            );
+
+            let branch = this.statement();
+
+            elifBranches.push({
+                condition: elifCondition,
+                branch
+            });
+        }
+
+        let elseBranch = null;
+        if (this.match(tokenTypes.SENAO)) {
+            elseBranch = this.statement();
+        }
+
+        return new Stmt.Se(condition, thenBranch, elifBranches, elseBranch);
+    }
+
+    whileStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'enquanto'.");
+            let condition = this.expression();
+            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condicional.");
+            let body = this.statement();
+
+            return new Stmt.Enquanto(condition, body);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    forStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'para'.");
+
+            let initializer;
+            if (this.match(tokenTypes.SEMICOLON)) {
+                initializer = null;
+            } else if (this.match(tokenTypes.VAR)) {
+                initializer = this.varDeclaration();
+            } else {
+                initializer = this.expressionStatement();
+            }
+
+            let condition = null;
+            if (!this.check(tokenTypes.SEMICOLON)) {
+                condition = this.expression();
+            }
+
+            this.consume(
+                tokenTypes.SEMICOLON,
+                "Esperado ';' após valores da condicional"
+            );
+
+            let increment = null;
+            if (!this.check(tokenTypes.RIGHT_PAREN)) {
+                increment = this.expression();
+            }
+
+            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após cláusulas");
+
+            let body = this.statement();
+
+            return new Stmt.Para(initializer, condition, increment, body);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    breakStatement() {
+        if (this.loopDepth < 1) {
+            this.error(this.previous(), "'pausa' deve estar dentro de um loop.");
+        }
+
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'pausa'.");
+        return new Stmt.Pausa();
+    }
+
+    continueStatement() {
+        if (this.loopDepth < 1) {
+            this.error(this.previous(), "'continua' precisa estar em um laço de repetição.");
+        }
+
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'continua'.");
+        return new Stmt.Continua();
+    }
+
+    returnStatement() {
+        let keyword = this.previous();
+        let value = null;
+
+        if (!this.check(tokenTypes.SEMICOLON)) {
+            value = this.expression();
+        }
+
+        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o retorno.");
+        return new Stmt.Retorna(keyword, value);
+    }
+
+    switchStatement() {
+        try {
+            this.loopDepth += 1;
+
+            this.consume(
+                tokenTypes.LEFT_PAREN,
+                "Esperado '{' após 'escolha'."
+            );
+            let condition = this.expression();
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado '}' após a condição de 'escolha'."
+            );
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' antes do escopo do 'escolha'."
+            );
+
+            let branches = [];
+            let defaultBranch = null;
+            while (!this.match(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+                if (this.match(tokenTypes.CASO)) {
+                    let branchConditions = [this.expression()];
+                    this.consume(
+                        tokenTypes.COLON,
+                        "Esperado ':' após o 'caso'."
+                    );
+
+                    while (this.check(tokenTypes.CASO)) {
+                        this.consume(tokenTypes.CASO, null);
+                        branchConditions.push(this.expression());
+                        this.consume(
+                            tokenTypes.COLON,
+                            "Esperado ':' após declaração do 'caso'."
+                        );
+                    }
+
+                    let stmts = [];
+                    do {
+                        stmts.push(this.statement());
+                    } while (
+                        !this.check(tokenTypes.CASO) &&
+                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.RIGHT_BRACE)
+                    );
+
+                    branches.push({
+                        conditions: branchConditions,
+                        stmts
+                    });
+                } else if (this.match(tokenTypes.PADRAO)) {
+                    if (defaultBranch !== null)
+                        throw new ParserError(
+                            "Você só pode ter um 'padrao' em cada declaração de 'escolha'."
+                        );
+
+                    this.consume(
+                        tokenTypes.COLON,
+                        "Esperado ':' após declaração do 'padrao'."
+                    );
+
+                    let stmts = [];
+                    do {
+                        stmts.push(this.statement());
+                    } while (
+                        !this.check(tokenTypes.CASO) &&
+                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.RIGHT_BRACE)
+                    );
+
+                    defaultBranch = {
+                        stmts
+                    };
+                }
+            }
+
+            return new Stmt.Escolha(condition, branches, defaultBranch);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    importStatement() {
+        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após declaração.");
+
+        let path = this.expression();
+
+        let closeBracket = this.consume(
+            tokenTypes.RIGHT_PAREN,
+            "Esperado ')' após declaração."
+        );
+
+        return new Stmt.Importar(path, closeBracket);
+    }
+
+    tryStatement() {
+        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' após a declaração 'tente'.");
+
+        let tryBlock = this.block();
+
+        let catchBlock = null;
+        if (this.match(tokenTypes.PEGUE)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            catchBlock = this.block();
+        }
+
+        let elseBlock = null;
+        if (this.match(tokenTypes.SENAO)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            elseBlock = this.block();
+        }
+
+        let finallyBlock = null;
+        if (this.match(tokenTypes.FINALMENTE)) {
+            this.consume(
+                tokenTypes.LEFT_BRACE,
+                "Esperado '{' após a declaração 'pegue'."
+            );
+
+            finallyBlock = this.block();
+        }
+
+        return new Stmt.Tente(tryBlock, catchBlock, elseBlock, finallyBlock);
+    }
+
+    doStatement() {
+        try {
+            this.loopDepth += 1;
+
+            let doBranch = this.statement();
+
+            this.consume(
+                tokenTypes.ENQUANTO,
+                "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+            );
+            this.consume(
+                tokenTypes.LEFT_PAREN,
+                "Esperado '(' após declaração 'enquanto'."
+            );
+
+            let whileCondition = this.expression();
+
+            this.consume(
+                tokenTypes.RIGHT_PAREN,
+                "Esperado ')' após declaração do 'enquanto'."
+            );
+
+            return new Stmt.Faca(doBranch, whileCondition);
+        } finally {
+            this.loopDepth -= 1;
+        }
+    }
+
+    statement() {
+        if (this.match(tokenTypes.FACA)) return this.doStatement();
+        if (this.match(tokenTypes.TENTE)) return this.tryStatement();
+        if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
+        if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
+        if (this.match(tokenTypes.CONTINUA)) return this.continueStatement();
+        if (this.match(tokenTypes.PAUSA)) return this.breakStatement();
+        if (this.match(tokenTypes.PARA)) return this.forStatement();
+        if (this.match(tokenTypes.ENQUANTO)) return this.whileStatement();
+        if (this.match(tokenTypes.SE)) return this.ifStatement();
+        if (this.match(tokenTypes.ESCREVA)) return this.printStatement();
+        if (this.match(tokenTypes.LEFT_BRACE)) return new Stmt.Block(this.block());
+
+        return this.expressionStatement();
+    }
+
+    varDeclaration() {
+        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome de variável.");
+        let initializer = null;
+        if (this.match(tokenTypes.EQUAL)) {
+            initializer = this.expression();
+        }
+
+        this.consume(
+            tokenTypes.SEMICOLON,
+            "Esperado ';' após a declaração da variável."
+        );
+        return new Stmt.Var(name, initializer);
+    }
+
+    function(kind) {
+        let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
+        return new Stmt.Funcao(name, this.functionBody(kind));
+    }
+
+    functionBody(kind) {
+        this.consume(tokenTypes.LEFT_PAREN, `Esperado '(' após o nome ${kind}.`);
+
+        let parameters = [];
+        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+            do {
+                if (parameters.length >= 255) {
+                    this.error(this.peek(), "Não pode haver mais de 255 parâmetros");
+                }
+
+                let paramObj = {};
+
+                if (this.peek().type === tokenTypes.STAR) {
+                    this.consume(tokenTypes.STAR, null);
+                    paramObj["type"] = "wildcard";
+                } else {
+                    paramObj["type"] = "standard";
+                }
+
+                paramObj['name'] = this.consume(
+                    tokenTypes.IDENTIFIER,
+                    "Expect parameter name."
+                );
+
+                if (this.match(tokenTypes.EQUAL)) {
+                    paramObj["default"] = this.primary();
+                }
+
+                parameters.push(paramObj);
+
+                // 
+                if (paramObj["type"] === "wildcard") break;
+            } while (this.match(tokenTypes.COMMA));
+        }
+
+        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
+        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo ${kind}.`);
+
+        let body = this.block();
+
+        return new Expr.Funcao(parameters, body);
+    }
+
+    classDeclaration() {
+        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome da classe.");
+
+        let superclass = null;
+        if (this.match(tokenTypes.HERDA)) {
+            this.consume(tokenTypes.IDENTIFIER, "Esperado nome da superclasse.");
+            superclass = new Expr.Variable(this.previous());
+        }
+
+        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' antes do escopo da classe.");
+
+        let methods = [];
+        while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+            methods.push(this.function("method"));
+        }
+
+        this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
+        return new Stmt.Classe(name, superclass, methods);
+    }
+
+    declaration() {
+        try {
+            if (
+                this.check(tokenTypes.FUNCAO) &&
+                this.checkNext(tokenTypes.IDENTIFIER)
+            ) {
+                this.consume(tokenTypes.FUNCAO, null);
+                return this.function("funcao");
+            }
+            if (this.match(tokenTypes.VAR)) return this.varDeclaration();
+            if (this.match(tokenTypes.CLASSE)) return this.classDeclaration();
+
+            return this.statement();
+        } catch (error) {
+            this.synchronize();
+            return null;
+        }
+    }
+
+    parse() {
+        let statements = [];
+        while (!this.isAtEnd()) {
+            statements.push(this.declaration());
+        }
+
+        return statements
+    }
+};
+},{"./expr.js":7,"./stmt.js":16,"./tokenTypes.js":23}],15:[function(require,module,exports){
+class ResolverError extends Error {
+    constructor(msg) {
+        super(msg);
+        this.message = msg;
+    }
+}
+
+class Stack {
+    constructor() {
+        this.stack = [];
+    }
+
+    push(item) {
+        this.stack.push(item);
+    }
+
+    isEmpty() {
+        return this.stack.length === 0;
+    }
+
+    peek() {
+        if (this.isEmpty()) throw new Error("Pilha vazia.");
+        return this.stack[this.stack.length - 1];
+    }
+
+    pop() {
+        if (this.isEmpty()) throw new Error("Pilha vazia.");
+        return this.stack.pop();
+    }
+}
+
+const FunctionType = {
+    NONE: "NONE",
+    FUNCAO: "FUNCAO",
+    CONSTRUTOR: "CONSTRUTOR",
+    METHOD: "METHOD"
+};
+
+const ClassType = {
+    NONE: "NONE",
+    CLASSE: "CLASSE",
+    SUBCLASS: "SUBCLASS"
+};
+
+const LoopType = {
+    NONE: "NONE",
+    ENQUANTO: "ENQUANTO",
+    ESCOLHA: "ESCOLHA",
+    PARA: "PARA",
+    FACA: "FACA"
+};
+
+module.exports = class Resolver {
+    constructor(interpreter, egua) {
+        this.interpreter = interpreter;
+        this.egua = egua;
+        this.scopes = new Stack();
+
+        this.currentFunction = FunctionType.NONE;
+        this.currentClass = ClassType.NONE;
+        this.currentLoop = ClassType.NONE;
+    }
+
+    define(name) {
+        if (this.scopes.isEmpty()) return;
+        this.scopes.peek()[name.lexeme] = true;
+    }
+
+    declare(name) {
+        if (this.scopes.isEmpty()) return;
+        let scope = this.scopes.peek();
+        if (scope.hasOwnProperty(name.lexeme))
+            this.egua.error(
+                name,
+                "Variável com esse nome já declarada neste escopo."
+            );
+        scope[name.lexeme] = false;
+    }
+
+    beginScope() {
+        this.scopes.push({});
+    }
+
+    endScope() {
+        this.scopes.pop();
+    }
+
+    resolve(statements) {
+        if (Array.isArray(statements)) {
+            for (let i = 0; i < statements.length; i++) {
+                statements[i].accept(this);
+            }
+        } else {
+            statements.accept(this);
+        }
+    }
+
+    resolveLocal(expr, name) {
+        for (let i = this.scopes.stack.length - 1; i >= 0; i--) {
+            if (this.scopes.stack[i].hasOwnProperty(name.lexeme)) {
+                this.interpreter.resolve(expr, this.scopes.stack.length - 1 - i);
+            }
+        }
+    }
+
+    visitBlockStmt(stmt) {
+        this.beginScope();
+        this.resolve(stmt.statements);
+        this.endScope();
+        return null;
+    }
+
+    visitVariableExpr(expr) {
+        if (
+            !this.scopes.isEmpty() &&
+            this.scopes.peek()[expr.name.lexeme] === false
+        ) {
+            throw new ResolverError(
+                "Não é possível ler a variável local em seu próprio inicializador."
+            );
+        }
+        this.resolveLocal(expr, expr.name);
+        return null;
+    }
+
+    visitVarStmt(stmt) {
+        this.declare(stmt.name);
+        if (stmt.initializer !== null) {
+            this.resolve(stmt.initializer);
+        }
+        this.define(stmt.name);
+        return null;
+    }
+
+    visitAssignExpr(expr) {
+        this.resolve(expr.value);
+        this.resolveLocal(expr, expr.name);
+        return null;
+    }
+
+    resolveFunction(func, funcType) {
+        let enclosingFunc = this.currentFunction;
+        this.currentFunction = funcType;
+
+        this.beginScope();
+        let params = func.params;
+        for (let i = 0; i < params.length; i++) {
+            this.declare(params[i]["name"]);
+            this.define(params[i]["name"]);
+        }
+        this.resolve(func.body);
+        this.endScope();
+
+        this.currentFunction = enclosingFunc;
+    }
+
+    visitFunctionStmt(stmt) {
+        this.declare(stmt.name);
+        this.define(stmt.name);
+
+        this.resolveFunction(stmt.func, FunctionType.FUNCAO);
+        return null;
+    }
+
+    visitFunctionExpr(stmt) {
+        this.resolveFunction(stmt, FunctionType.FUNCAO);
+        return null;
+    }
+
+    visitTryStmt(stmt) {
+        this.resolve(stmt.tryBranch);
+
+        if (stmt.catchBranch !== null) this.resolve(stmt.catchBranch);
+        if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
+        if (stmt.finallyBranch !== null) this.resolve(stmt.finallyBranch);
+    }
+
+    visitClassStmt(stmt) {
+        let enclosingClass = this.currentClass;
+        this.currentClass = ClassType.CLASSE;
+
+        this.declare(stmt.name);
+        this.define(stmt.name);
+
+        if (
+            stmt.superclass !== null &&
+            stmt.name.lexeme === stmt.superclass.name.lexeme
+        ) {
+            this.egua.error("Uma classe não pode herdar de si mesma.");
+        }
+
+        if (stmt.superclass !== null) {
+            this.currentClass = ClassType.SUBCLASS;
+            this.resolve(stmt.superclass);
+        }
+
+        if (stmt.superclass !== null) {
+            this.beginScope();
+            this.scopes.peek()["super"] = true;
+        }
+
+        this.beginScope();
+        this.scopes.peek()["isto"] = true; // AQUI
+
+        let methods = stmt.methods;
+        for (let i = 0; i < methods.length; i++) {
+            let declaration = FunctionType.METHOD;
+
+            if (methods[i].name.lexeme === "isto") {
+                declaration = FunctionType.CONSTRUTOR;
+            }
+
+            this.resolveFunction(methods[i].func, declaration);
+        }
+
+        this.endScope();
+
+        if (stmt.superclass !== null) this.endScope();
+
+        this.currentClass = enclosingClass;
+        return null;
+    }
+
+    visitSuperExpr(expr) {
+        if (this.currentClass === ClassType.NONE) {
+            this.egua.error(expr.keyword, "Não pode usar 'super' fora de uma classe.");
+        } else if (this.currentClass !== ClassType.SUBCLASS) {
+            this.egua.error(
+                expr.keyword,
+                "Não se usa 'super' numa classe sem superclasse."
+            );
+        }
+
+        this.resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
+    visitGetExpr(expr) {
+        this.resolve(expr.object);
+        return null;
+    }
+
+    visitExpressionStmt(stmt) {
+        this.resolve(stmt.expression);
+        return null;
+    }
+
+    visitIfStmt(stmt) {
+        this.resolve(stmt.condition);
+        this.resolve(stmt.thenBranch);
+
+        for (let i = 0; i < stmt.elifBranches.length; i++) {
+            this.resolve(stmt.elifBranches[i].condition);
+            this.resolve(stmt.elifBranches[i].branch);
+        }
+
+        if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
+        return null;
+    }
+
+    visitImportStmt(stmt) {
+        this.resolve(stmt.path);
+    }
+
+    visitPrintStmt(stmt) {
+        this.resolve(stmt.expression);
+    }
+
+    visitReturnStmt(stmt) {
+        if (this.currentFunction === FunctionType.NONE) {
+            this.egua.error(stmt.keyword, "Não é possível retornar do código do escopo superior.");
+        }
+        if (stmt.value !== null) {
+            if (this.currentFunction === FunctionType.CONSTRUTOR) {
+                this.egua.error(
+                    stmt.keyword,
+                    "Não pode retornar o valor do construtor."
+                );
+            }
+            this.resolve(stmt.value);
+        }
+        return null;
+    }
+
+    visitSwitchStmt(stmt) {
+        let enclosingType = this.currentLoop;
+        this.currentLoop = LoopType.ESCOLHA;
+
+        let branches = stmt.branches;
+        let defaultBranch = stmt.defaultBranch;
+
+        for (let i = 0; i < branches.length; i++) {
+            this.resolve(branches[i]["stmts"]);
+        }
+
+        if (defaultBranch !== null) this.resolve(defaultBranch["stmts"]);
+
+        this.currentLoop = enclosingType;
+    }
+
+    visitWhileStmt(stmt) {
+        this.resolve(stmt.condition);
+        this.resolve(stmt.body);
+        return null;
+    }
+
+    visitForStmt(stmt) {
+        if (stmt.initializer !== null) {
+            this.resolve(stmt.initializer);
+        }
+        if (stmt.condition !== null) {
+            this.resolve(stmt.condition);
+        }
+        if (stmt.increment !== null) {
+            this.resolve(stmt.increment);
+        }
+
+        let enclosingType = this.currentLoop;
+        this.currentLoop = LoopType.ENQUANTO;
+        this.resolve(stmt.body);
+        this.currentLoop = enclosingType;
+
+        return null;
+    }
+
+    visitDoStmt(stmt) {
+        this.resolve(stmt.whileCondition);
+
+        let enclosingType = this.currentLoop;
+        this.currentLoop = LoopType.FACA;
+        this.resolve(stmt.doBranch);
+        this.currentLoop = enclosingType;
+        return null;
+    }
+
+    visitBinaryExpr(expr) {
+        this.resolve(expr.left);
+        this.resolve(expr.right);
+        return null;
+    }
+
+    visitCallExpr(expr) {
+        this.resolve(expr.callee);
+
+        let args = expr.args;
+        for (let i = 0; i < args.length; i++) {
+            this.resolve(args[i]);
+        }
+
+        return null;
+    }
+
+    visitGroupingExpr(expr) {
+        this.resolve(expr.expression);
+        return null;
+    }
+
+    visitDictionaryExpr(expr) {
+        for (let i = 0; i < expr.keys.length; i++) {
+            this.resolve(expr.keys[i]);
+            this.resolve(expr.values[i]);
+        }
+        return null;
+    }
+
+    visitArrayExpr(expr) {
+        for (let i = 0; i < expr.values.length; i++) {
+            this.resolve(expr.values[i]);
+        }
+        return null;
+    }
+
+    visitSubscriptExpr(expr) {
+        this.resolve(expr.callee);
+        this.resolve(expr.index);
+        return null;
+    }
+
+    visitContinueStmt(stmt) {
+        return null;
+    }
+
+    visitBreakStmt(stmt) {
+        return null;
+    }
+
+    visitAssignsubscriptExpr(expr) {
+        return null;
+    }
+
+    visitLiteralExpr(expr) {
+        return null;
+    }
+
+    visitLogicalExpr(expr) {
+        this.resolve(expr.left);
+        this.resolve(expr.right);
+        return null;
+    }
+
+    visitUnaryExpr(expr) {
+        this.resolve(expr.right);
+        return null;
+    }
+
+    visitSetExpr(expr) {
+        this.resolve(expr.value);
+        this.resolve(expr.object);
+        return null;
+    }
+
+    visitThisExpr(expr) {
+        if (this.currentClass == ClassType.NONE) {
+            this.egua.error(expr.keyword, "Não pode usar 'isto' fora da classe.");
+        }
+        this.resolveLocal(expr, expr.keyword);
+        return null;
+    }
+};
+},{}],16:[function(require,module,exports){
+class Stmt {
+    accept(visitor) { }
+}
+
+class Expression extends Stmt {
+    constructor(expression) {
+        super();
+        this.expression = expression;
+    }
+
+    accept(visitor) {
+        return visitor.visitExpressionStmt(this)
+    }
+}
+
+class Funcao extends Stmt {
+    constructor(name, func) {
+        super();
+        this.name = name;
+        this.func = func;
+    }
+
+    accept(visitor) {
+        return visitor.visitFunctionStmt(this);
+    }
+}
+
+class Retorna extends Stmt {
+    constructor(keyword, value) {
+        super();
+        this.keyword = keyword;
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitReturnStmt(this);
+    }
+}
+
+class Classe extends Stmt {
+    constructor(name, superclass, methods) {
+        super();
+        this.name = name;
+        this.superclass = superclass;
+        this.methods = methods;
+    }
+
+    accept(visitor) {
+        return visitor.visitClassStmt(this);
+    }
+}
+
+class Block extends Stmt {
+    constructor(statements) {
+        super();
+        this.statements = statements;
+    }
+
+    accept(visitor) {
+        return visitor.visitBlockStmt(this);
+    }
+}
+
+class Escreva extends Stmt {
+    constructor(expression) {
+        super();
+        this.expression = expression;
+    }
+
+    accept(visitor) {
+        return visitor.visitPrintStmt(this);
+    }
+}
+
+class Importar extends Stmt {
+    constructor(path, closeBracket) {
+        super();
+        this.path = path;
+        this.closeBracket = closeBracket;
+    }
+
+    accept(visitor) {
+        return visitor.visitImportStmt(this);
+    }
+}
+
+class Faca extends Stmt {
+    constructor(doBranch, whileCondition) {
+      super();
+      this.doBranch = doBranch;
+      this.whileCondition = whileCondition;
+    }
+  
+    accept(visitor) {
+      return visitor.visitDoStmt(this);
+    }
+  }
+
+class Enquanto extends Stmt {
+    constructor(condition, body) {
+        super();
+        this.condition = condition;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitWhileStmt(this);
+    }
+}
+
+class Para extends Stmt {
+    constructor(initializer, condition, increment, body) {
+        super();
+        this.initializer = initializer;
+        this.condition = condition;
+        this.increment = increment;
+        this.body = body;
+    }
+
+    accept(visitor) {
+        return visitor.visitForStmt(this);
+    }
+}
+
+class Tente extends Stmt {
+    constructor(tryBranch, catchBranch, elseBranch, finallyBranch) {
+        super();
+        this.tryBranch = tryBranch;
+        this.catchBranch = catchBranch;
+        this.elseBranch = elseBranch;
+        this.finallyBranch = finallyBranch;
+    }
+
+    accept(visitor) {
+        return visitor.visitTryStmt(this);
+    }
+}
+
+class Se extends Stmt {
+    constructor(condition, thenBranch, elifBranches, elseBranch) {
+        super();
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elifBranches = elifBranches;
+        this.elseBranch = elseBranch;
+    }
+
+    accept(visitor) {
+        return visitor.visitIfStmt(this);
+    }
+}
+
+class Escolha extends Stmt {
+    constructor(condition, branches, defaultBranch) {
+        super();
+        this.condition = condition;
+        this.branches = branches;
+        this.defaultBranch = defaultBranch;
+    }
+
+    accept(visitor) {
+        return visitor.visitSwitchStmt(this);
+    }
+}
+
+class Pausa extends Stmt {
+    constructor() {
+        super();
+    }
+
+    accept(visitor) {
+        return visitor.visitBreakStmt(this);
+    }
+}
+
+class Continua extends Stmt {
+    constructor() {
+        super();
+    }
+
+    accept(visitor) {
+        return visitor.visitContinueStmt(this);
+    }
+}
+
+class Var extends Stmt {
+    constructor(name, initializer) {
+        super();
+        this.name = name;
+        this.initializer = initializer;
+    }
+
+    accept(visitor) {
+        return visitor.visitVarStmt(this);
+    }
+}
+
+module.exports = {
+    Expression,
+    Funcao,
+    Retorna,
+    Classe,
+    Block,
+    Escreva,
+    Importar,
+    Faca,
+    Enquanto,
+    Para,
+    Tente,
+    Se,
+    Escolha,
+    Pausa,
+    Continua,
+    Var
+};
+},{}],17:[function(require,module,exports){
+module.exports = class Callable {
+    arity() {
+        return this.arityValue;
+    }
+};
+},{}],18:[function(require,module,exports){
+const Callable = require("./callable.js");
+const EguaInstance = require("./instance.js");
+
+module.exports = class EguaClass extends Callable {
+    constructor(name, superclass, methods) {
+        super();
+        this.name = name;
+        this.superclass = superclass;
+        this.methods = methods;
+    }
+
+    findMethod(name) {
+        if (this.methods.hasOwnProperty(name)) {
+            return this.methods[name];
+        }
+
+        if (this.superclass !== null) {
+            return this.superclass.findMethod(name);
+        }
+
+        return undefined;
+    }
+
+    toString() {
+        return `<classe ${this.name}>`;
+    }
+
+    arity() {
+        let initializer = this.findMethod("construtor");
+        return initializer ? initializer.arity() : 0;
+    }
+
+    call(interpreter, args) {
+        let instance = new EguaInstance(this);
+
+        let initializer = this.findMethod("construtor");
+        if (initializer) {
+            initializer.bind(instance).call(interpreter, args);
+        }
+
+        return instance;
+    }
+};
+},{"./callable.js":17,"./instance.js":20}],19:[function(require,module,exports){
+const Callable = require("./callable.js");
+const Environment = require("../environment.js");
+const ReturnExpection = require("../errors.js").ReturnException;
+
+module.exports =  class EguaFunction extends Callable {
+    constructor(name, declaration, closure, isInitializer = false) {
+        super();
+        this.name = name;
+        this.declaration = declaration;
+        this.closure = closure;
+        this.isInitializer = isInitializer;
+    }
+
+    arity() {
+        return this.declaration.params.length;
+    }
+
+    toString() {
+        if (this.name === null) return "<função>";
+        return `<função ${this.name}>`;
+    }
+
+    call(interpreter, args) {
+        let environment = new Environment(this.closure);
+        let params = this.declaration.params;
+        for (let i = 0; i < params.length; i++) {
+            let param = params[i];
+
+            let name = param["name"].lexeme;
+            let value = args[i];
+            if (args[i] === null) {
+                value = param["default"] ? param["default"].value : null;
+            }
+            environment.defineVar(name, value);
+        }
+
+        try {
+            interpreter.executeBlock(this.declaration.body, environment);
+        } catch (error) {
+            if (error instanceof ReturnExpection) {
+                if (this.isInitializer) return this.closure.getVarAt(0, "isto");
+                return error.value;
+            } else {
+                throw error;
+            }
+        }
+
+        if (this.isInitializer) return this.closure.getVarAt(0, "isto");
+        return null;
+    }
+
+    bind(instance) {
+        let environment = new Environment(this.closure);
+        environment.defineVar("isto", instance);
+        return new EguaFunction(
+            this.name,
+            this.declaration,
+            environment,
+            this.isInitializer
+        );
+    }
+};
+},{"../environment.js":5,"../errors.js":6,"./callable.js":17}],20:[function(require,module,exports){
+module.exports = class EguaInstance {
+    constructor(creatorClass) {
+        this.creatorClass = creatorClass;
+        this.fields = {};
+    }
+
+    get(name) {
+        if (this.fields.hasOwnProperty(name.lexeme)) {
+            return this.fields[name.lexeme];
+        }
+
+        let method = this.creatorClass.findMethod(name.lexeme);
+        if (method) return method.bind(this);
+
+        throw new RuntimeError(name, "Método indefinido não recuperado.");
+    }
+
+    set(name, value) {
+        this.fields[name.lexeme] = value;
+    }
+
+    toString() {
+        return "<" + this.creatorClass.name + " instância>";
+    }
+};
+},{}],21:[function(require,module,exports){
+module.exports = class EguaModule {
+    constructor(name) {
+        if (name !== undefined) this.name = name;
+    }
+
+    toString() {
+        return this.name ? `<module ${this.name}>` : "<module>";
+    }
+};
+},{}],22:[function(require,module,exports){
+const Callable = require("./callable.js");
+
+module.exports = class StandardFn extends Callable {
+    constructor(arityValue, func) {
+        super();
+        this.arityValue = arityValue;
+        this.func = func;
+    }
+
+    call(interpreter, args, token) {
+        this.token = token;
+        return this.func.apply(this, args);
+    }
+
+    toString() {
+        return "<função>";
+    }
+};
+},{"./callable.js":17}],23:[function(require,module,exports){
+module.exports = {
+    LEFT_PAREN: "LEFT_PAREN",
+    RIGHT_PAREN: "RIGHT_PAREN",
+    LEFT_BRACE: "LEFT_BRACE",
+    RIGHT_BRACE: "RIGHT_BRACE",
+    LEFT_SQUARE_BRACKET: "LEFT_SQUARE_BRACKET",
+    RIGHT_SQUARE_BRACKET: "RIGHT_SQUARE_BRACKET",
+    COMMA: "COMMA",
+    DOT: "DOT",
+    MINUS: "MINUS",
+    PLUS: "PLUS",
+    BIT_AND: "BIT_AND",
+    BIT_OR: "BIT_OR",
+    BIT_XOR: "BIT_XOR",
+    BIT_NOT: "BIT_NOT",
+    COLON: "COLON",
+    SEMICOLON: "SEMICOLON",
+    SLASH: "SLASH",
+    STAR: "STAR",
+    STAR_STAR: "STAR_STAR",
+    MODULUS: "MODULUS",
+    BANG: "BANG",
+    BANG_EQUAL: "BANG_EQUAL",
+    EQUAL: "EQUAL",
+    EQUAL_EQUAL: "EQUAL_EQUAL",
+    GREATER: "GREATER",
+    GREATER_EQUAL: "GREATER_EQUAL",
+    LESS: "LESS",
+    LESS_EQUAL: "LESS_EQUAL",
+    GREATER_GREATER: "GREATER_GREATER",
+    LESSER_LESSER: "LESSER_LESSER",
+    IDENTIFIER: "IDENTIFIER",
+    STRING: "STRING",
+    NUMBER: "NUMBER",
+    E: "E",
+    EM: "EM",
+    CLASSE: "CLASSE",
+    FALSO: "FALSO",
+    FUNCAO: "FUNCAO",
+    PARA: "PARA",
+    SE: "SE",
+    SENAOSE: "SENAOSE",
+    SENAO: "SENAO",
+    ESCOLHA: "ESCOLHA",
+    CASO: "CASO",
+    PADRAO: "PADRAO",
+    NULO: "NULO",
+    OU: "OU",
+    ESCREVA: "ESCREVA",
+    RETORNA: "RETORNA",
+    SUPER: "SUPER",
+    ISTO: "ISTO",
+    VERDADEIRO: "VERDADEIRO",
+    VAR: "VAR",
+    ENQUANTO: "ENQUANTO",
+    PAUSA: "PAUSA",
+    CONTINUA: "CONTINUA",
+    HERDA: "HERDA",
+    IMPORTAR: "IMPORTAR",
+    FACA: "FACA",
+    TENTE: "TENTE",
+    PEGUE: "PEGUE",
+    FINALMENTE: "FINALMENTE",
+    EOF: "EOF"
+};
+},{}],24:[function(require,module,exports){
+(function (process){
+const Lexer = require("./lexer.js");
+const Parser = require("./parser.js");
+const Resolver = require("./resolver.js");
+const Interpreter = require("./interpreter.js");
+const tokenTypes = require("./tokenTypes.js");
+
+module.exports.Egua = class Egua {
+  constructor(filename) {
+    this.filename = filename;
+
+    this.hadError = false;
+    this.hadRuntimeError = false;
+  }
+
+  runBlock(code) {
+    const interpreter = new Interpreter(this, process.cwd());
+
+    const lexer = new Lexer(code, this);
+    const tokens = lexer.scan();
+
+    if (this.hadError === true) return;
+
+    const parser = new Parser(tokens, this);
+    const statements = parser.parse();
+
+    if (this.hadError === true) return;
+
+    const resolver = new Resolver(interpreter, this);
+    resolver.resolve(statements);
+
+    if (this.hadError === true) return;
+
+    interpreter.interpret(statements);
+  }
+
+  report(line, where, message) {
+    if (this.filename)
+      console.error(
+        `[Arquivo: ${this.filename}] [Linha: ${line}] Erro${where}: ${message}`
+      );
+    else console.error(`[Linha: ${line}] Erro${where}: ${message}`);
+    this.hadError = true;
+  }
+
+  error(token, errorMessage) {
+    if (token.type === tokenTypes.EOF) {
+      this.report(token.line, " no fim", errorMessage);
+    } else {
+      this.report(token.line, ` no '${token.lexeme}'`, errorMessage);
+    }
+  }
+
+  lexerError(line, char, msg) {
+    this.report(line, ` no '${char}'`, msg);
+  }
+
+  runtimeError(error) {
+    let line = error.token.line;
+    if (error.token && line) {
+      if (this.filename)
+        console.error(
+          `Erro: [Arquivo: ${this.filename}] [Linha: ${error.token.line}] ${error.message}`
+        );
+      else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
+    } else {
+      console.error(error);
+    }
+    this.hadRuntimeError = true;
+  }
+};
+}).call(this,require('_process'))
+},{"./interpreter.js":8,"./lexer.js":9,"./parser.js":14,"./resolver.js":15,"./tokenTypes.js":23,"_process":3}]},{},[24])(24)
+});

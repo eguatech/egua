@@ -4,7 +4,7 @@
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-web": "browserify src/web.js --s Egua > web/dist.js"
   },
   "repository": {
     "type": "git",
