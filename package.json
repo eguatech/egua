@@ -1,10 +1,13 @@
 {
   "name": "egua",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
-    "build-web": "browserify src/web.js --s Egua > web/dist.js"
+    "build-web": "browserify src/web.js --s Egua > web/dist.js",
+    "npm-publish": "npm publish",
+
+    "production":"npm run build-web && npm run npm-publish"
   },
   "repository": {
     "type": "git",
