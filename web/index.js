@@ -30,7 +30,8 @@ const clearOutput = function() {
 
 const editor = new CodeFlask("#editor", {
   lineNumbers: true,
-  language: 'js'
+  language: 'js',
+  defaultTheme: false
 });
 
 clearOutput();
