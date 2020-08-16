@@ -28,7 +28,7 @@ html {
 }
 
 #editor {
-  width: 50%;
+  width: 65%;
   height: 100%;
   height: calc(100% - 45px);
   left: 0;
@@ -38,7 +38,7 @@ html {
 }
 
 #output {
-  width: calc(50% - 4px);
+  width: calc(35% - 4px);
   height: calc(100% - 45px);
   right: 0;
   position: fixed;
