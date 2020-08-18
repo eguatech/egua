@@ -1,4 +1,4 @@
-const Exemplos = '';
+const exemplos = '';
 const Classe = `classe Animal {
   correr() {
       escreva("Correndo Loucamente");
