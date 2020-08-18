@@ -1,5 +1,5 @@
-const exemplos = '';
-const classe = `classe Animal {
+const Exemplos = '';
+const Classe = `classe Animal {
   correr() {
       escreva("Correndo Loucamente");
   }
@@ -15,13 +15,7 @@ var nomeDoCachorro = Cachorro();
 nomeDoCachorro.correr();
 nomeDoCachorro.latir();`
 
-const demos = {
-  exemplos,
-  classe
-}
-
-const MergeSort = 
-var vetor1 = [8, 2, 9, 5];
+const MergeSort = `var vetor1 = [8, 2, 9, 5];
 var a=0;
 var aux=0;
 var i=0;
@@ -70,4 +64,10 @@ se (vetor2[0]<vetor3[0] e vetor2[1]<vetor3[1]){
     
 para (a=0; a<4; a=a+1){
   escreva ("vetor4("+texto(vetor4[a])+")");
+}`
+
+const demos = {
+  exemplos,
+  Classe,
+  MargeSort
 }
