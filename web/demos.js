@@ -1,4 +1,4 @@
-const exemplos = '';
+const Exemplos = '';
 const Classe = `classe Animal {
   correr() {
       escreva("Correndo Loucamente");
@@ -67,7 +67,7 @@ para (a=0; a<4; a=a+1){
 }`
 
 const demos = {
-  exemplos,
+  Exemplos,
   Classe,
-  MargeSort
+  MergeSort
 }
