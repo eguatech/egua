@@ -179,11 +179,87 @@ enquanto(erro!=0){
   escreva("erro: " + texto(erro));
 }`
 
+const FilaEstatica = `funcao enfileirar (valorEntrada) {
+  se (indexFinal == maximoDeElementos){
+    escreva("Fila Cheia");
+  } senao {
+    filaEstatica[indexFinal] = valorEntrada;
+    escreva("Valor inserido com sucesso: " + texto(filaEstatica[indexFinal]));
+    retorna indexFinal = indexFinal + 1;
+  }
+}
+
+funcao desenfileirar(){
+  se (indexInicial == indexFinal){
+    escreva("Fila Vazia") ;
+  } senao {
+    para (i = 0; i <= indexFinal; i=i+1){
+      
+      se(i+1 == indexFinal){
+        indexFinal = indexFinal - 1;
+        escreva("Valor retirado com sucesso.");
+        
+      } senao {
+        filaEstatica[i] = filaEstatica[i+1];
+      }
+    }    
+  }
+}
+
+funcao mostrar_fila () {
+  se(indexInicial == indexFinal){
+    escreva("Fila Vazia");
+  } senao {  
+    para (var i = 0; i < indexFinal; i = i + 1){
+      escreva("index "+texto(i)); 
+      escreva(texto(filaEstatica[i]));
+    }
+  }
+}
+
+var maximoDeElementos = 4;
+var indexInicial = 0;
+var indexFinal = 0;
+
+//Variavel de controle em iterações
+var i = 0;
+
+
+var filaEstatica = [];
+
+
+//Demonstração de uso das funções:
+mostrar_fila();
+
+var valorEntrada = 2;
+enfileirar(valorEntrada);
+
+var valorEntrada = 8;
+enfileirar(valorEntrada);
+
+var valorEntrada = 23;
+enfileirar(valorEntrada);
+
+var valorEntrada = 7;
+enfileirar(valorEntrada);
+
+mostrar_fila();
+
+desenfileirar();
+
+mostrar_fila();
+
+var valorEntrada = 24;
+enfileirar(valorEntrada);
+
+mostrar_fila();`
+
 const demos = {
   Exemplos,
   Classe,
   MergeSort,
   Bhaskara,
   Fibonacci,
-  Perceptron
+  Perceptron,
+  FilaEstatica
 }
