@@ -64,22 +64,20 @@ para (a=0; a<4; a=a+1){
   escreva ("vetor4("+texto(vetor4[a])+")");
 }`
 
-const Bhaskara = `var a; var b; var c; var d; var c; var f; var x1; var x2; var r1; var r2;
-
-funcao bhaskara(d,a,b,c,x1,x2){
+const Bhaskara = `funcao bhaskara(a,b,c){
   //A variável "d" vai simbolizar o Delta.
   //"a", "b", e "c" irão representar os coeficientes da equação.
-  d = b**2;
+  var d = b**2;
         var f = 4*a*c; 
   d = d-f;
   escreva("O valor de Delta é: " + texto(d));
   d = d**0.5;
   
   //Encontrando os valores de X1 e X2.
-  x1 = -b+d;
+  var x1 = -b+d;
   x1 = x1/2*a;
   escreva("O valor de X1 é: "+ texto(x1));
-  x2 = -b-d;
+  var x2 = -b-d;
   x2 = x2/2*a;
   escreva("O valor de X2 é: "+ texto(x2));
   //Resultado das substituições de X por X1 e X2 na equação.
@@ -104,11 +102,88 @@ funcao bhaskara(d,a,b,c,x1,x2){
 //Insira o valor do coeficiente B:
  var c = -30;
 
-bhaskara(d,a,b,c,x1,x2);`
+bhaskara(a,b,c);`
+
+const Fibonacci = `// Recursão para o cálculo da sequência de fibonacci
+
+funcao fibonacci(n){
+  se(n==0){
+    retorna(0);
+ }senao{
+    se(n==1){
+      retorna(1);
+   }senao{
+    var n1 = n-1;
+    var n2 = n-2;
+    var f1 = fibonacci(n1);
+    var f2 = fibonacci(n2);
+    retorna(f1 + f2);}
+  }
+}
+
+var a = fibonacci(0);
+escreva(a);
+a = fibonacci(1);
+escreva(a);
+a = fibonacci(2);
+escreva(a);
+a = fibonacci(3);
+escreva(a);
+a = fibonacci(4);
+escreva(a);
+a = fibonacci(5);
+escreva(a);`
+
+const Perceptron = `var pesoInicial1 = 0.3;
+var pesoInicial2 = 0.4;
+
+var entrada1 = 1;
+var entrada2 = 1;
+
+var erro = 1;
+
+var resultadoEsperado;
+
+enquanto(erro!=0){
+  se(entrada1 == 1){
+    se(entrada2 == 1){
+      resultadoEsperado = 1;
+    }
+  } senao {
+    resultadoEsperado = 0;
+  }
+  
+  var somatoria = pesoInicial1 * entrada1;
+  somatoria = pesoInicial2 * entrada2 + somatoria;
+  
+  var resultado;
+  
+  se(somatoria < 1){
+    resultado = 0;
+  } senao{
+    se(somatoria>=1){
+      resultado = 1;
+    }
+  }
+  
+  escreva("resultado: " + texto(resultado));
+  
+  erro = resultadoEsperado - resultado;
+
+  escreva("p1: " + texto(pesoInicial1));
+  escreva("p2: " + texto(pesoInicial2));
+
+  pesoInicial1 = 0.1 * entrada1 * erro + pesoInicial1;
+  pesoInicial2 = 0.1 * entrada2 * erro + pesoInicial2;
+
+  escreva("erro: " + texto(erro));
+}`
 
 const demos = {
   Exemplos,
   Classe,
   MergeSort,
-  Bhaskara
+  Bhaskara,
+  Fibonacci,
+  Perceptron
 }
