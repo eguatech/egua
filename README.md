@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <img src="./web/assets/egua.png" alt="egua" width="80px" height="80px">
+  <img src="./web/assets/egua.png" alt="egua" width="auto" height="80px">
 
   <h3 align="center">Linguagem Egua</h3>
 
