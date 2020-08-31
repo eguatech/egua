@@ -1,11 +1,11 @@
 {
   "name": "egua",
-  "version": "1.0.92",
+  "version": "1.0.94",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
-    "publish": "npm publish",
+    "npm-publish": "npm publish",
 
     "testes": "./bin/egua tests/tests.egua",
 
