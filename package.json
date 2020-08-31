@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
-    "npm-publish": "npm publish",
+    "publish": "npm publish",
+
+    "testes": "./bin/egua tests/tests.egua",
 
     "production":"npm run build-web && npm run npm-publish"
   },
