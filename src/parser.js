@@ -760,7 +760,6 @@ module.exports = class Parser {
 
                 parameters.push(paramObj);
 
-                // 
                 if (paramObj["type"] === "wildcard") break;
             } while (this.match(tokenTypes.COMMA));
         }

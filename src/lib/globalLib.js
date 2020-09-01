@@ -11,7 +11,6 @@ module.exports = function (globals) {
   globals.defineVar(
     "tamanho",
     new StandardFn(1, function (obj) {
-      // 
       if (!isNaN(obj)) {
         throw new RuntimeError(
           this.token,
@@ -19,7 +18,6 @@ module.exports = function (globals) {
         );
       }
 
-      // 
       if (obj instanceof EguaInstance) {
         throw new RuntimeError(
           this.token,

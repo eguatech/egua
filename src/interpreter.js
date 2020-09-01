@@ -198,7 +198,6 @@ module.exports = class Interpreter {
             params = [];
         }
 
-        //
         if (args.length < callee.arity()) {
             let diff = callee.arity() - args.length;
             for (let i = 0; i < diff; i++) {
@@ -206,9 +205,7 @@ module.exports = class Interpreter {
             }
         }
 
-        // 
         else if (args.length >= callee.arity()) {
-            // 
             if (
                 params.length > 0 &&
                 params[params.length - 1]["type"] === "wildcard"
@@ -268,21 +265,20 @@ module.exports = class Interpreter {
             } else if (right.constructor == Object) {
                 return left in right;
             } else {
-                throw new RuntimeError("Tipo de chamada inválida com 'em'."); //Invalid type called with in keyword
+                throw new RuntimeError("Tipo de chamada inválida com 'em'.");
             }
         }
 
+        // se um estado for verdadeiro, retorna verdadeiro
         if (expr.operator.type === tokenTypes.OU) {
-            // se um estado for verdadeiro, retorna verdadeiro
             if (this.isTruthy(left)) return left;
         }
 
+        // se um estado for falso, retorna falso
         if (expr.operator.type === tokenTypes.E) {
-            // se um estado for falso, retorna falso
             if (!this.isTruthy(left)) return left;
         }
 
-        //
         return this.evaluate(expr.right);
     }
 
@@ -325,7 +321,6 @@ module.exports = class Interpreter {
                 if (error instanceof BreakException) {
                     break;
                 } else if (error instanceof ContinueException) {
-                    // 
                 } else {
                     throw error;
                 }
@@ -346,7 +341,6 @@ module.exports = class Interpreter {
                 if (error instanceof BreakException) {
                     break;
                 } else if (error instanceof ContinueException) {
-                    // 
                 } else {
                     throw error;
                 }
@@ -374,7 +368,6 @@ module.exports = class Interpreter {
                             }
                         } catch (error) {
                             if (error instanceof ContinueException) {
-                                // 
                             } else {
                                 throw error;
                             }
@@ -390,7 +383,6 @@ module.exports = class Interpreter {
             }
         } catch (error) {
             if (error instanceof BreakException) {
-                // 
             } else {
                 throw error;
             }
@@ -433,7 +425,6 @@ module.exports = class Interpreter {
                 if (error instanceof BreakException) {
                     break;
                 } else if (error instanceof ContinueException) {
-                    // 
                 } else {
                     throw error;
                 }
@@ -547,14 +538,12 @@ module.exports = class Interpreter {
         let value = this.evaluate(expr.value);
 
         if (Array.isArray(obj)) {
-            //
             if (index < 0 && obj.length !== 0) {
                 while (index < 0) {
                     index += obj.length;
                 }
             }
 
-            // 
             while (obj.length < index) {
                 obj.push(null);
             }
@@ -570,7 +559,6 @@ module.exports = class Interpreter {
             obj[index] = value;
         }
 
-        //
         else {
             throw new RuntimeError(
                 expr.obj.name,
@@ -591,7 +579,6 @@ module.exports = class Interpreter {
                 );
             }
 
-            // 
             if (index < 0 && obj.length !== 0) {
                 while (index < 0) {
                     index += obj.length;
@@ -604,7 +591,6 @@ module.exports = class Interpreter {
             return obj[index];
         }
 
-        // other data types
         else if (
             obj.constructor == Object ||
             obj instanceof EguaInstance ||
@@ -615,9 +601,7 @@ module.exports = class Interpreter {
             return obj[index] || null;
         }
 
-        // 
         else if (typeof obj === "string") {
-            // 
             if (!Number.isInteger(index)) {
                 throw new RuntimeError(
                     expr.closeBracket,
@@ -637,7 +621,6 @@ module.exports = class Interpreter {
             return obj.charAt(index);
         }
 
-        // 
         else {
             throw new RuntimeError(
                 expr.callee.name,

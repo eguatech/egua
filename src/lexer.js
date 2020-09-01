@@ -265,12 +265,13 @@ module.exports = class Lexer {
                 }
                 break;
 
+            // Esta sessão ignora espaços em branco na tokenização
             case " ":
             case "\r":
             case "\t":
-                // Ignore whitespace.
                 break;
 
+            // tentativa de pulhar linha com \n que ainda não funciona
             case "\n":
                 this.line += 1;
                 break;

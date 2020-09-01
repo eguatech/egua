@@ -200,7 +200,7 @@ module.exports = class Resolver {
         }
 
         this.beginScope();
-        this.scopes.peek()["isto"] = true; // AQUI
+        this.scopes.peek()["isto"] = true;
 
         let methods = stmt.methods;
         for (let i = 0; i < methods.length; i++) {
