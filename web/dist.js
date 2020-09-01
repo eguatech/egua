@@ -3007,7 +3007,7 @@ module.exports = class Parser {
 
                 paramObj['name'] = this.consume(
                     tokenTypes.IDENTIFIER,
-                    "Expect parameter name."
+                    "Esperado nome do parâmetro."
                 );
 
                 if (this.match(tokenTypes.EQUAL)) {
