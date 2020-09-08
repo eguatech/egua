@@ -4,9 +4,7 @@ const EguaInstance = require("../structures/instance.js");
 const StandardFn = require("../structures/standardFn.js");
 const EguaClass = require("../structures/class.js");
 
-/**
- * 
- */
+
 module.exports = function (globals) {
   globals.defineVar(
     "tamanho",
