@@ -84,6 +84,8 @@ De maneira bem resumida eis o que precisa ser feito:
 
 - [ ] Testar localmente suas alterações.
 
+- [ ] Atualizar versão no arquivo `package.json`
+
 - [ ] Abrir issue no repositório Docs.
 
 ## Agradecimentos
