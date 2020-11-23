@@ -4,7 +4,7 @@ Olá! Estamos muito felizes que você quer contribuir com nosso projeto. Antes d
 
 ## Introdução
 
-O desenvolvimento da linguagem égua, assim como a utilização da linguagem, possui uma estrutura que facilita a contribuição, principalmente em termos de biblioteca e métodos internos da linguagem, entretanto essa facilidade só é garantida a partir de algumas práticas e regras que devem ser seguidas, para facilitar a análise de pull requests e garantir a integridade da linguagem e funcionalidade da linguagem em casa commit, já que prezamos pela entrega continua, onde garantimos que o usuário possua a versão mais recente da linguagem para ser utilizada.
+O desenvolvimento da linguagem egua, assim como a utilização da linguagem, possui uma estrutura que facilita a contribuição, principalmente em termos de biblioteca e métodos internos da linguagem, entretanto essa facilidade só é garantida a partir de algumas práticas e regras que devem ser seguidas, para facilitar a análise de pull requests e garantir a integridade da linguagem e funcionalidade da linguagem em casa commit, já que prezamos pela entrega continua, onde garantimos que o usuário possua a versão mais recente da linguagem para ser utilizada.
 
 ## Montando ambiente
 
