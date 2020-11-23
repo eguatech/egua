@@ -29,10 +29,12 @@ O desenvolvimento da linguagem égua, assim como a utilização da linguagem, po
 ### Contribuindo com bibliotecas para a linguagem
 
 Possuímos um vídeo que mostra um exemplo de como efetuar a criação de uma biblioteca:
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/CZw0-y4Em2U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-Palestra sobre a criação de bibliotecas na BrasilJS on the reoad Natal/Belém 2020
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/W2LccJacNXE?start=5553" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![](http://img.youtube.com/vi/CZw0-y4Em2U/0.jpg)](http://www.youtube.com/watch?v=CZw0-y4Em2U "")
+
+Palestra sobre a criação de bibliotecas na BrasilJS on the reoad Natal/Belém 2020:
+
+[![](http://img.youtube.com/vi/W2LccJacNXE/0.jpg)](http://www.youtube.com/watch?v=W2LccJacNXE "")
 
 ### Contribuindo com o core da linguagem
 
