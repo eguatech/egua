@@ -86,6 +86,31 @@ module.exports = function (globals) {
     })
   );
 
+  globals.defineVar(
+    "ordenar", 
+    new StandardFn(1, function(obj){     
+      if (Array.isArray(obj) == false) {
+        throw new RuntimeError(
+          this.token,
+          "Valor Inválido. Objeto inserido não é um vetor."
+        );
+      }
+
+      let trocado;
+      let length = obj.length;
+      do{
+        trocado = false;
+        for(var i = 0; i < length-1; i++){
+          if( obj[i] > obj[i+1] ){          
+            [obj[i], obj[i+1]] = [obj[i+1], obj[i]];
+            trocado = true;           
+          }
+        }
+      }while(trocado);         
+      return obj;
+    })
+  );
+
   globals.defineVar("exports", {});
 
   return globals;
