@@ -1,0 +1,18 @@
+name: Commit - Desenvolvimento
+
+on:
+  push:
+    branches: [ desenvolvimento ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '12'
+
+    - name: Teste binário do egua
+      run: npm run testes   
