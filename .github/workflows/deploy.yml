@@ -19,7 +19,7 @@ jobs:
       run: npm run testes
 
     - name: Publicando NPM
-      uses : actions/setup-node@v2-beta
+      uses : actions/setup-node@v1
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
