@@ -2,10 +2,11 @@ name: Deploy
 
 on:
   push:
-    branches: [ master ]
-  paths:
-    - 'web/**'
-    - 'package.json'
+    branches:
+    - master
+    paths:
+      - 'web/**'
+      - 'package.json'
 
 jobs:
   build:
