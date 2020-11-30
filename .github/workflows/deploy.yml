@@ -19,13 +19,14 @@ jobs:
       run: npm run testes
 
     - name: Publicando NPM
-    - uses : actions/setup-node@v1
-      with:
-        node-version: 12
-        registry-url: https://registry.npmjs.org
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+    - run: yarn install
+    - run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       
     - name: Deploy no servidor
       uses: matheusvanzan/sshpass-action@v1
