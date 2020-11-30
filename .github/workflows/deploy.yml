@@ -37,5 +37,8 @@ jobs:
           cd public_html/egua
           git pull
 
-    # run: npm i -g egua
-      # run: egua tests/tests.egua
+    - name: Funcionamento de pacote
+      uses: actions/setup-node@v2-beta
+      run: |
+        npm i -g egua
+        egua tests/tests.egua

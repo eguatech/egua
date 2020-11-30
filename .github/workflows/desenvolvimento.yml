@@ -19,5 +19,3 @@ jobs:
     - name: Teste
       run: | 
         npm run testes
-        npm i -g egua
-        egua tests/tests.egua
