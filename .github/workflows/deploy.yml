@@ -24,7 +24,7 @@ jobs:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
       run: npm publish
-        env:
+        with:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
     - name: Deploy no servidor
