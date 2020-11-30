@@ -1,7 +1,9 @@
-name: Commit - Desenvolvimento
+name: Desenvolvimento
 
 on:
   push:
+    branches: [ desenvolvimento ]
+  pull_request:
     branches: [ desenvolvimento ]
 
 jobs:
@@ -14,5 +16,7 @@ jobs:
       with:
         node-version: '12'
 
-    - name: Teste binário do egua
-      run: npm run testes   
+    - name: Teste
+      run: npm run testes
+      run: npm i -g egua
+      run: egua tests/tests.egua
