@@ -21,10 +21,10 @@ jobs:
       uses: actions/setup-node@v2-beta
       run: npm run testes
 
-    - name: Publicando NPM
-    - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+   # - name: Publicando NPM
+    #  uses: JS-DevTools/npm-publish@v1
+     #   with:
+      #    token: ${{ secrets.NPM_TOKEN }}
       
     - name: Deploy no servidor
       uses: matheusvanzan/sshpass-action@v1
