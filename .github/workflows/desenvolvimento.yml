@@ -17,6 +17,7 @@ jobs:
         node-version: '12'
 
     - name: Teste
-      run: npm run testes
-      run: npm i -g egua
-      run: egua tests/tests.egua
+      run: | 
+        npm run testes
+        npm i -g egua
+        egua tests/tests.egua
