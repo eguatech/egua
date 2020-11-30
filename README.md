@@ -36,10 +36,10 @@
 
 - **Simples e Completa.** Podendo ser usadas por pessoas com ou sem experiência em programação.
 - **Totalmente em Português.** Desenvolvida totalmente em português para quebrar a barreira do inglês.
-- **Gratis.** Sem planos, sem limitações e sem propaganda.
+- **Grátis.** Sem planos, sem limitações e sem propaganda.
 - **Open-source** Todo código fonte disponível para estudar, modificar e contribuir.
-- **Constantes Atualizações.** Junto a nossa comunidade, tentamos sempre trazer melhorias e inovações.
-- **Linguagem Cientifica.** Apoiamos e encorajamos o desenvolvimento e aprimoramento da ciência e da educação.
+- **Constantes Atualizações.** Junto à nossa comunidade, para trazermos melhorias e inovações.
+- **Linguagem Científica.** Apoiamos e encorajamos o desenvolvimento e aprimoramento da ciência e da educação.
 
 ## Instalação
 
