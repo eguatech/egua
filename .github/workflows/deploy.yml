@@ -39,7 +39,6 @@ jobs:
           git pull
 
     - name: Funcionamento de pacote
-      uses: actions/setup-node@v2-beta
       run: |
         npm i -g egua
         egua tests/tests.egua
