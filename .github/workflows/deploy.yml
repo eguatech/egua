@@ -18,16 +18,16 @@ jobs:
       run: npm run testes
 
     - name: Publicando NPM
-    - uses: actions/setup-node@v1
+      uses: actions/setup-node@v1
       with:
         node-version: '10.x'
         registry-url: 'https://registry.npmjs.org'
-        run: npm publish  
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm publish  
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Deploy no servidor
-    - uses: matheusvanzan/sshpass-action@v1
+      uses: matheusvanzan/sshpass-action@v1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USUARIO }}
