@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches: [ master ]
+    paths: [ 'web/**', 'package.json']
 
 jobs:
   build:
@@ -16,26 +17,4 @@ jobs:
     - name: Testando binário
       run: npm run testes
 
-    - name: Publicando NPM
-      uses: actions/setup-node@v1
-      with:
-        node-version: '10.x'
-        registry-url: 'https://registry.npmjs.org'
-      run: npm publish  
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    - name: Deploy no servidor
-      uses: matheusvanzan/sshpass-action@v1
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USUARIO }}
-        password: ${{ secrets.SENHA }}
-      run: |
-        cd public_html/egua
-        git pull
-  
-    - name: Funcionamento de pacote
-      run: |
-        npm i -g egua
-        egua tests/tests.egua
+    
