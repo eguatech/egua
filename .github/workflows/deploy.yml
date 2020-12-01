@@ -9,7 +9,7 @@ on:
       - 'package.json'
 
 jobs:
-  build:
+  teste:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +19,29 @@ jobs:
       uses: actions/setup-node@v2-beta
       run: npm run testes
 
+  publish:
+    needs: teste
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/setup-node@v1
+    
     - name: Publicando NPM
-      uses: actions/setup-node@v1
       with:
         node-version: 12
         registry-url: https://registry.npmjs.org/
         run: npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      
+
+  deploy:
+    needs: [teste, publish]    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: matheusvanzan/sshpass-action@v1
+
     - name: Deploy no servidor
-      uses: matheusvanzan/sshpass-action@v1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USUARIO }}
@@ -37,6 +49,13 @@ jobs:
         run: |
           cd public_html/egua
           git pull
+  
+  working:
+    needs: [teste, publish, deploy]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
 
     - name: Funcionamento de pacote
       run: |
