@@ -16,7 +16,6 @@ jobs:
 
     - name: Testando binário
     run: npm run testes
-
     - name: Publicando NPM
     uses: actions/setup-node@v1
     with:
@@ -25,7 +24,6 @@ jobs:
       run: npm publish  
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
 
     - name: Deploy no servidor
     uses: matheusvanzan/sshpass-action@v1
