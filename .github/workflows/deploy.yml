@@ -16,6 +16,7 @@ jobs:
 
     - name: Testando binário
       run: npm run testes
+      
     - name: Publicando NPM
       uses: actions/setup-node@v1
       with:
