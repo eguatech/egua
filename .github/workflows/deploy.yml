@@ -13,15 +13,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2-beta
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Testando binário
       run: npm run testes
 
     - name: Publicando NPM
-      uses: actions/setup-node@v1
-      with:
-        node-version: '10.x'
-        registry-url: 'https://registry.npmjs.org'
       run: npm publish  
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
