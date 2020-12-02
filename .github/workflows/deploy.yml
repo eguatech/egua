@@ -30,16 +30,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: matheusvanzan/sshpass-action@v1
+        
+    - name: Deploy no servidor
+      uses: matheusvanzan/sshpass-action@v1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USUARIO }}
         password: ${{ secrets.SENHA }}
-        
-    - name: Deploy no servidor
-      run: |
-        cd public_html/egua
-        git pull
+        run: |
+          cd public_html/egua
+          git pull
 
   package:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
 
     - name: Funcionamento de pacote
       run: |
-          npm i -g egua
+          sudo npm i -g egua
           egua tests/tests.egua
 
     
