@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ master ]
+    paths: [ 'web/**', 'package.json']
+
+jobs:
+  test_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Testando binário
+      run: npm run testes
+
+    - name: Publicando NPM
+      run: npm publish  
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
+  deploy_server:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: matheusvanzan/sshpass-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USUARIO }}
+        password: ${{ secrets.SENHA }}
+        
+    - name: Deploy no servidor
+      run: |
+        cd public_html/egua
+        git pull
+
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+
+    - name: Funcionamento de pacote
+      run: |
+          npm i -g egua
+          egua tests/tests.egua
+
+    
