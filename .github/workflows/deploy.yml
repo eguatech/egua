@@ -27,6 +27,7 @@ jobs:
   
   deploy_server:
     runs-on: ubuntu-latest
+    needs: test_publish
 
     steps:
     - uses: actions/checkout@v2
@@ -43,6 +44,7 @@ jobs:
 
   package:
     runs-on: ubuntu-latest
+    needs: deploy_server
 
     steps:
     - uses: actions/checkout@v2
