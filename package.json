@@ -6,17 +6,16 @@
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
     "npm-publish": "npm publish",
-
     "testes": "./bin/egua tests/tests.egua",
-
-    "production":"npm run build-web && npm run npm-publish"
+    "test": "jest",
+    "production": "npm run build-web && npm run npm-publish"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eguatech/egua.git"
   },
   "bin": {
-    "egua":"./bin/egua"
+    "egua": "./bin/egua"
   },
   "keywords": [
     "egua"
@@ -26,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/eguatech/egua/issues"
   },
-  "homepage": "https://github.com/eguatech/egua#readme"
+  "homepage": "https://github.com/eguatech/egua#readme",
+  "devDependencies": {
+    "@babel/preset-env": "^7.12.1",
+    "jest": "^26.6.1"
+  }
 }
