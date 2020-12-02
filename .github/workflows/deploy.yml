@@ -6,8 +6,7 @@ on:
     paths: [ 'web/**', 'package.json']
 
 jobs:
-  build:
-
+  test_publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,5 +24,21 @@ jobs:
       run: npm publish  
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
+  deploy_server:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: matheusvanzan/sshpass-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USUARIO }}
+        password: ${{ secrets.SENHA }}
+        
+    - name: Deploy no servidor
+      run: |
+        cd public_html/egua
+        git pull
 
     
