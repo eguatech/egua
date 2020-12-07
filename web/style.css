@@ -89,3 +89,11 @@ html {
   width: 25%;
   text-align: center;
 }
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 25%;
+  height: 55%
+}
