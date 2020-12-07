@@ -1,11 +1,10 @@
 {
   "name": "egua",
-  "version": "1.0.98",
+  "version": "1.0.99",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
-
     "testes": "./bin/egua tests/tests.egua"
   },
   "repository": {
@@ -13,7 +12,7 @@
     "url": "git+https://github.com/eguatech/egua.git"
   },
   "bin": {
-    "egua":"./bin/egua"
+    "egua": "./bin/egua"
   },
   "keywords": [
     "egua"
