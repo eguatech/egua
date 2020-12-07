@@ -55,7 +55,7 @@ Os comandos de teste são:
 
 ```sh
 # Execução dos testes unitários
-npm run teste
+npm run testes
 ```
 
 Após o desenvolvimento ser concluído, é necessário ter a build web do projeto, que é feita com o comando: 

@@ -84,7 +84,7 @@ class Importar extends Stmt {
     }
 }
 
-class Faca extends Stmt {
+class Fazer extends Stmt {
     constructor(doBranch, whileCondition) {
       super();
       this.doBranch = doBranch;
@@ -203,7 +203,7 @@ module.exports = {
     Block,
     Escreva,
     Importar,
-    Faca,
+    Fazer,
     Enquanto,
     Para,
     Tente,

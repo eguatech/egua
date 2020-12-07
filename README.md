@@ -49,8 +49,18 @@
 
 - Para acessar nossa documentação, visite o [site de documentação](https://egua.tech/docs).
 
-## Contruibuições e Patrocínio
+## Contruibuições
 
 * Para contribuições, por favor, leia o nosso [Guia de Contribuição](.github/CONTRIBUTING.md) antes de submeter um Pull Request.
 
-- A linguagem Égua é um projeto open-source que se faz possível com o empenho da nossa apaixonada equipe de desenvolvedores, talentoso colaboradores e futuros patrocinadores. Obrigado a todos!!
+## Apoie-nos!
+- Se você gosta do nosso trabalho e quer nos apoiar, agora você pode através do nosso picpay! São várias opções de assinatura começando a partir de apenas R$1,00. Acesse agora usando o QR Code ou clicando na imagem abaixo.
+
+- SPOILER!! Tem mimos pra quem apoiar, e virão mais no futuro!
+
+<p align="center"> <a href="https://picpay.me/eguatech">
+  <img src="web/assets/picpay.jpeg" alt="picpay" width="auto" height="400px">
+  </a></p>
+
+- <strong> A linguagem Égua é um projeto open-source que se faz possível com o empenho da nossa apaixonada equipe de desenvolvedores, talentoso colaboradores e apoiadores. Obrigado a todos!!<strong>
+

@@ -47,7 +47,7 @@ const LoopType = {
     ENQUANTO: "ENQUANTO",
     ESCOLHA: "ESCOLHA",
     PARA: "PARA",
-    FACA: "FACA"
+    FAZER: "FAZER"
 };
 
 module.exports = class Resolver {
@@ -327,7 +327,7 @@ module.exports = class Resolver {
         this.resolve(stmt.whileCondition);
 
         let enclosingType = this.currentLoop;
-        this.currentLoop = LoopType.FACA;
+        this.currentLoop = LoopType.FAZER;
         this.resolve(stmt.doBranch);
         this.currentLoop = enclosingType;
         return null;

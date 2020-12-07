@@ -675,7 +675,7 @@ module.exports = class Parser {
 
             this.consume(
                 tokenTypes.ENQUANTO,
-                "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+                "Esperado delcaração do 'enquanto' após o escopo do 'fazer'."
             );
             this.consume(
                 tokenTypes.LEFT_PAREN,
@@ -689,14 +689,14 @@ module.exports = class Parser {
                 "Esperado ')' após declaração do 'enquanto'."
             );
 
-            return new Stmt.Faca(doBranch, whileCondition);
+            return new Stmt.Fazer(doBranch, whileCondition);
         } finally {
             this.loopDepth -= 1;
         }
     }
 
     statement() {
-        if (this.match(tokenTypes.FACA)) return this.doStatement();
+        if (this.match(tokenTypes.FAZER)) return this.doStatement();
         if (this.match(tokenTypes.TENTE)) return this.tryStatement();
         if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();

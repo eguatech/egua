@@ -73,7 +73,7 @@ funcao tFacaEnquanto(){
   escreva("Iniciando Teste: Faça - Enquanto");
   escreva("-----------------------------");
   var a = 0;
-  faca {
+  fazer {
     a = a + 1;
   } enquanto(a<5){
   }
