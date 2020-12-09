@@ -7,14 +7,14 @@
   <p align="center">
     Linguagem de programação simples e moderna.
     <br />
-    <a href="https://egua.tech/docs/egua"><strong>Documentação »</strong></a>
+    <a href="https://egua.tech/docs/egua" target="_blank"><strong>Documentação »</strong></a>
     <br />
     <br />
-    <a href="https://egua.tech/egua/">IDEgua</a>
+    <a href="https://egua.tech/egua/" target="_blank">IDEgua</a>
     ·
-    <a href="https://github.com/eguatech/egua/issues">Reportar Bug</a>
+    <a href="https://github.com/eguatech/egua/issues" target="_blank">Reportar Bug</a>
     ·
-    <a href="https://github.com/eguatech/egua/issues">Solicitar Funcionalidade</a>
+    <a href="https://github.com/eguatech/egua/issues" target="_blank">Solicitar Funcionalidade</a>
     <br />
     <br />
     <img src="https://img.shields.io/github/issues/eguatech/egua" />
@@ -23,12 +23,12 @@
     <img src="https://img.shields.io/npm/v/egua">
     <img src="https://img.shields.io/github/license/eguatech/egua" />
     <br>
-    <a href="https://github.com/eguatech"><img src="https://img.shields.io/badge/-Github-000?style=flat&logo=Github&logoColor=white">
-    <a href="https://twitter.com/eguatech"> <img src="https://img.shields.io/badge/-Twitter-1ca0f1?style=flat&labelColor=1ca0f1&logo=twitter&logoColor=white&link=Twitter" href="https://twitter.com/eguatech">
-    <a href="https://www.instagram.com/eguatech/"><img src="https://img.shields.io/badge/-Instagram-c13584?style=flat&labelColor=c13584&logo=instagram&logoColor=white">
-    <a href="https://www.youtube.com/channel/UCDgGUdR_6hZ6lfVaQbkQPLw"><img src="https://img.shields.io/badge/-YouTube-ff0000?style=flat-square&labelColor=ff0000&logo=youtube&logoColor=white">
-    <a href="https://www.linkedin.com/company/eguatech/"><img src="https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=Linkedin&logoColor=white"> </a>
-    <a href="https://dev.to/eguatech"><img src="https://img.shields.io/badge/DEV.TO-%230A0A0A.svg?&style=for-the-badge&logo=dev-dot-to&logoColor=white" height=22> </a>
+    <a href="https://github.com/eguatech" target="_blank"><img src="https://img.shields.io/badge/-Github-000?style=flat&logo=Github&logoColor=white">
+    <a href="https://twitter.com/eguatech" target="_blank"> <img src="https://img.shields.io/badge/-Twitter-1ca0f1?style=flat&labelColor=1ca0f1&logo=twitter&logoColor=white&link=Twitter" href="https://twitter.com/eguatech">
+    <a href="https://www.instagram.com/eguatech/" target="_blank"><img src="https://img.shields.io/badge/-Instagram-c13584?style=flat&labelColor=c13584&logo=instagram&logoColor=white">
+    <a href="https://www.youtube.com/channel/UCDgGUdR_6hZ6lfVaQbkQPLw" target="_blank"><img src="https://img.shields.io/badge/-YouTube-ff0000?style=flat-square&labelColor=ff0000&logo=youtube&logoColor=white">
+    <a href="https://www.linkedin.com/company/eguatech/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=Linkedin&logoColor=white"> </a>
+    <a href="https://dev.to/eguatech" target="_blank"><img src="https://img.shields.io/badge/DEV.TO-%230A0A0A.svg?&style=for-the-badge&logo=dev-dot-to&logoColor=white" height=22> </a>
   </p>
 </p>
 
@@ -58,7 +58,7 @@
 
 - SPOILER!! Tem mimos pra quem apoiar, e virão mais no futuro!
 
-<p align="center"> <a href="https://picpay.me/eguatech">
+<p align="center"> <a href="https://picpay.me/eguatech" target="_blank">
   <img src="web/assets/picpay.jpeg" alt="picpay" width="auto" height="400px">
   </a></p>
 
