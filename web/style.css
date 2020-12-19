@@ -12,7 +12,7 @@ html {
   border-radius: 5px;
   padding: 15px 20px;
   float: right;
-  margin-right: 10px;  
+  margin-right: 10px;
 }
 
 #demoSelector {
@@ -34,6 +34,31 @@ html {
   position: fixed;
   border-right: 2px solid grey;
   border-top: 2px solid grey;
+}
+
+@media only screen and (max-width: 768px) {
+   
+  #editor {
+    width: 100% !important;
+    height: 70% !important;
+    position: relative !important;
+  }
+  
+  #output {
+    width: 100% !important;
+    height: 30% !important;
+    position: relative !important;
+  }
+
+  #runBtn {
+    width: 100px;
+    font-size: 11px;
+  }
+
+  #demoSelector {
+    width: 108px;
+    font-size: 11px;
+  }
 }
 
 #output {
@@ -58,7 +83,7 @@ html {
 }
 
 #container {
-  height: 80px;
+  height: auto;
   width: 100%;
   font-size: 0;
   margin-bottom: 7px;
