@@ -29,7 +29,7 @@ html {
 
 #editor {
   width: 65%;
-  height: calc(100% - 96px);
+  height: calc(100% - 65px);
   left: 0;
   position: fixed;
   border-right: 2px solid grey;
@@ -46,7 +46,7 @@ html {
   
   #output {
     width: 100% !important;
-    height: 30% !important;
+    height: 29% !important;
     position: relative !important;
   }
 
@@ -63,7 +63,7 @@ html {
 
 #output {
   width: calc(35% - 4px);
-  height: calc(100% - 96px);
+  height: calc(100% - 65px);
   right: 0;
   position: fixed;
   border-right: 2px solid grey;
