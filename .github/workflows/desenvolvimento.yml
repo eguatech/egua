@@ -1,4 +1,4 @@
-name: Desenvolvimento
+name: Commit e PR - Desenvolvimento
 
 on:
   push:
