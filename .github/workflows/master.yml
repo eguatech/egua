@@ -1,4 +1,4 @@
-name: Master
+name: Commit e PR - Master
 
 on:
   push:

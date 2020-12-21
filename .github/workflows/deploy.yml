@@ -1,9 +1,9 @@
-name: Deploy
+name: Deploy Servidor e NPM
 
 on:
   push:
     branches: [ master ]
-    paths: [ 'web/**', 'package.json']
+    paths: [ 'web/dist.js', 'package.json']
 
 jobs:
   test_publish:
