@@ -3221,6 +3221,12 @@ module.exports.comp= function(a) {
   return comp;
 };
 
+//Comprimento de um vetor
+module.exports.minaprox = function(a) {
+
+  var minaprox = Math.floor(a);
+  return minaprox;
+};
 },{"../errors.js":6}],11:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 const EguaFunction = require("../structures/function.js");
