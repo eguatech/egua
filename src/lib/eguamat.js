@@ -1009,3 +1009,10 @@ module.exports.comp= function(a) {
   var comp = a.length;
   return comp;
 };
+
+//Aproximação Floor
+module.exports.minaprox = function(a) {
+
+  var minaprox = Math.floor(a);
+  return minaprox;
+};
