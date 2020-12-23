@@ -1003,3 +1003,9 @@ module.exports.pid = function(Mo, t, K, T1, T2) {
   return ['csi:'+csi,'<br/>','Wn:'+Wn,'<br/>','Proporcional:'+Kp,'<br/>','Integral:'+Ki,'<br/>','Progressivo:'+Kd];
 };
 
+//Comprimento de um vetor
+module.exports.comp= function(a) {
+
+  var comp = a.length;
+  return comp;
+};
