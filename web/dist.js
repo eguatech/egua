@@ -3221,7 +3221,7 @@ module.exports.comp= function(a) {
   return comp;
 };
 
-//Comprimento de um vetor
+//Aproximação Floor
 module.exports.minaprox = function(a) {
 
   var minaprox = Math.floor(a);
