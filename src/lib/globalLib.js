@@ -111,6 +111,36 @@ module.exports = function (globals) {
     })
   );
 
+  globals.defineVar(
+    "mapear", 
+    new StandardFn(1, function(array, callback){     
+      if (!Array.isArray(array)) {
+        throw new RuntimeError(
+          this.token,
+          "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+        );
+      }
+
+      if (typeof callback !== 'function'){
+        throw new RuntimeError(
+          this.token,
+          "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+        );
+      }
+
+      let provisorio = [];
+      for(let index = 0; index < arr.length; index++){
+        provisorio.push(
+          callback(
+            arr[index], index, array
+          )
+        );
+      }
+      
+      return provisorio;
+    })
+  );
+
   globals.defineVar("exports", {});
 
   return globals;
