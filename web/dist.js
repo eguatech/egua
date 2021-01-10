@@ -3359,10 +3359,10 @@ module.exports = function (globals) {
       }
 
       let provisorio = [];
-      for(let index = 0; index < arr.length; index++){
+      for(let index = 0; index < array.length; index++){
         provisorio.push(
           callback(
-            arr[index], index, array
+            array[index], index, array
           )
         );
       }
