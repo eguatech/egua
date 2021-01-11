@@ -3351,7 +3351,7 @@ module.exports = function (globals) {
         );
       }
 
-      if (typeof callback !== 'function'){
+      if (callback instanceof EguaFunction){
         throw new RuntimeError(
           this.token,
           "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
@@ -3359,7 +3359,7 @@ module.exports = function (globals) {
       }
 
       let provisorio = [];
-      for(let index = 0; index < array.length; index++){
+      for(let index = 0; index < array.length; ++index){
         provisorio.push(
           callback(
             array[index], index, array
@@ -3966,7 +3966,7 @@ module.exports = class Parser {
     returnStatement() {
         let keyword = this.previous();
         let value = null;
-
+        escreva(value);
         if (!this.check(tokenTypes.SEMICOLON)) {
             value = this.expression();
         }
