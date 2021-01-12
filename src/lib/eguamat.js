@@ -96,24 +96,6 @@ module.exports.linspace = function(startValue, stopValue, cardinality) {
   return lista;
 };
 
-//Gráfico da Função Quadrática
-module.exports.fun2 = function(a,b,c) {
-  if (isNaN(a) || a === null)
-    throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para fun2(a,b,c)."
-    );
-  n = 2.5;
-  var arr = [];
-  var step = (n - (-n)) / (n- 1);
-  for (var i = 0; i < n; i=i+0.01) {
-    arr.push(((-n-1.945) + (step * i)));
-  }
-  x = arr;
-  f = x.map(function(x) { return ((x * x * a)+(b * x)+c); });
-  plot(x,f);//['f(x) ='+f];
-};
-
 //Raízes da Função Quadrática
 module.exports.fun2R = function(a,b,c) {
   if (isNaN(a) || a === null)
