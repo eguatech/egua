@@ -6,7 +6,7 @@
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
     "testes": "./bin/egua tests/tests.egua",
-    "build:azure": "ls / && ls -l"
+    "build:azure": "ls /github/workspace"
   },
   "repository": {
     "type": "git",
