@@ -1,10 +1,10 @@
 const RuntimeError = require("../errors.js").RuntimeError;
 
-module.exports.nula = function(){
+module.exports.nula = function () {
   var nula = null;
   return nula;
 }
-module.exports.radiano = function(angle) {
+module.exports.radiano = function (angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
       this.token,
@@ -14,7 +14,7 @@ module.exports.radiano = function(angle) {
   return angle * (Math.PI / 180);
 };
 
-module.exports.graus = function(angle) {
+module.exports.graus = function (angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
       this.token,
@@ -24,9 +24,9 @@ module.exports.graus = function(angle) {
   return angle * (180 / Math.PI);
 };
 
-module.exports.pi = Math.PI; 
+module.exports.pi = Math.PI;
 
-module.exports.raiz = function(num, root) {
+module.exports.raiz = function (num, root) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
       this.token,
@@ -48,45 +48,45 @@ module.exports.raiz = function(num, root) {
   if (Math.abs(num - root) < 1 && num > 0 == root > 0)
     return negateFlag ? -possible : possible;
 
-  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${ originalRoot } de ${ num }.`)
+  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
 };
 
 
-module.exports.nula = function() {
+module.exports.nula = function () {
   var nula = null;
   return nula;
 };
 
 //FUNÇÃO AFIM E QUADRÁTICA
 //Valores das Abscissas
-module.exports.fun1 = function(a,b) {
+module.exports.fun1 = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para fun1(valor1,valor2)."
+      this.token,
+      "Você deve prover valores para fun1(valor1,valor2)."
     );
-  x = [b-4,b-3,b-2,b-1,b,b+1,b+2,b+3,b+4];
-  f = x.map(function(x) { return ((x * a)+b); });
-  return ['f(x)= '+f];
+  x = [b - 4, b - 3, b - 2, b - 1, b, b + 1, b + 2, b + 3, b + 4];
+  f = x.map(function (x) { return ((x * a) + b); });
+  return ['f(x)= ' + f];
 };
 
 //Raíz da Função Afim
-module.exports.fun1R = function(a,b) {
+module.exports.fun1R = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para fun1(valor1,valor2)."
+      this.token,
+      "Você deve prover valores para fun1(valor1,valor2)."
     );
-  x = (-1*b)/a;
-  return ['f(0)= '+x];
+  x = (-1 * b) / a;
+  return ['f(0)= ' + x];
 };
 
 //Intervalo Preenchido
-module.exports.linspace = function(startValue, stopValue, cardinality) {
+module.exports.linspace = function (startValue, stopValue, cardinality) {
   if (isNaN(startValue) || startValue === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para linspace(valor1,valor2,valor3)."
+      this.token,
+      "Você deve prover valores para linspace(valor1,valor2,valor3)."
     );
   var lista = [];
   var step = (stopValue - startValue) / (cardinality - 1);
@@ -97,44 +97,44 @@ module.exports.linspace = function(startValue, stopValue, cardinality) {
 };
 
 //Raízes da Função Quadrática
-module.exports.fun2R = function(a,b,c) {
+module.exports.fun2R = function (a, b, c) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para fun2R(a,b,c)."
+      this.token,
+      "Você deve prover valores para fun2R(a,b,c)."
     );
   r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
   r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
-  xv = (-1*b)/(2*a);
-  yv = (-1*(Math.pow(b, 2) - (4 * a * c)))/4*a;
+  xv = (-1 * b) / (2 * a);
+  yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
   return ["Xv: " + xv + " Yv: " + yv];
 };
 
 //Matriz aleatória bidimensional
-module.exports.rand = function(n1,n2,e) {
+module.exports.rand = function (n1, n2, e) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para rand(n1,n2,e)."
+      this.token,
+      "Você deve prover valores para rand(n1,n2,e)."
     );
   if (e == undefined) { e = 0; }
   if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
-  var data = Array.from(Array(n1),() => new Array(n2));
+  var data = Array.from(Array(n1), () => new Array(n2));
   // benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
   for (var i = 0; i < n1; i++) {
     for (var j = 0; j < n2; j++) {
       data[i][j] = e + Math.random() * 2 - 1;
     }
   }
-  return aprox(data,5);
+  return aprox(data, 5);
 };
 
 //Aproximação de valores
-module.exports.aprox = function(x,z) {
+module.exports.aprox = function (x, z) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para aprox(x,z)."
+      this.token,
+      "Você deve prover valores para aprox(x,z)."
     );
   if (z == undefined) { z = 2; }
   console.log("type of = " + typeof (x));
@@ -153,25 +153,25 @@ module.exports.aprox = function(x,z) {
 };
 
 //Parâmetros da Função
-module.exports.matrizn = function(z) {
+module.exports.matrizn = function (z) {
   if (isNaN(z) || z === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para matrizn(z)."
+      this.token,
+      "Você deve prover valores para matrizn(z)."
     );
   n = arguments.length;
   console.log("n = " + n);
-  var data = Array.from(Array(1),() => new Array(n));
-  for (var i = 0; i < n; i++) { data[0][i] = arguments[i];}
+  var data = Array.from(Array(1), () => new Array(n));
+  for (var i = 0; i < n; i++) { data[0][i] = arguments[i]; }
   return matriz(data);
 };
 
 //Vetor de pontos aleatórios
-module.exports.pale = function(n) {
+module.exports.pale = function (n) {
   if (isNaN(n) || n === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para pale(n)."
+      this.token,
+      "Você deve prover valores para pale(n)."
     );
   if (ex == undefined) { ex = 0; }
   var x = [];
@@ -185,26 +185,26 @@ module.exports.pale = function(n) {
 };
 
 //Intervalo A-B
-module.exports.vet = function(a,b) {
+module.exports.vet = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para vet(a,b)."
+      this.token,
+      "Você deve prover valores para vet(a,b)."
     );
-  var data = Array.from(Array(1),() => new Array(b-a+1));
+  var data = Array.from(Array(1), () => new Array(b - a + 1));
   // the benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
   for (var i = 0; i < data[0].length; i++) {
-    data[0][i]= a + i;
+    data[0][i] = a + i;
   }
   return matrizn(data);
 };
 
 //Contagem de Elementos
-module.exports.qtd = function(a,b) {
+module.exports.qtd = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para qtd(a,b)."
+      this.token,
+      "Você deve prover valores para qtd(a,b)."
     );
   if (b == undefined) {
     var count = a.length;
@@ -219,11 +219,11 @@ module.exports.qtd = function(a,b) {
 };
 
 //Gráfico do Vetor
-module.exports.plot = function(x,y) {
+module.exports.plot = function (x, y) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para plot(z)."
+      this.token,
+      "Você deve prover valores para plot(z)."
     );
 
   var yy = y;
@@ -236,61 +236,61 @@ module.exports.plot = function(x,y) {
     line: { color: 'blue', width: 2 }
   }];
   var layout =
-      {
-        width: window.screen.Width,
-        height: 550,
-        paper_bgcolor: 'white',
-        plot_bgcolor: 'white',
-        margin: { l: 70, b: 60, r: 10, t: 40 },
-        xaxis: { title: 'x-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
-        yaxis: { title: 'y-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
-        xaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' },
-        yaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' }
-      };
+  {
+    width: window.screen.Width,
+    height: 550,
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    margin: { l: 70, b: 60, r: 10, t: 40 },
+    xaxis: { title: 'x-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
+    yaxis: { title: 'y-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
+    xaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' },
+    yaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' }
+  };
   toggleOrCheckIfFunctionCall(true);
   Plotly.newPlot(outId, data, layout, { displayModeBar: true, staticPlot: true });
 };
 
 /*ESTATÍSTICA*/
 //Valor Máximo de uma matriz
-module.exports.max = function(a) {
+module.exports.max = function (a) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para max(a)."
+      this.token,
+      "Você deve prover valores para max(a)."
     );
 
   return Math.max.apply(null, a);
 };
 
 //Valor Mínimo de uma matriz
-module.exports.min = function(a) {
+module.exports.min = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para min(a)."
+      this.token,
+      "Você deve prover valores para min(a)."
     );
 
   return Math.min.apply(null, a);
 };
 
 //Intervalo (max - min) de uma matriz
-module.exports.intervalo = function(a) {
+module.exports.intervalo = function (a) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para intervalo(a)."
+      this.token,
+      "Você deve prover valores para intervalo(a)."
     );
 
   return max(a) - min(a);
 };
 
 //Mediana de uma matriz
-module.exports.mediana = function(a) {
+module.exports.mediana = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mediana(a)."
+      this.token,
+      "Você deve prover valores para mediana(a)."
     );
 
   a.sort(function (a, b) { return a - b; });
@@ -299,58 +299,58 @@ module.exports.mediana = function(a) {
 };
 
 //Soma de determinada matriz
-module.exports.smtr = function(a) {
+module.exports.smtr = function (a) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para smtr(a)."
+      this.token,
+      "Você deve prover valores para smtr(a)."
     );
 
-  var z = 0 ;
+  var z = 0;
   if (a.length == 1) {   // a is a 1D row array
-    for (var j = 0; j < a[0].length; j++) {z = z + a[0][j]; }
+    for (var j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
   }
   else if (a[0].length == 1) {   // a is a 1D column array
     console.log("column array");
-    for (var i = 0; i < a.length; i++) {z = z + a[i][0]; }
+    for (var i = 0; i < a.length; i++) { z = z + a[i][0]; }
   }
   else {
-    for (var j = 0; j < a.length; j++) {z = z + a[j]; }
+    for (var j = 0; j < a.length; j++) { z = z + a[j]; }
   }
   toggleOrCheckIfFunctionCall(false);
-  return aprox(z,2);
+  return aprox(z, 2);
 };
 
 //Média de uma matriz
-module.exports.media = function(a) {
+module.exports.media = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para media(a)."
+      this.token,
+      "Você deve prover valores para media(a)."
     );
 
-  return smtr(a)/a.length;
+  return smtr(a) / a.length;
 };
 
 //Média aritmética de uma matriz
-module.exports.ve = function(a) {
+module.exports.ve = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para ve(a)."
+      this.token,
+      "Você deve prover valores para ve(a)."
     );
 
-  if(a.length == 1){return aprox(smtr(a) / a[0].length,4);} // a is a row array
-  if(a[0].length == 1){return aprox(smtr(a) / a.length,4);} // a is a column array
-  if(a[0].length == undefined){return aprox(smtr(a) / a.length,4);}
+  if (a.length == 1) { return aprox(smtr(a) / a[0].length, 4); } // a is a row array
+  if (a[0].length == 1) { return aprox(smtr(a) / a.length, 4); } // a is a column array
+  if (a[0].length == undefined) { return aprox(smtr(a) / a.length, 4); }
 };
 
 //Soma dos quadrados dos resíduos (sqr) de uma matriz
-module.exports.sqr = function(a) {
+module.exports.sqr = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para sqr(a)."
+      this.token,
+      "Você deve prover valores para sqr(a)."
     );
   var mean = ve(array);
   var sum = 0;
@@ -364,22 +364,22 @@ module.exports.sqr = function(a) {
 };
 
 //Variação de uma matriz
-module.exports.variancia = function(array, flag) {
+module.exports.variancia = function (array, flag) {
   if (isNaN(array) || array === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para variancia(matriz, flag)."
+      this.token,
+      "Você deve prover valores para variancia(matriz, flag)."
     );
   if (flag == undefined) { flag = 1; }
   return sqr(array) / (array.length - (flag ? 1 : 0));
 };
 
 //Desvio padrão de uma matriz
-module.exports.devpad = function(matriz, flag) {
+module.exports.devpad = function (matriz, flag) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para devpad(matriz, flag)."
+      this.token,
+      "Você deve prover valores para devpad(matriz, flag)."
     );
 
   if (flag == undefined) { flag = 1; }
@@ -387,11 +387,11 @@ module.exports.devpad = function(matriz, flag) {
 };
 
 //Covariância de duas matrizes
-module.exports.covar = function(array1, array2) {
+module.exports.covar = function (array1, array2) {
   if (isNaN(array1) || array1 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para covar(matriz1, matriz2)."
+      this.token,
+      "Você deve prover valores para covar(matriz1, matriz2)."
     );
   var u = ve(array1);
   var v = ve(array2);
@@ -403,22 +403,22 @@ module.exports.covar = function(array1, array2) {
 };
 
 //Coeficiente de variação para uma matriz
-module.exports.coefvar = function(array) {
+module.exports.coefvar = function (array) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para coefvar(matriz)."
+      this.token,
+      "Você deve prover valores para coefvar(matriz)."
     );
 
   return devpad(array, 1) / ex(array);
 };
 
 //Coeficiente de correlação de pearson para duas matrizes
-module.exports.coefcorr = function(array1, array2) {
+module.exports.coefcorr = function (array1, array2) {
   if (isNaN(array1) || array1 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para coefcorr(array1, array2)."
+      this.token,
+      "Você deve prover valores para coefcorr(array1, array2)."
     );
 
   return aprox(covar(array1, array2) / devpad(array1, 1) / devpad(array2, 1));
@@ -426,11 +426,11 @@ module.exports.coefcorr = function(array1, array2) {
 
 /*MATRIZES*/
 //Coluna específica c de uma matriz bidimensional
-module.exports.coluna = function(a,c) {
+module.exports.coluna = function (a, c) {
   if (isNaN(a) || c === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para coluna(a,c)."
+      this.token,
+      "Você deve prover valores para coluna(a,c)."
     );
 
   var column = Array.from(Array(a.length), () => new Array(1));
@@ -441,11 +441,11 @@ module.exports.coluna = function(a,c) {
 };
 
 //Linha específica c de uma matriz bidimensional
-module.exports.linha = function(a,r) {
+module.exports.linha = function (a, r) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para linha(a,r)."
+      this.token,
+      "Você deve prover valores para linha(a,r)."
     );
 
   console.log(a[0].length);
@@ -457,11 +457,11 @@ module.exports.linha = function(a,r) {
 };
 
 //Transposta de linhas de um vetor
-module.exports.transposta = function(a) {
+module.exports.transposta = function (a) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para transposta(a)."
+      this.token,
+      "Você deve prover valores para transposta(a)."
     );
   console.log("a.length = " + a.length);
   console.log("a[0].length = " + a[0].length);
@@ -491,11 +491,11 @@ module.exports.transposta = function(a) {
 };
 
 //Criação e exibição de tabelas de um vetor ou matriz
-module.exports.matriz = function(z) {
+module.exports.matriz = function (z) {
   if (isNaN(z) || z === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para matriz(a)."
+      this.token,
+      "Você deve prover valores para matriz(a)."
     );
 
   if (z[0].length == undefined) { // 1D array
@@ -533,11 +533,11 @@ module.exports.matriz = function(z) {
 };
 
 //Multiplicação de matrizes
-module.exports.matrizmult = function(a,b) {
+module.exports.matrizmult = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para matrizmult(a,b)."
+      this.token,
+      "Você deve prover valores para matrizmult(a,b)."
     );
 
   var data = [];  // maybe change this to array of array
@@ -578,11 +578,11 @@ module.exports.matrizmult = function(a,b) {
 };
 
 //Inverso de uma matriz
-module.exports.matrizinv= function(m) {
+module.exports.matrizinv = function (m) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para matrizinv(m)."
+      this.token,
+      "Você deve prover valores para matrizinv(m)."
     );
 
   if (m.length !== m[0].length) { return "não é uma matriz quadrada"; }
@@ -666,11 +666,11 @@ module.exports.matrizinv= function(m) {
 };
 
 //Matriz de identidade
-module.exports.matrizid= function(m) {
+module.exports.matrizid = function (m) {
   if (isNaN(num) || num === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para matrizid(m)."
+      this.token,
+      "Você deve prover valores para matrizid(m)."
     );
   var data = Array.from(Array(n), () => new Array(n));
   for (var i = 0; i < n; i++) {
@@ -684,115 +684,115 @@ module.exports.matrizid= function(m) {
 
 /*TRIGONOMETRIA*/
 //Seno de um número
-module.exports.sen = function(x) {
+module.exports.sen = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para sen(x)."
+      this.token,
+      "Você deve prover valores para sen(x)."
     );
 
   return Math.sin(x);
 };
 
 //Cosseno de um número
-module.exports.cos = function(x) {
+module.exports.cos = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para cos(x)."
+      this.token,
+      "Você deve prover valores para cos(x)."
     );
 
   return Math.cos(x);
 };
 
 //Tangente de um número
-module.exports.tan = function(x) {
+module.exports.tan = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para tan(x)."
+      this.token,
+      "Você deve prover valores para tan(x)."
     );
 
   return Math.tan(x);
 };
 
 //Arco cosseno de um número
-module.exports.arcos = function(x) {
+module.exports.arcos = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para arcos(x)."
+      this.token,
+      "Você deve prover valores para arcos(x)."
     );
 
   return Math.acos(x);
 };
 
 //Arco seno de um número
-module.exports.arsen = function(x) {
+module.exports.arsen = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para arsen(x)."
+      this.token,
+      "Você deve prover valores para arsen(x)."
     );
 
   return Math.asin(x);
 };
 
 //Arco tangente de um número
-module.exports.artan = function(x) {
+module.exports.artan = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para artan(x)."
+      this.token,
+      "Você deve prover valores para artan(x)."
     );
 
   return Math.atan(x)
 };
 
 //Exponencial
-module.exports.exp = function(x) {
+module.exports.exp = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para exp(x)."
+      this.token,
+      "Você deve prover valores para exp(x)."
     );
 
   return Math.exp(x);
 };
 
 //Logaritmo natural
-module.exports.log = function(x) {
+module.exports.log = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para log(x)."
+      this.token,
+      "Você deve prover valores para log(x)."
     );
 
   return Math.log(x);
 };
 
 //Potenciação de um número base X por uma expoente Y
-module.exports.pot = function(x,y) {
+module.exports.pot = function (x, y) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para pot(x,y)."
+      this.token,
+      "Você deve prover valores para pot(x,y)."
     );
 
-  return Math.pow(x,y);
+  return Math.pow(x, y);
 };
 
 //Número pseudo-aleatório
-module.exports.aleat = function() {
+module.exports.aleat = function () {
   return Math.random();
 };
 
 //Raíz quadrada
-module.exports.raizq = function(x) {
+module.exports.raizq = function (x) {
   if (isNaN(x) || x === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para raizq(x)."
+      this.token,
+      "Você deve prover valores para raizq(x)."
     );
 
   return Math.sqrt(x);
@@ -801,117 +801,117 @@ module.exports.raizq = function(x) {
 /*CINEMÁTICA*/
 
 //Velocidade média
-module.exports.vmed = function(s,t) {
+module.exports.vmed = function (s, t) {
   if (isNaN(s) || s === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para vmed(d,t)."
+      this.token,
+      "Você deve prover valores para vmed(d,t)."
     );
 
-  return (s/t);
+  return (s / t);
 };
 
 //Espaço percorrido
-module.exports.deltas = function(s0,s) {
+module.exports.deltas = function (s0, s) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para deltas(e0,e1)."
+      this.token,
+      "Você deve prover valores para deltas(e0,e1)."
     );
-  ds = s-s0;
+  ds = s - s0;
   return ds;
 };
 
 //Tempo Percorrido
-module.exports.deltat = function(t0,t) {
+module.exports.deltat = function (t0, t) {
   if (isNaN(t0) || t0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para deltat(t0,t1)."
+      this.token,
+      "Você deve prover valores para deltat(t0,t1)."
     );
-  dt=t-t;
+  dt = t - t;
   return dt;
 };
 
 //Aceleração
-module.exports.acel = function(v, v0, t, t0) {
+module.exports.acel = function (v, v0, t, t0) {
   if (isNaN(v) || v === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para acel(v, v0, t, t0)."
+      this.token,
+      "Você deve prover valores para acel(v, v0, t, t0)."
     );
-  a = (v-v0)/(t-t0)
+  a = (v - v0) / (t - t0)
   return a;
 };
 
 //Função Horária da Posição (M.R.U)
-module.exports.mrufh = function(s0,v,t) {
+module.exports.mrufh = function (s0, v, t) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mrufh(s0,v,t)."
+      this.token,
+      "Você deve prover valores para mrufh(s0,v,t)."
     );
-  t=t+1;
+  t = t + 1;
   var s = new Array();
   var index = 0;
-  for(var i=0;i<t;i++){
-    s[index]=s0+v*i;
+  for (var i = 0; i < t; i++) {
+    s[index] = s0 + v * i;
     index++;
     console.log(s[i]);
   }
-  return ["Função: "+s0+"+("+v+")*t"+"<br>"+"Posições: "+s];
+  return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
 };
 
 //Gráfico para a Função Horária da Posição (M.R.U)
-module.exports.mrufhp = function(s0,v, t) {
+module.exports.mrufhp = function (s0, v, t) {
   if (isNaN(s0 || s0 === null))
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mrufhp(Pi, Vf, T)."
+      this.token,
+      "Você deve prover valores para mrufhp(Pi, Vf, T)."
     );
   var s = new Array();
   var x = new Array();
   var index = 0;
-  for(var i=0;i<t;i++){
-    s[index]=s0+v*i;
+  for (var i = 0; i < t; i++) {
+    s[index] = s0 + v * i;
     x[index] = i;
     index++;
     console.log(s[i]);
   }
-  return plot(x,s);
+  return plot(x, s);
 };
 
 //Gráfico Velocidade (M.R.U)
-module.exports.mruvel = function(s0,s,t) {
+module.exports.mruvel = function (s0, s, t) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mruvel(s0,s,t)."
+      this.token,
+      "Você deve prover valores para mruvel(s0,s,t)."
     );
   var v = new Array();
   var x = new Array();
   var index = 0;
-  for(var i=0;i<t;i++){
-    v[index]=(s-s0)/t;
-    x[index]=i;
+  for (var i = 0; i < t; i++) {
+    v[index] = (s - s0) / t;
+    x[index] = i;
     index++;
     console.log(v[i]);
   }
-  return plot(x,v);
+  return plot(x, v);
 };
 
 //Função Horária da Posição (M.R.U.V)
-module.exports.mruvfh = function(s0,v0, t, a) {
+module.exports.mruvfh = function (s0, v0, t, a) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mruvfh(s0,v0, t, a)."
+      this.token,
+      "Você deve prover valores para mruvfh(s0,v0, t, a)."
     );
 
   var index = 0;
   var s = new Array(t);
-  for(var i=0;i<t;i++){
-    s[index]=s0+v0*i+((a*i*i)/2);
+  for (var i = 0; i < t; i++) {
+    s[index] = s0 + v0 * i + ((a * i * i) / 2);
     index++;
     console.log(s[i]);
   }
@@ -919,40 +919,40 @@ module.exports.mruvfh = function(s0,v0, t, a) {
 };
 
 //Gráfico para a Função Horária da Posição (M.R.U.V)
-module.exports.mruvfhp = function(s0,v0, t, a) {
+module.exports.mruvfhp = function (s0, v0, t, a) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mruvfhp(Pi, Vf, T, A)."
+      this.token,
+      "Você deve prover valores para mruvfhp(Pi, Vf, T, A)."
     );
 
   var index = 0;
   var s = new Array(t);
   var x = new Array();
-  for(var i=0;i<t;i++){
-    s[i]=s0+v0*i+((a*i*i)/2);
+  for (var i = 0; i < t; i++) {
+    s[i] = s0 + v0 * i + ((a * i * i) / 2);
     x[index] = i;
     index++;
     console.log(s[i]);
   }
-  return plot(x,s);
+  return plot(x, s);
 };
 
 //Gráfico da velocidade (M.R.U.V)
-module.exports.mruvvel = function(s0,s,a) {
+module.exports.mruvvel = function (s0, s, a) {
   if (isNaN(s0) || s0 === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para mruvvel(Pi, Vf, A)."
+      this.token,
+      "Você deve prover valores para mruvvel(Pi, Vf, A)."
     );
   var vf = new Array();
   var x = new Array();
   var v = new Array();
   var index = 0;
-  for(var i=0;i<s;i++){
-    v=index;
-    vf[index]=Math.sqrt(2*a*(index-s0));
-    x[index]=i;
+  for (var i = 0; i < s; i++) {
+    v = index;
+    vf[index] = Math.sqrt(2 * a * (index - s0));
+    x[index] = i;
     index++;
     console.log(vf[i]);
   }
@@ -960,40 +960,40 @@ module.exports.mruvvel = function(s0,s,a) {
 };
 
 /*Controle e Servomecanismos*/
-module.exports.pid = function(Mo, t, K, T1, T2) {
+module.exports.pid = function (Mo, t, K, T1, T2) {
   if (isNaN(Mo) || Mo === null)
     throw new RuntimeError(
-        this.token,
-        "Você deve prover valores para pid(Ov, Ts, K, T1, T2)."
+      this.token,
+      "Você deve prover valores para pid(Ov, Ts, K, T1, T2)."
     );
   pi = Math.PI;//Pi da bilbioteca Math.js
 
   //Amortecimento Relativo
-  csi = (-1*(Math.log((Mo/100))))/(Math.sqrt(Math.pow(pi,2)+(pot((Math.log((Mo/100))),2))));
+  csi = (-1 * (Math.log((Mo / 100)))) / (Math.sqrt(Math.pow(pi, 2) + (pot((Math.log((Mo / 100))), 2))));
 
   //Frequência Natural
-  Wn = (4)/(t*csi);
+  Wn = (4) / (t * csi);
 
   //Controlador Proporcional (P)
-  Kp = 20*(Math.pow(csi,2)*Math.pow(Wn,2)*T1*T2)+((Math.pow(Wn,2)*T1*T2)-1)/(K);
+  Kp = 20 * (Math.pow(csi, 2) * Math.pow(Wn, 2) * T1 * T2) + ((Math.pow(Wn, 2) * T1 * T2) - 1) / (K);
 
   //Controlador Integral (I)
-  Ki = (10*csi*(Math.pow(Wn,3))*T1*T2)/(K);
+  Ki = (10 * csi * (Math.pow(Wn, 3)) * T1 * T2) / (K);
 
   //Controlador Derivativo (D)
-  Kd = (12*csi*Wn*T1*T2-T1-T2)/(K);
-  return ['csi:'+csi,'<br/>','Wn:'+Wn,'<br/>','Proporcional:'+Kp,'<br/>','Integral:'+Ki,'<br/>','Progressivo:'+Kd];
+  Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
+  return ['csi:' + csi, '<br/>', 'Wn:' + Wn, '<br/>', 'Proporcional:' + Kp, '<br/>', 'Integral:' + Ki, '<br/>', 'Progressivo:' + Kd];
 };
 
 //Comprimento de um vetor
-module.exports.comp= function(a) {
+module.exports.comp = function (a) {
 
   var comp = a.length;
   return comp;
 };
 
 //Aproximação Floor
-module.exports.minaprox = function(a) {
+module.exports.minaprox = function (a) {
 
   var minaprox = Math.floor(a);
   return minaprox;
