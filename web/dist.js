@@ -2643,6 +2643,8 @@ module.exports = function (name) {
     return null;
 };
 },{"../structures/module.js":18,"../structures/standardFn.js":19,"./eguamat.js":7,"./time.js":10}],10:[function(require,module,exports){
+const { RuntimeError } = require("../errors");
+
 module.exports.time = function () {
     return +new Date();
 };
@@ -2663,13 +2665,7 @@ module.exports.horario = function (timestamp) {
     let timeFormatted = timestamp !== null ? new Date(timestamp) : new Date();
     return timeFormatted;
 };
-
-module.exports.dormir = function (ms) {
-    let now = new Date().getTime();
-    while (new Date().getTime() < now + ms) { }
-    return null;
-};
-},{}],11:[function(require,module,exports){
+},{"../errors":3}],11:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
