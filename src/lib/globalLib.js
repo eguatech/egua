@@ -113,15 +113,15 @@ module.exports = function (globals) {
 
   globals.defineVar(
     "mapear", 
-    new StandardFn(1, function(array, callback){     
+    new StandardFn(2, function(array, callback){     
       if (!Array.isArray(array)) {
         throw new RuntimeError(
           this.token,
           "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
         );
       }
-
-      if (typeof callback !== 'function'){
+      
+      if (callback instanceof EguaFunction === false){
         throw new RuntimeError(
           this.token,
           "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."

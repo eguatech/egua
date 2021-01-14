@@ -3343,15 +3343,15 @@ module.exports = function (globals) {
 
   globals.defineVar(
     "mapear", 
-    new StandardFn(1, function(array, callback){     
+    new StandardFn(2, function(array, callback){     
       if (!Array.isArray(array)) {
         throw new RuntimeError(
           this.token,
           "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
         );
       }
-
-      if (callback instanceof EguaFunction){
+      
+      if (callback instanceof EguaFunction === false){
         throw new RuntimeError(
           this.token,
           "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
@@ -3966,7 +3966,7 @@ module.exports = class Parser {
     returnStatement() {
         let keyword = this.previous();
         let value = null;
-        escreva(value);
+
         if (!this.check(tokenTypes.SEMICOLON)) {
             value = this.expression();
         }
