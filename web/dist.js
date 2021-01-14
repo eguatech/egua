@@ -3222,10 +3222,13 @@ module.exports.comp= function(a) {
 };
 
 //Aproximação Floor
-module.exports.minaprox = function(a) {
+module.exports.minaprox = function(value) {
 
-  var minaprox = Math.floor(a);
-  return minaprox;
+  if (typeof value === 'string' || typeof value === 'number'){
+    return Math.floor(value);
+  }
+  
+  return "O valor passado pra função deve ser uma string ou um número.";
 };
 },{"../errors.js":6}],11:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
@@ -3340,37 +3343,7 @@ module.exports = function (globals) {
       return obj;
     })
   );
-
-  globals.defineVar(
-    "mapear", 
-    new StandardFn(2, function(array, callback){     
-      if (!Array.isArray(array)) {
-        throw new RuntimeError(
-          this.token,
-          "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
-        );
-      }
-      
-      if (callback instanceof EguaFunction === false){
-        throw new RuntimeError(
-          this.token,
-          "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
-        );
-      }
-
-      let provisorio = [];
-      for(let index = 0; index < array.length; ++index){
-        provisorio.push(
-          callback(
-            array[index], index, array
-          )
-        );
-      }
-      
-      return provisorio;
-    })
-  );
-
+  
   globals.defineVar("exports", {});
 
   return globals;

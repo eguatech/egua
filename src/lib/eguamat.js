@@ -1010,9 +1010,12 @@ module.exports.comp= function(a) {
   return comp;
 };
 
-//Aproximação Floor
-module.exports.minaprox = function(a) {
+// Retorna o menor número inteiro dentre o valor de "value"
+module.exports.minaprox = function(value) {
 
-  var minaprox = Math.floor(a);
-  return minaprox;
+  if (typeof value === 'string' || typeof value === 'number'){
+    return Math.floor(value);
+  }
+  
+  return "O valor passado pra função deve ser uma string ou um número.";
 };
