@@ -1017,5 +1017,8 @@ module.exports.minaprox = function(value) {
     return Math.floor(value);
   }
   
-  return "O valor passado pra função deve ser uma string ou um número.";
+  throw new RuntimeError(
+    this.token,
+    "O valor passado pra função deve ser uma string ou um número."
+  );
 };
