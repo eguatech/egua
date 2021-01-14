@@ -1013,12 +1013,12 @@ module.exports.comp= function(a) {
 // Retorna o menor número inteiro dentre o valor de "value"
 module.exports.minaprox = function(value) {
 
-  if (typeof value === 'string' || typeof value === 'number'){
-    return Math.floor(value);
+  if (typeof value !== 'number'){
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um número."
+    );
   }
   
-  throw new RuntimeError(
-    this.token,
-    "O valor passado pra função deve ser uma string ou um número."
-  );
+  return Math.floor(value);  
 };

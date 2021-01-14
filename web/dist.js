@@ -3221,14 +3221,18 @@ module.exports.comp= function(a) {
   return comp;
 };
 
-//Aproximação Floor
+// Retorna o menor número inteiro dentre o valor de "value"
 module.exports.minaprox = function(value) {
 
-  if (typeof value === 'string' || typeof value === 'number'){
-    return Math.floor(value);
+  if (typeof value !== 'number'){
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um número."
+    );
+    return;
   }
   
-  return "O valor passado pra função deve ser uma string ou um número.";
+  return Math.floor(value);  
 };
 },{"../errors.js":6}],11:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
