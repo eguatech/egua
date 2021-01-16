@@ -2370,26 +2370,6 @@ module.exports.mruvfh = function (s0, v0, t, a) {
   return s;
 };
 
-//Gráfico para a Função Horária da Posição (M.R.U.V)
-module.exports.mruvfhp = function (s0, v0, t, a) {
-  if (isNaN(s0) || s0 === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mruvfhp(Pi, Vf, T, A)."
-    );
-
-  var index = 0;
-  var s = new Array(t);
-  var x = new Array();
-  for (var i = 0; i < t; i++) {
-    s[i] = s0 + v0 * i + ((a * i * i) / 2);
-    x[index] = i;
-    index++;
-    console.log(s[i]);
-  }
-  return plot(x, s);
-};
-
 //Gráfico da velocidade (M.R.U.V)
 module.exports.mruvvel = function (s0, s, a) {
   if (isNaN(s0) || s0 === null)
