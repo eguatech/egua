@@ -2482,11 +2482,18 @@ module.exports.comp = function (a) {
   return comp;
 };
 
-//Aproximação Floor
-module.exports.minaprox = function (a) {
-
-  var minaprox = Math.floor(a);
-  return minaprox;
+// Retorna o menor número inteiro dentre o valor de "value"
+module.exports.minaprox = function(value) {
+  
+  if (typeof value !== 'number'){
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um número."
+    );
+    return;
+  }
+  
+  return Math.floor(value);  
 };
 },{"../errors.js":3}],8:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
@@ -2601,7 +2608,7 @@ module.exports = function (globals) {
       return obj;
     })
   );
-
+  
   globals.defineVar("exports", {});
 
   return globals;
