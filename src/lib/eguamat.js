@@ -862,25 +862,6 @@ module.exports.mrufh = function (s0, v, t) {
   return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
 };
 
-//Gráfico Velocidade (M.R.U)
-module.exports.mruvel = function (s0, s, t) {
-  if (isNaN(s0) || s0 === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mruvel(s0,s,t)."
-    );
-  var v = new Array();
-  var x = new Array();
-  var index = 0;
-  for (var i = 0; i < t; i++) {
-    v[index] = (s - s0) / t;
-    x[index] = i;
-    index++;
-    console.log(v[i]);
-  }
-  return plot(x, v);
-};
-
 //Função Horária da Posição (M.R.U.V)
 module.exports.mruvfh = function (s0, v0, t, a) {
   if (isNaN(s0) || s0 === null)
