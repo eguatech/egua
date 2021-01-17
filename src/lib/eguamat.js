@@ -927,11 +927,17 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
   return ['csi:' + csi, '<br/>', 'Wn:' + Wn, '<br/>', 'Proporcional:' + Kp, '<br/>', 'Integral:' + Ki, '<br/>', 'Progressivo:' + Kd];
 };
 
-//Comprimento de um vetor
-module.exports.comp = function (a) {
+// Retorna o comprimento de um vetor
+module.exports.comp = function (array) {
 
-  var comp = a.length;
-  return comp;
+  if (!Array.isArray(array)){
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um vetor."
+    );
+  }
+
+  return array.length;
 };
 
 // Retorna o menor número inteiro dentre o valor de "value"
