@@ -110,7 +110,7 @@ module.exports = function (globals) {
       return obj;
     })
   );
-
+  
   globals.defineVar("exports", {});
 
   return globals;

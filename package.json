@@ -1,11 +1,12 @@
 {
   "name": "egua",
-  "version": "1.1.1",
+  "version": "1.1.11",
   "description": "Linguagem de programação simples e moderna",
   "main": "index.js",
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
-    "testes": "./bin/egua tests/tests.egua"
+    "testes": "./bin/egua tests/tests.egua",
+    "build:azure": "ls /github/workspace"
   },
   "repository": {
     "type": "git",
