@@ -361,16 +361,6 @@ funcao tmrufh(){
         }
 }
 
-funcao tmruvfh(){
-    var mruvfh = m.mruvfh(0,30,15,2);
-    se (mruvfh != nula)
-            escreva(mruvfh);
-        senao {
-            errosM = errosM+1;
-            escreva(errosM);
-        }
-}
-
 funcao tmruvvel(){
     var mruvvel = m.mruvvel(0,30,15,2);
     se (mruvvel != nula)
@@ -460,10 +450,6 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Função mruhfh:");
 tmrufh();
-escreva("|");
-escreva("--------------------------------");
-escreva("Função mruvfh:");
-tmruvfh();
 escreva("|");
 escreva("--------------------------------");
 escreva("Função mruvvel:");
