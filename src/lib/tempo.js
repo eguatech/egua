@@ -22,12 +22,12 @@ module.exports.horas = function () {
 
 // Retorna a data completa que foi passada por parâmetro
 module.exports.horario = function (timestamp) {
-	const regex = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
+	const regex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
 
 	if (typeof timestamp !== 'string' || !regex.test(timestamp)){
 		throw new RuntimeError(
 			this.token,
-			"O parâmetro passado deve ser um texto com a data no formato PT-BR."
+			"O parâmetro passado deve ser um texto com a data no formato PT-BR. Ex: '01/01/2014'"
 		);
 	}
 	
