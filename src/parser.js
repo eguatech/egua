@@ -675,7 +675,7 @@ module.exports = class Parser {
 
             this.consume(
                 tokenTypes.ENQUANTO,
-                "Esperado delcaração do 'enquanto' após o escopo do 'fazer'."
+                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
             );
             this.consume(
                 tokenTypes.LEFT_PAREN,
