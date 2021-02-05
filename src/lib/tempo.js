@@ -20,7 +20,7 @@ module.exports.horas = function () {
 	return new Date().getHours();
 };
 
-// Retorna a data completa que foi passada por parâmetro
+// Retorna uma instância de Date da data passada por parâmetro
 module.exports.horario = function (timestamp) {
 	const regex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
 
