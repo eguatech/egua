@@ -19,13 +19,13 @@ const loadModule = function (moduleName, modulePath) {
     return newModule;
 };
 
-require("./time.js");
+require("./tempo.js");
 require("./eguamat.js");
 
 module.exports = function (name) {
     switch (name) {
-        case "time":
-            return loadModule("time", "./time.js");
+        case "tempo":
+            return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
     }
