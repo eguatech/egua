@@ -3416,10 +3416,21 @@ module.exports = class Parser {
         return this.peek().type == tokenTypes.EOF;
     }
 
+<<<<<<< HEAD
     advance() {
         if (!this.isAtEnd()) this.current += 1;
         return this.previous();
     }
+=======
+            this.consume(
+                tokenTypes.ENQUANTO,
+                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
+            );
+            this.consume(
+                tokenTypes.LEFT_PAREN,
+                "Esperado '(' após declaração 'enquanto'."
+            );
+>>>>>>> 647c5a250e0198d1d62ff128078ce161b8d9f7df
 
     match(...args) {
         for (let i = 0; i < args.length; i++) {
