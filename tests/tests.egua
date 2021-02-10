@@ -342,7 +342,7 @@ funcao tdeltat(){
 }
 
 funcao tacel(){
-    var acel= m.acel(30,0,60,0);
+    var acel= m.aceleracao(30,0,60,0);
     se (acel != nula)
             escreva(acel);
         senao {
