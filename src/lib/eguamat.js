@@ -833,15 +833,35 @@ module.exports.deltat = function (t0, t) {
   return dt;
 };
 
-//Aceleração
-module.exports.acel = function (v, v0, t, t0) {
-  if (isNaN(v) || v === null)
+// Cálculo de aceleração
+module.exports.aceleracao = function (
+  velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
+
+  if (
+    velocidadeFinal === null || 
+    velocidadeInicial === null || 
+    tempoFinal === null || 
+    tempoInicial === null
+    ){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para acel(v, v0, t, t0)."
+      "Devem ser fornecidos quatro parâmetros obrigatórios."
     );
-  a = (v - v0) / (t - t0)
-  return a;
+  }
+
+  if (
+    typeof velocidadeFinal !== 'number' ||
+    typeof velocidadeInicial !== 'number' ||
+    typeof tempoFinal !== 'number' ||
+    typeof tempoInicial !== 'number'
+    ){
+      throw new RuntimeError(
+        this.token,
+        "Todos os parâmetros devem ser do tipo número."
+      );
+    }
+
+  return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
 
 //Função Horária da Posição (M.R.U)
@@ -860,24 +880,6 @@ module.exports.mrufh = function (s0, v, t) {
     console.log(s[i]);
   }
   return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
-};
-
-//Função Horária da Posição (M.R.U.V)
-module.exports.mruvfh = function (s0, v0, t, a) {
-  if (isNaN(s0) || s0 === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mruvfh(s0,v0, t, a)."
-    );
-
-  var index = 0;
-  var s = new Array(t);
-  for (var i = 0; i < t; i++) {
-    s[index] = s0 + v0 * i + ((a * i * i) / 2);
-    index++;
-    console.log(s[i]);
-  }
-  return s;
 };
 
 //Gráfico da velocidade (M.R.U.V)

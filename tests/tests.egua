@@ -342,7 +342,7 @@ funcao tdeltat(){
 }
 
 funcao tacel(){
-    var acel= m.acel(30,0,60,0);
+    var acel= m.aceleracao(30,0,60,0);
     se (acel != nula)
             escreva(acel);
         senao {
@@ -355,16 +355,6 @@ funcao tmrufh(){
     var mrufh = m.mrufh(0,30,15);
     se (mrufh != nula)
             escreva(mrufh);
-        senao {
-            errosM = errosM+1;
-            escreva(errosM);
-        }
-}
-
-funcao tmruvfh(){
-    var mruvfh = m.mruvfh(0,30,15,2);
-    se (mruvfh != nula)
-            escreva(mruvfh);
         senao {
             errosM = errosM+1;
             escreva(errosM);
@@ -460,10 +450,6 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Função mruhfh:");
 tmrufh();
-escreva("|");
-escreva("--------------------------------");
-escreva("Função mruvfh:");
-tmruvfh();
 escreva("|");
 escreva("--------------------------------");
 escreva("Função mruvvel:");
