@@ -19,7 +19,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.1.12");
+        console.log("Console da Linguagem Egua v1.1.13");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -1164,6 +1164,10 @@ module.exports = class Interpreter {
 
     stringify(object) {
         if (object === null) return "nulo";
+        if (typeof object === "boolean") {
+            return object ? "verdadeiro" : "falso";
+        }
+        
         if (Array.isArray(object)) return object;
 
         return object.toString();
