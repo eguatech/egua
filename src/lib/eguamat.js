@@ -783,7 +783,7 @@ module.exports.pot = function (x, y) {
 };
 
 //Número pseudo-aleatório
-module.exports.aleat = function () {
+module.exports.aleatorio = function () {
   return Math.random();
 };
 
