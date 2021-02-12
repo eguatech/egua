@@ -782,11 +782,6 @@ module.exports.pot = function (x, y) {
   return Math.pow(x, y);
 };
 
-//Número pseudo-aleatório
-module.exports.aleat = function () {
-  return Math.random();
-};
-
 //Raíz quadrada
 module.exports.raizq = function (x) {
   if (isNaN(x) || x === null)

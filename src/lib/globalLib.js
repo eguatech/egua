@@ -110,6 +110,30 @@ module.exports = function (globals) {
       return obj;
     })
   );
+
+  // Retorna um número aleatório entre 0 e 1.
+  globals.defineVar(
+    "aleatorio", 
+    new StandardFn(1, function(){     
+      return Math.random();
+    })
+  );
+
+  // Retorna um número aleatório de acordo com o parâmetro passado.
+  // MIN(inclusivo) - MAX(exclusivo)
+  globals.defineVar(
+    "aleatorioEntre", 
+    new StandardFn(1, function(min, max){     
+      if (typeof min !== 'number' || typeof max !== 'number'){
+        throw new RuntimeError(
+          this.token,
+          "Os dois parâmetros devem ser do tipo número."
+        );
+      }
+    
+      return Math.floor(Math.random() * (max - min)) + min;
+    })
+  );
   
   globals.defineVar("exports", {});
 
