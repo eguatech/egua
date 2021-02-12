@@ -117,6 +117,20 @@ module.exports = function (globals) {
       return Math.random();
     })
   );
+
+  globals.defineVar(
+    "aleatorioEntre", 
+    new StandardFn(1, function(min, max){     
+      if (typeof min !== 'number' || typeof max !== 'number'){
+        throw new RuntimeError(
+          this.token,
+          "Os dois parâmetros devem ser do tipo número."
+        );
+      }
+    
+      return Math.floor(Math.random() * (max - min)) + min;
+    })
+  );
   
   globals.defineVar("exports", {});
 
