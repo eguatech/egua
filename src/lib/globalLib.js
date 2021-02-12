@@ -111,6 +111,7 @@ module.exports = function (globals) {
     })
   );
 
+  // Retorna um número aleatório entre 0 e 1.
   globals.defineVar(
     "aleatorio", 
     new StandardFn(1, function(){     
@@ -118,6 +119,8 @@ module.exports = function (globals) {
     })
   );
 
+  // Retorna um número aleatório de acordo com o parâmetro passado.
+  // MIN(inclusivo) - MAX(exclusivo)
   globals.defineVar(
     "aleatorioEntre", 
     new StandardFn(1, function(min, max){     
