@@ -110,6 +110,13 @@ module.exports = function (globals) {
       return obj;
     })
   );
+
+  globals.defineVar(
+    "aleatorio", 
+    new StandardFn(1, function(){     
+      return Math.random();
+    })
+  );
   
   globals.defineVar("exports", {});
 
