@@ -478,18 +478,6 @@ funcao ttamanho(){
   }
 }
 
-funcao ttamanho(){
-  var array = [1,2,3];
-  var tam = tamanho(array);
-
-  se (tam != nula)
-    escreva(tam);
-  senao {
-    errosM = errosM+1;
-    escreva(errosM);
-  }
-}
-
 funcao ttexto(){
   var t = 123;
   var text = texto(t);
