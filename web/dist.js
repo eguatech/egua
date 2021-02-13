@@ -740,7 +740,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.1.0");
+        console.log("Console da Linguagem Egua v1.1.13");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -1885,6 +1885,10 @@ module.exports = class Interpreter {
 
     stringify(object) {
         if (object === null) return "nulo";
+        if (typeof object === "boolean") {
+            return object ? "verdadeiro" : "falso";
+        }
+        
         if (Array.isArray(object)) return object;
 
         return object.toString();
@@ -2993,11 +2997,6 @@ module.exports.pot = function (x, y) {
   return Math.pow(x, y);
 };
 
-//Número pseudo-aleatório
-module.exports.aleat = function () {
-  return Math.random();
-};
-
 //Raíz quadrada
 module.exports.raizq = function (x) {
   if (isNaN(x) || x === null)
@@ -3044,15 +3043,35 @@ module.exports.deltat = function (t0, t) {
   return dt;
 };
 
-//Aceleração
-module.exports.acel = function (v, v0, t, t0) {
-  if (isNaN(v) || v === null)
+// Cálculo de aceleração
+module.exports.aceleracao = function (
+  velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
+
+  if (
+    velocidadeFinal === null || 
+    velocidadeInicial === null || 
+    tempoFinal === null || 
+    tempoInicial === null
+    ){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para acel(v, v0, t, t0)."
+      "Devem ser fornecidos quatro parâmetros obrigatórios."
     );
-  a = (v - v0) / (t - t0)
-  return a;
+  }
+
+  if (
+    typeof velocidadeFinal !== 'number' ||
+    typeof velocidadeInicial !== 'number' ||
+    typeof tempoFinal !== 'number' ||
+    typeof tempoInicial !== 'number'
+    ){
+      throw new RuntimeError(
+        this.token,
+        "Todos os parâmetros devem ser do tipo número."
+      );
+    }
+
+  return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
 
 //Função Horária da Posição (M.R.U)
@@ -3258,6 +3277,27 @@ module.exports = function (globals) {
       return obj;
     })
   );
+
+  globals.defineVar(
+    "aleatorio", 
+    new StandardFn(1, function(){     
+      return Math.random();
+    })
+  );
+
+  globals.defineVar(
+    "aleatorioEntre", 
+    new StandardFn(1, function(min, max){     
+      if (typeof min !== 'number' || typeof max !== 'number'){
+        throw new RuntimeError(
+          this.token,
+          "Os dois parâmetros devem ser do tipo número."
+        );
+      }
+    
+      return Math.floor(Math.random() * (max - min)) + min;
+    })
+  );
   
   globals.defineVar("exports", {});
 
@@ -3322,7 +3362,7 @@ module.exports.horas = function () {
 	return new Date().getHours();
 };
 
-// Retorna a data completa que foi passada por parâmetro
+// Retorna uma instância de Date da data passada por parâmetro
 module.exports.horario = function (timestamp) {
 	const regex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
 
@@ -3416,21 +3456,10 @@ module.exports = class Parser {
         return this.peek().type == tokenTypes.EOF;
     }
 
-<<<<<<< HEAD
     advance() {
         if (!this.isAtEnd()) this.current += 1;
         return this.previous();
     }
-=======
-            this.consume(
-                tokenTypes.ENQUANTO,
-                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
-            );
-            this.consume(
-                tokenTypes.LEFT_PAREN,
-                "Esperado '(' após declaração 'enquanto'."
-            );
->>>>>>> 647c5a250e0198d1d62ff128078ce161b8d9f7df
 
     match(...args) {
         for (let i = 0; i < args.length; i++) {
@@ -4035,7 +4064,7 @@ module.exports = class Parser {
 
             this.consume(
                 tokenTypes.ENQUANTO,
-                "Esperado delcaração do 'enquanto' após o escopo do 'fazer'."
+                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
             );
             this.consume(
                 tokenTypes.LEFT_PAREN,
@@ -4952,7 +4981,7 @@ module.exports = class EguaInstance {
     }
 
     toString() {
-        return "<" + this.creatorClass.name + " instância>";
+        return "<Objeto " + this.creatorClass.name + ">";
     }
 };
 },{}],21:[function(require,module,exports){

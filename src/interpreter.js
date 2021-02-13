@@ -762,6 +762,10 @@ module.exports = class Interpreter {
 
     stringify(object) {
         if (object === null) return "nulo";
+        if (typeof object === "boolean") {
+            return object ? "verdadeiro" : "falso";
+        }
+        
         if (Array.isArray(object)) return object;
 
         return object.toString();

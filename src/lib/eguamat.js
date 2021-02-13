@@ -782,11 +782,6 @@ module.exports.pot = function (x, y) {
   return Math.pow(x, y);
 };
 
-//Número pseudo-aleatório
-module.exports.aleat = function () {
-  return Math.random();
-};
-
 //Raíz quadrada
 module.exports.raizq = function (x) {
   if (isNaN(x) || x === null)
@@ -833,15 +828,35 @@ module.exports.deltat = function (t0, t) {
   return dt;
 };
 
-//Aceleração
-module.exports.acel = function (v, v0, t, t0) {
-  if (isNaN(v) || v === null)
+// Cálculo de aceleração
+module.exports.aceleracao = function (
+  velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
+
+  if (
+    velocidadeFinal === null || 
+    velocidadeInicial === null || 
+    tempoFinal === null || 
+    tempoInicial === null
+    ){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para acel(v, v0, t, t0)."
+      "Devem ser fornecidos quatro parâmetros obrigatórios."
     );
-  a = (v - v0) / (t - t0)
-  return a;
+  }
+
+  if (
+    typeof velocidadeFinal !== 'number' ||
+    typeof velocidadeInicial !== 'number' ||
+    typeof tempoFinal !== 'number' ||
+    typeof tempoInicial !== 'number'
+    ){
+      throw new RuntimeError(
+        this.token,
+        "Todos os parâmetros devem ser do tipo número."
+      );
+    }
+
+  return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
 
 //Função Horária da Posição (M.R.U)

@@ -20,6 +20,6 @@ module.exports = class EguaInstance {
     }
 
     toString() {
-        return "<" + this.creatorClass.name + " instância>";
+        return "<Objeto " + this.creatorClass.name + ">";
     }
 };
