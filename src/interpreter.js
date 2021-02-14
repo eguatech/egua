@@ -1,17 +1,17 @@
-const tokenTypes = require("./tokenTypes.js");
-const Environment = require("./environment.js");
-const Egua = require("./egua.js");
-const loadGlobalLib = require("./lib/globalLib.js");
-const path = require("path");
-const fs = require("fs");
-const checkStdLib = require("./lib/importStdlib.js");
+const tokenTypes = require("./tokenTypes.js"),
+    Environment = require("./environment.js"),
+    Egua = require("./egua.js"),
+    loadGlobalLib = require("./lib/globalLib.js"),
+    path = require("path"),
+    fs = require("fs"),
+    checkStdLib = require("./lib/importStdlib.js");
 
-const Callable = require("./structures/callable.js");
-const StandardFn = require("./structures/standardFn.js");
-const EguaClass = require("./structures/class.js");
-const EguaFunction = require("./structures/function.js");
-const EguaInstance = require("./structures/instance.js");
-const EguaModule = require("./structures/module.js");
+const Callable = require("./structures/callable.js"),
+    StandardFn = require("./structures/standardFn.js"),
+    EguaClass = require("./structures/class.js"),
+    EguaFunction = require("./structures/function.js"),
+    EguaInstance = require("./structures/instance.js"),
+    EguaModule = require("./structures/module.js");
 
 const {
     RuntimeError,
@@ -29,7 +29,7 @@ module.exports = class Interpreter {
         this.environment = this.globals;
         this.locals = new Map();
 
-        this.globals = loadGlobalLib(this.globals);
+        this.globals = loadGlobalLib(this, this.globals);
     }
 
     resolve(expr, depth) {
@@ -49,9 +49,12 @@ module.exports = class Interpreter {
     }
 
     isTruthy(object) {
-        if (object === null) return false;
-        else if (typeof object === "boolean") return Boolean(object);
-        else return true;
+        if (object === null) 
+            return false;
+        if (typeof object === "boolean") 
+            return Boolean(object);
+        
+        return true;
     }
 
     checkNumberOperand(operator, operand) {
@@ -76,8 +79,10 @@ module.exports = class Interpreter {
     }
 
     isEqual(left, right) {
-        if (left === null && right === null) return true;
-        else if (left === null) return false;
+        if (left === null && right === null) 
+            return true;
+        if (left === null) 
+            return false;
 
         return left === right;
     }

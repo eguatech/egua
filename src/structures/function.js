@@ -2,7 +2,7 @@ const Callable = require("./callable.js");
 const Environment = require("../environment.js");
 const ReturnExpection = require("../errors.js").ReturnException;
 
-module.exports =  class EguaFunction extends Callable {
+module.exports = class EguaFunction extends Callable {
     constructor(name, declaration, closure, isInitializer = false) {
         super();
         this.name = name;
