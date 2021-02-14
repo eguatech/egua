@@ -2986,15 +2986,16 @@ module.exports.log = function (x) {
   return Math.log(x);
 };
 
-//Potenciação de um número base X por uma expoente Y
-module.exports.pot = function (x, y) {
-  if (isNaN(x) || x === null)
+// Retorna a base elevada ao expoente
+module.exports.potencia = function (base, expoente) {
+  if (typeof base !== 'number' || typeof expoente !== 'number'){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para pot(x,y)."
+      "Os parâmetros devem ser do tipo número."
     );
-
-  return Math.pow(x, y);
+  }
+    
+  return Math.pow(base, expoente);
 };
 
 //Raíz quadrada
@@ -3278,6 +3279,7 @@ module.exports = function (globals) {
     })
   );
 
+  // Retorna um número aleatório entre 0 e 1.
   globals.defineVar(
     "aleatorio", 
     new StandardFn(1, function(){     
@@ -3285,6 +3287,8 @@ module.exports = function (globals) {
     })
   );
 
+  // Retorna um número aleatório de acordo com o parâmetro passado.
+  // MIN(inclusivo) - MAX(exclusivo)
   globals.defineVar(
     "aleatorioEntre", 
     new StandardFn(1, function(min, max){     

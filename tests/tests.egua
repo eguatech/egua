@@ -293,8 +293,8 @@ funcao tlog(){
   }
 }
 
-funcao tpot(){
-  var pot = m.pot(2,3);
+funcao tpotencia(){
+  var pot = m.potencia(2,3);
   
   se (pot != nula)
     escreva(pot);
@@ -430,8 +430,8 @@ escreva("Função log:");
 tlog();
 escreva("|");
 escreva("--------------------------------");
-escreva("Função pot:");
-tpot();
+escreva("Função potencia:");
+tpotencia();
 escreva("|");
 escreva("--------------------------------");
 escreva("Função raizq:");
