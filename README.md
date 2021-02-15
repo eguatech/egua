@@ -75,8 +75,18 @@ Para finalizar a execução do interpretador LAIR Egua, use o atalho <key>Ctrl</
 
 ## Apoie-nos!
 
-- Se você gosta do nosso trabalho e quer nos apoiar, agora você pode através do nosso picpay! São várias opções de assinatura começando a partir de apenas R$1,00. Acesse agora usando o QR Code ou clicando na imagem abaixo.
+- Se você gosta do nosso trabalho e quer nos apoiar, agora você pode através do nosso PicPay ou PayPal! Você pode nos ajudar com doações mensais ou únicas. Acesse agora usando o QR Code ou clicando na imagem abaixo.
 - Tem mimos pra quem apoiar, e virão mais no futuro!
+
+<p align="center">
+  <form action="https://www.paypal.com/donate" method="post" target="_top">
+  <input type="hidden" name="business" value="L6W3VGTKZPPK6" />
+  <input type="hidden" name="item_name" value="Sua doação contribui para que eu possa seguir desenvolvendo projetos de código aberto como a Linguagem Egua" />
+  <input type="hidden" name="currency_code" value="BRL" />
+  <input type="image" src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" />
+  <img alt="" border="0" src="https://www.paypal.com/pt_BR/i/scr/pixel.gif" width="1" height="1" />
+  </form>
+</p>
 
 <p align="center">
   <a href="https://picpay.me/eguatech" target="_blank">

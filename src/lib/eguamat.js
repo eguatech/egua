@@ -771,20 +771,16 @@ module.exports.log = function (x) {
   return Math.log(x);
 };
 
-//Potenciação de um número base X por uma expoente Y
-module.exports.pot = function (x, y) {
-  if (isNaN(x) || x === null)
+// Retorna a base elevada ao expoente
+module.exports.potencia = function (base, expoente) {
+  if (typeof base !== 'number' || typeof expoente !== 'number'){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para pot(x,y)."
+      "Os parâmetros devem ser do tipo número."
     );
-
-  return Math.pow(x, y);
-};
-
-//Número pseudo-aleatório
-module.exports.aleat = function () {
-  return Math.random();
+  }
+    
+  return Math.pow(base, expoente);
 };
 
 //Raíz quadrada

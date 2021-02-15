@@ -19,7 +19,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.1.13");
+        console.log("Console da Linguagem Egua v1.1.14");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -405,20 +405,20 @@ module.exports = {
     Variable
 };
 },{}],5:[function(require,module,exports){
-const tokenTypes = require("./tokenTypes.js");
-const Environment = require("./environment.js");
-const Egua = require("./egua.js");
-const loadGlobalLib = require("./lib/globalLib.js");
-const path = require("path");
-const fs = require("fs");
-const checkStdLib = require("./lib/importStdlib.js");
+const tokenTypes = require("./tokenTypes.js"),
+    Environment = require("./environment.js"),
+    Egua = require("./egua.js"),
+    loadGlobalLib = require("./lib/globalLib.js"),
+    path = require("path"),
+    fs = require("fs"),
+    checkStdLib = require("./lib/importStdlib.js");
 
-const Callable = require("./structures/callable.js");
-const StandardFn = require("./structures/standardFn.js");
-const EguaClass = require("./structures/class.js");
-const EguaFunction = require("./structures/function.js");
-const EguaInstance = require("./structures/instance.js");
-const EguaModule = require("./structures/module.js");
+const Callable = require("./structures/callable.js"),
+    StandardFn = require("./structures/standardFn.js"),
+    EguaClass = require("./structures/class.js"),
+    EguaFunction = require("./structures/function.js"),
+    EguaInstance = require("./structures/instance.js"),
+    EguaModule = require("./structures/module.js");
 
 const {
     RuntimeError,
@@ -436,7 +436,7 @@ module.exports = class Interpreter {
         this.environment = this.globals;
         this.locals = new Map();
 
-        this.globals = loadGlobalLib(this.globals);
+        this.globals = loadGlobalLib(this, this.globals);
     }
 
     resolve(expr, depth) {
@@ -456,9 +456,12 @@ module.exports = class Interpreter {
     }
 
     isTruthy(object) {
-        if (object === null) return false;
-        else if (typeof object === "boolean") return Boolean(object);
-        else return true;
+        if (object === null) 
+            return false;
+        if (typeof object === "boolean") 
+            return Boolean(object);
+        
+        return true;
     }
 
     checkNumberOperand(operator, operand) {
@@ -483,8 +486,10 @@ module.exports = class Interpreter {
     }
 
     isEqual(left, right) {
-        if (left === null && right === null) return true;
-        else if (left === null) return false;
+        if (left === null && right === null) 
+            return true;
+        if (left === null) 
+            return false;
 
         return left === right;
     }
@@ -2265,20 +2270,16 @@ module.exports.log = function (x) {
   return Math.log(x);
 };
 
-//Potenciação de um número base X por uma expoente Y
-module.exports.pot = function (x, y) {
-  if (isNaN(x) || x === null)
+// Retorna a base elevada ao expoente
+module.exports.potencia = function (base, expoente) {
+  if (typeof base !== 'number' || typeof expoente !== 'number'){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para pot(x,y)."
+      "Os parâmetros devem ser do tipo número."
     );
-
-  return Math.pow(x, y);
-};
-
-//Número pseudo-aleatório
-module.exports.aleat = function () {
-  return Math.random();
+  }
+    
+  return Math.pow(base, expoente);
 };
 
 //Raíz quadrada
@@ -2449,122 +2450,176 @@ module.exports.minaprox = function(value) {
   return Math.floor(value);  
 };
 },{"../errors.js":3}],8:[function(require,module,exports){
-const RuntimeError = require("../errors.js").RuntimeError;
-const EguaFunction = require("../structures/function.js");
-const EguaInstance = require("../structures/instance.js");
-const StandardFn = require("../structures/standardFn.js");
-const EguaClass = require("../structures/class.js");
+const RuntimeError = require("../errors.js").RuntimeError,
+    EguaFunction = require("../structures/function.js"),
+    EguaInstance = require("../structures/instance.js"),
+    StandardFn = require("../structures/standardFn.js"),
+    EguaClass = require("../structures/class.js");
 
 
-module.exports = function (globals) {
-  globals.defineVar(
-    "tamanho",
-    new StandardFn(1, function (obj) {
-      if (!isNaN(obj)) {
-        throw new RuntimeError(
-          this.token,
-          "Não é possível encontrar o tamanho de um número."
-        );
-      }
+module.exports = function (interpreter, globals) {
+    // Retorna um número aleatório entre 0 e 1.
+    globals.defineVar(
+        "aleatorio",
+        new StandardFn(1, function () {
+            return Math.random();
+        })
+    );
 
-      if (obj instanceof EguaInstance) {
-        throw new RuntimeError(
-          this.token,
-          "Você não pode encontrar o tamanho de uma declaração."
-        );
-      }
+    // Retorna um número aleatório de acordo com o parâmetro passado.
+    // MIN(inclusivo) - MAX(exclusivo)
+    globals.defineVar(
+        "aleatorioEntre",
+        new StandardFn(1, function (min, max) {
+            if (typeof min !== 'number' || typeof max !== 'number') {
+                throw new RuntimeError(
+                    this.token,
+                    "Os dois parâmetros devem ser do tipo número."
+                );
+            }
 
-      if (obj instanceof EguaFunction) {
-        return obj.declaration.params.length;
-      }
+            return Math.floor(Math.random() * (max - min)) + min;
+        })
+    );    
 
-      if (obj instanceof StandardFn) {
-        return obj.arityValue;
-      }
+    globals.defineVar(
+        "inteiro",
+        new StandardFn(1, function (value) {
+            if (value === undefined || value === null) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
 
-      if (obj instanceof EguaClass) {
-        let methods = obj.methods;
-        let length = 0;
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
 
-        if (methods.init && methods.init.isInitializer) {
-          length = methods.init.declaration.params.length;
-        }
+            return parseInt(value);
+        })
+    );
 
-        return length;
-      }
+    globals.defineVar(
+        "mapear",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
 
-      return obj.length;
-    })
-  );
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
 
-  globals.defineVar(
-    "texto",
-    new StandardFn(1, function (value) {
-      return `${value}`;
-    })
-  );
+            let provisorio = [];
+            for (let index = 0; index < array.length; ++index) {
+                provisorio.push(
+                    callback.call(
+                        interpreter, [array[index]]
+                    )
+                );
+            }
 
-  globals.defineVar(
-    "real",
-    new StandardFn(1, function (value) {
-      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para real."
-        );
-      return parseFloat(value);
-    })
-  );
+            return provisorio;
+        })
+    );
 
-  globals.defineVar(
-    "inteiro",
-    new StandardFn(1, function (value) {
-      if (value === undefined || value === null) {
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para inteiro."
-        );
-      }
+    globals.defineVar(
+        "ordenar",
+        new StandardFn(1, function (obj) {
+            if (Array.isArray(obj) == false) {
+                throw new RuntimeError(
+                    this.token,
+                    "Valor Inválido. Objeto inserido não é um vetor."
+                );
+            }
 
-      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para inteiro."
-        );
-      }
+            let trocado;
+            let length = obj.length;
+            do {
+                trocado = false;
+                for (var i = 0; i < length - 1; i++) {
+                    if (obj[i] > obj[i + 1]) {
+                        [obj[i], obj[i + 1]] = [obj[i + 1], obj[i]];
+                        trocado = true;
+                    }
+                }
+            } while (trocado);
+            return obj;
+        })
+    );
 
-      return parseInt(value);
-    })
-  );
+    globals.defineVar(
+        "real",
+        new StandardFn(1, function (value) {
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para real."
+                );
+            return parseFloat(value);
+        })
+    );
 
-  globals.defineVar(
-    "ordenar", 
-    new StandardFn(1, function(obj){     
-      if (Array.isArray(obj) == false) {
-        throw new RuntimeError(
-          this.token,
-          "Valor Inválido. Objeto inserido não é um vetor."
-        );
-      }
+    globals.defineVar(
+        "tamanho",
+        new StandardFn(1, function (obj) {
+            if (!isNaN(obj)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Não é possível encontrar o tamanho de um número."
+                );
+            }
 
-      let trocado;
-      let length = obj.length;
-      do{
-        trocado = false;
-        for(var i = 0; i < length-1; i++){
-          if( obj[i] > obj[i+1] ){          
-            [obj[i], obj[i+1]] = [obj[i+1], obj[i]];
-            trocado = true;           
-          }
-        }
-      }while(trocado);         
-      return obj;
-    })
-  );
-  
-  globals.defineVar("exports", {});
+            if (obj instanceof EguaInstance) {
+                throw new RuntimeError(
+                    this.token,
+                    "Você não pode encontrar o tamanho de uma declaração."
+                );
+            }
 
-  return globals;
+            if (obj instanceof EguaFunction) {
+                return obj.declaration.params.length;
+            }
+
+            if (obj instanceof StandardFn) {
+                return obj.arityValue;
+            }
+
+            if (obj instanceof EguaClass) {
+                let methods = obj.methods;
+                let length = 0;
+
+                if (methods.init && methods.init.isInitializer) {
+                    length = methods.init.declaration.params.length;
+                }
+
+                return length;
+            }
+
+            return obj.length;
+        })
+    );
+
+    globals.defineVar(
+        "texto",
+        new StandardFn(1, function (value) {
+            return `${value}`;
+        })
+    );
+
+    globals.defineVar("exports", {});
+
+    return globals;
 };
 
 },{"../errors.js":3,"../structures/class.js":15,"../structures/function.js":16,"../structures/instance.js":17,"../structures/standardFn.js":19}],9:[function(require,module,exports){
@@ -4163,7 +4218,7 @@ const Callable = require("./callable.js");
 const Environment = require("../environment.js");
 const ReturnExpection = require("../errors.js").ReturnException;
 
-module.exports =  class EguaFunction extends Callable {
+module.exports = class EguaFunction extends Callable {
     constructor(name, declaration, closure, isInitializer = false) {
         super();
         this.name = name;
