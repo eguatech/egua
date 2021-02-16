@@ -75,8 +75,14 @@ Para finalizar a execução do interpretador LAIR Egua, use o atalho <key>Ctrl</
 
 ## Apoie-nos!
 
-- Se você gosta do nosso trabalho e quer nos apoiar, agora você pode através do nosso picpay! São várias opções de assinatura começando a partir de apenas R$1,00. Acesse agora usando o QR Code ou clicando na imagem abaixo.
+- Se você gosta do nosso trabalho e quer nos apoiar, agora você pode através do nosso PicPay ou PayPal! Você pode nos ajudar com doações mensais ou únicas. Acesse agora usando o QR Code ou clicando na imagem abaixo.
 - Tem mimos pra quem apoiar, e virão mais no futuro!
+
+<p align="center">
+  <a href="https://www.paypal.com/donate?business=L6W3VGTKZPPK6&item_name=Sua+doa%C3%A7%C3%A3o+contribui+para+que+eu+possa+seguir+desenvolvendo+projetos+de+c%C3%B3digo+aberto+como+a+Linguagem+Egua&currency_code=BRL" target="_blank">
+  <img type="image" src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" />
+  </a>
+</p>
 
 <p align="center">
   <a href="https://picpay.me/eguatech" target="_blank">
@@ -85,3 +91,4 @@ Para finalizar a execução do interpretador LAIR Egua, use o atalho <key>Ctrl</
 </p>
 
 - **A linguagem Égua é um projeto open-source que se faz possível com o empenho da nossa apaixonada equipe de desenvolvedores, talentoso colaboradores e apoiadores. Obrigado a todos!**
+- **Em caso da necessidade de um contato mais pessoal envie email para `lucaspompeuneves@gmail.com` ou [entre aqui](https://egua.tech/comunidade)**

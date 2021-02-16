@@ -9,4 +9,4 @@ community_bridge: # Replace with a single Community Bridge project-name e.g., cl
 liberapay: # Replace with a single Liberapay username
 issuehunt: # Replace with a single IssueHunt username
 otechie: # Replace with a single Otechie username
-custom: ['https://picpay.me/eguatech']
+custom: ['https://picpay.me/eguatech', 'https://www.paypal.com/donate?business=L6W3VGTKZPPK6&item_name=Sua+doa%C3%A7%C3%A3o+contribui+para+que+eu+possa+seguir+desenvolvendo+projetos+de+c%C3%B3digo+aberto+como+a+Linguagem+Egua&currency_code=BRL']
