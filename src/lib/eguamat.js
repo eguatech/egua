@@ -321,15 +321,58 @@ module.exports.smtr = function (a) {
   return aprox(z, 2);
 };
 
-//Média de uma matriz
-module.exports.media = function (a) {
-  if (isNaN(num) || num === null)
+// Retorna a média de um vetor de números
+module.exports.media = function () {
+  const argumentsLength = Object.keys(arguments).length;
+
+  if (argumentsLength <= 0){
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para media(a)."
+      "Você deve fornecer um parâmetro para a função."
     );
+  }
 
-  return smtr(a) / a.length;
+  if (argumentsLength > 1){
+    throw new RuntimeError(
+      this.token,
+      "A função recebe apenas um parâmetro."
+    );
+  }
+
+  // Pega o primeiro argumento do objeto de argumentos
+  const args = arguments['0'];
+
+  if (!Array.isArray(args)){
+    throw new RuntimeError(
+      this.token,
+      "Você deve fornecer um parâmetro do tipo vetor."
+    );
+  }
+
+  // Valida se o array está vazio.
+  if (!args.length){
+    throw new RuntimeError(
+      this.token,
+      "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
+    );
+  }
+
+  // Valida se o array contém apenas valores do tipo número.
+  args.forEach(item => {
+    if (typeof item !== 'number'){
+      throw new RuntimeError(
+        this.token,
+        "Você deve fornecer um vetor contendo apenas valores do tipo número."
+      );
+    }
+  })
+
+  // Soma todos os itens.
+  const valoresSomados = args.reduce(
+    (acumulador, itemAtual) => acumulador + itemAtual, 0);
+
+  // Faz o cáculo da média em si e retorna.
+  return (valoresSomados / args.length);
 };
 
 //Média aritmética de uma matriz
