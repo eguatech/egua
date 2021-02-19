@@ -218,39 +218,6 @@ module.exports.qtd = function (a, b) {
   return count;
 };
 
-//Gráfico do Vetor
-module.exports.plot = function (x, y) {
-  if (isNaN(x) || x === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para plot(z)."
-    );
-
-  var yy = y;
-  var xx = x;
-
-  var data = [{
-    x: xx,
-    y: yy,
-    type: 'scatter',
-    line: { color: 'blue', width: 2 }
-  }];
-  var layout =
-  {
-    width: window.screen.Width,
-    height: 550,
-    paper_bgcolor: 'white',
-    plot_bgcolor: 'white',
-    margin: { l: 70, b: 60, r: 10, t: 40 },
-    xaxis: { title: 'x-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
-    yaxis: { title: 'y-axis', titlefont: { family: 'Courier New, monospace', size: 18, color: 'black' } },
-    xaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' },
-    yaxis: { tickfont: { size: 12, color: 'black' }, showgrid: true, gridcolor: 'black', linecolor: 'black' }
-  };
-  toggleOrCheckIfFunctionCall(true);
-  Plotly.newPlot(outId, data, layout, { displayModeBar: true, staticPlot: true });
-};
-
 /*ESTATÍSTICA*/
 //Valor Máximo de uma matriz
 module.exports.max = function (a) {
