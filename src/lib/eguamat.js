@@ -1,19 +1,5 @@
 const RuntimeError = require("../errors.js").RuntimeError;
 
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
-}
-module.exports.radiano = function (angle) {
-  if (isNaN(angle) || angle === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.radiano(Ângulo)."
-    );
-
-  return angle * (Math.PI / 180);
-};
-
 module.exports.graus = function (angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
@@ -24,7 +10,35 @@ module.exports.graus = function (angle) {
   return angle * (180 / Math.PI);
 };
 
+//Mediana de uma matriz
+module.exports.mediana = function (a) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mediana(a)."
+    );
+
+  a.sort(function (a, b) { return a - b; });
+  var mid = a.length / 2;
+  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
+};
+
+module.exports.nula = function () {
+  var nula = null;
+  return nula;
+};
+
 module.exports.pi = Math.PI;
+
+module.exports.radiano = function (angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.radiano(Ângulo)."
+    );
+
+  return angle * (Math.PI / 180);
+};
 
 module.exports.raiz = function (num, root) {
   if (isNaN(num) || num === null)
@@ -48,13 +62,7 @@ module.exports.raiz = function (num, root) {
   if (Math.abs(num - root) < 1 && num > 0 == root > 0)
     return negateFlag ? -possible : possible;
 
-  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
-};
-
-
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
+  throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
 };
 
 //FUNÇÃO AFIM E QUADRÁTICA
@@ -252,19 +260,6 @@ module.exports.intervalo = function (a) {
   return max(a) - min(a);
 };
 
-//Mediana de uma matriz
-module.exports.mediana = function (a) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mediana(a)."
-    );
-
-  a.sort(function (a, b) { return a - b; });
-  var mid = a.length / 2;
-  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
-};
-
 //Soma de determinada matriz
 module.exports.smtr = function (a) {
   if (isNaN(a) || a === null)
@@ -292,14 +287,14 @@ module.exports.smtr = function (a) {
 module.exports.media = function () {
   const argumentsLength = Object.keys(arguments).length;
 
-  if (argumentsLength <= 0){
+  if (argumentsLength <= 0) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro para a função."
     );
   }
 
-  if (argumentsLength > 1){
+  if (argumentsLength > 1) {
     throw new RuntimeError(
       this.token,
       "A função recebe apenas um parâmetro."
@@ -309,7 +304,7 @@ module.exports.media = function () {
   // Pega o primeiro argumento do objeto de argumentos
   const args = arguments['0'];
 
-  if (!Array.isArray(args)){
+  if (!Array.isArray(args)) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro do tipo vetor."
@@ -317,7 +312,7 @@ module.exports.media = function () {
   }
 
   // Valida se o array está vazio.
-  if (!args.length){
+  if (!args.length) {
     throw new RuntimeError(
       this.token,
       "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
@@ -326,7 +321,7 @@ module.exports.media = function () {
 
   // Valida se o array contém apenas valores do tipo número.
   args.forEach(item => {
-    if (typeof item !== 'number'){
+    if (typeof item !== 'number') {
       throw new RuntimeError(
         this.token,
         "Você deve fornecer um vetor contendo apenas valores do tipo número."
@@ -525,13 +520,13 @@ module.exports.log = function (x) {
 
 // Retorna a base elevada ao expoente
 module.exports.potencia = function (base, expoente) {
-  if (typeof base !== 'number' || typeof expoente !== 'number'){
+  if (typeof base !== 'number' || typeof expoente !== 'number') {
     throw new RuntimeError(
       this.token,
       "Os parâmetros devem ser do tipo número."
     );
   }
-    
+
   return Math.pow(base, expoente);
 };
 
@@ -586,11 +581,11 @@ module.exports.aceleracao = function (
   velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
 
   if (
-    velocidadeFinal === null || 
-    velocidadeInicial === null || 
-    tempoFinal === null || 
+    velocidadeFinal === null ||
+    velocidadeInicial === null ||
+    tempoFinal === null ||
     tempoInicial === null
-    ){
+  ) {
     throw new RuntimeError(
       this.token,
       "Devem ser fornecidos quatro parâmetros obrigatórios."
@@ -602,12 +597,12 @@ module.exports.aceleracao = function (
     typeof velocidadeInicial !== 'number' ||
     typeof tempoFinal !== 'number' ||
     typeof tempoInicial !== 'number'
-    ){
-      throw new RuntimeError(
-        this.token,
-        "Todos os parâmetros devem ser do tipo número."
-      );
-    }
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Todos os parâmetros devem ser do tipo número."
+    );
+  }
 
   return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
@@ -680,7 +675,7 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
 // Retorna o comprimento de um vetor
 module.exports.comp = function (array) {
 
-  if (!Array.isArray(array)){
+  if (!Array.isArray(array)) {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um vetor."
@@ -691,14 +686,14 @@ module.exports.comp = function (array) {
 };
 
 // Retorna o menor número inteiro dentre o valor de "value"
-module.exports.minaprox = function(value) {
-  
-  if (typeof value !== 'number'){
+module.exports.minaprox = function (value) {
+
+  if (typeof value !== 'number') {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um número."
     );
   }
-  
-  return Math.floor(value);  
+
+  return Math.floor(value);
 };
