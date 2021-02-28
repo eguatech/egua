@@ -249,17 +249,6 @@ module.exports.min = function (a) {
   return Math.min.apply(null, a);
 };
 
-//Intervalo (max - min) de uma matriz
-module.exports.intervalo = function (a) {
-  if (isNaN(a) || a === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para intervalo(a)."
-    );
-
-  return max(a) - min(a);
-};
-
 //Soma de determinada matriz
 module.exports.smtr = function (a) {
   if (isNaN(a) || a === null)
