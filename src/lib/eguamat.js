@@ -624,7 +624,7 @@ module.exports.mruvvel = function (s0, s, a) {
     );
   const vf = new Array();
   const x = new Array();
-  const v = new Array();
+  let v = new Array();
   let index = 0;
   for (var i = 0; i < s; i++) {
     v = index;
