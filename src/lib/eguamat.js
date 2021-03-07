@@ -23,21 +23,36 @@ module.exports.mediana = function (a) {
   return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
 };
 
+/**
+ * Função que sempre returna `nulo`. 
+ * Útil para comparações entre outras funções que também retornam nulo.
+ * @returns `null` do JavaScript.
+ */
 module.exports.nula = function () {
-  const nula = null;
-  return nula;
+  return null;
 };
 
+/**
+ * Constante pi.
+ * @see https://pt.wikipedia.org/wiki/Pi
+ */
 module.exports.pi = Math.PI;
 
-module.exports.radiano = function (angle) {
-  if (isNaN(angle) || angle === null)
+/**
+ * Calcula o valor radiano de um ângulo. O radiano é o comprimento do arco formado 
+ * por um ângulo em uma circunferência.
+ * @param {inteiro} angulo O ângulo, em graus, do valor radiano desejado.
+ * @returns O valor, em radianos, do arco formado pelo ângulo.
+ * @see https://pt.wikipedia.org/wiki/Radiano
+ */
+module.exports.radiano = function (angulo) {
+  if (!Number.isInteger(angulo))
     throw new RuntimeError(
       this.token,
-      "Você deve prover um número para mat.radiano(Ângulo)."
+      "Você deve prover um número inteiro para o parâmetro `angulo`, em radiano(angulo)."
     );
 
-  return angle * (Math.PI / 180);
+  return angulo * (Math.PI / 180);
 };
 
 module.exports.raiz = function (num, root) {
@@ -66,16 +81,38 @@ module.exports.raiz = function (num, root) {
 };
 
 //FUNÇÃO AFIM E QUADRÁTICA
-//Valores das Abscissas
-module.exports.fun1 = function (a, b) {
-  if (isNaN(a) || a === null)
+/**
+ * Gera valores para abscissa.
+ * @param {inteiro} distancia A distância entra dois pontos. 
+ * @param {inteiro} valorPontoCentral O ponto central na abscissa.
+ * @param {inteiro} numeroPontos Número de pontos a serem gerados (padrão: 7).
+ * @returns Um vetor, contendo o número de pontos informado ou definido por padrão em uma abscissa.
+ *          Se o número informado é par, um ponto negativo a mais é gerado.
+ */
+module.exports.gerarPontosAbscissa = function (distancia, valorPontoCentral, numeroPontos) {
+  if (!Number.isInteger(distancia))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para fun1(valor1,valor2)."
+      "Você deve prover um valor inteiro para o parâmetro `distancia`, em gerarPontosAbscissa(distancia, valorInicial)."
     );
-  x = [b - 4, b - 3, b - 2, b - 1, b, b + 1, b + 2, b + 3, b + 4];
-  f = x.map(function (x) { return ((x * a) + b); });
-  return ['f(x)= ' + f];
+
+  if (!Number.isInteger(valorPontoCentral))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um valor inteiro para o parâmetro `valorInicial`, em gerarPontosAbscissa(distancia, valorInicial)."
+    );
+
+  if (!numeroPontos) {
+    numeroPontos = 7;
+  }
+
+  const elementoInicial = valorPontoCentral - (((numeroPontos / 2) >> 0) * distancia);
+  const x = [];
+  for (let i = 0; i < numeroPontos; i++) {
+    x.push(elementoInicial + (i * distancia));
+  }
+
+  return x;
 };
 
 //Raíz da Função Afim
@@ -83,7 +120,7 @@ module.exports.fun1R = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para fun1(valor1,valor2)."
+      "Você deve prover valores para fun1R(valor1,valor2)."
     );
   x = (-1 * b) / a;
   return ['f(0)= ' + x];
@@ -266,7 +303,6 @@ module.exports.smtr = function (a) {
     for (let j = 0; j < a.length; j++) { z = z + a[j]; }
   }
 
-  toggleOrCheckIfFunctionCall(false);
   return aprox(z, 2);
 };
 
