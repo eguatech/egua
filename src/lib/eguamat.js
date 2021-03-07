@@ -241,47 +241,65 @@ module.exports.vet = function (a, b) {
   return matrizn(data);
 };
 
-//Contagem de Elementos
-module.exports.qtd = function (a, b) {
-  if (isNaN(a) || a === null)
+
+/**
+ * Conta quantas vezes um determinado valor aparece em um vetor.
+ * @param {qualquer[]} vetor Vetor de elementos
+ * @param {qualquer} valor Valor a ser encontrado no vetor
+ * @returns Valor inteiro, com o número de vezes que `valor` foi encontrado em `vetor`.
+ */
+module.exports.numeroOcorrencias = function (vetor, valor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para qtd(a,b)."
+      "Parâmetro `vetor` deve ser um vetor, em numeroOcorrencias(vetor, valor)."
     );
-  let count = 0;
-  if (b == undefined) {
-    count = a.length;
-  } else {
-    count = 0;
-    for (let i = 0; i < a.length; ++i) {
-      if (a[i] == b)
-        count++;
-    }
-  }
-  return count;
+
+  return vetor.filter((v) => (v === valor)).length;
 };
 
-/*ESTATÍSTICA*/
-//Valor Máximo de uma matriz
-module.exports.max = function (a) {
-  if (isNaN(a) || a === null)
+/* ESTATÍSTICA */
+
+/**
+ * Encontra o elemento máximo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O maior número encontrado em um vetor.
+ */
+module.exports.max = function (vetor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para max(a)."
+      "Parâmetro `vetor` deve ser um vetor, em max(vetor)."
     );
 
-  return Math.max.apply(null, a);
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em max(vetor)."
+    );
+
+  return Math.max.apply(null, vetor);
 };
 
-//Valor Mínimo de uma matriz
-module.exports.min = function (a) {
-  if (isNaN(num) || num === null)
+/**
+ * Encontra o elemento mínimo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O menor número encontrado em um vetor.
+ */
+module.exports.min = function (vetor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para min(a)."
+      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
     );
 
-  return Math.min.apply(null, a);
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
+    );
+
+  return Math.min.apply(null, vetor);
 };
 
 //Soma de determinada matriz
