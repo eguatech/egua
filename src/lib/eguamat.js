@@ -692,11 +692,18 @@ module.exports.mruvvel = function (s0, s, a) {
 
 /*Controle e Servomecanismos*/
 module.exports.pid = function (Mo, t, K, T1, T2) {
-  if (isNaN(Mo) || Mo === null)
+  if (
+    isNaN(Mo) || Mo === null ||
+    isNaN(t) || t == null ||
+    isNaN(K) || K == null ||
+    isNaN(T1) || T1 == null ||
+    isNaN(T2) || T2 == null
+  ) {
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para pid(Ov, Ts, K, T1, T2)."
     );
+  }
   pi = Math.PI;//Pi da bilbioteca Math.js
 
   //Amortecimento Relativo
@@ -713,7 +720,8 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
 
   //Controlador Derivativo (D)
   Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
-  return ['csi:' + csi, '<br/>', 'Wn:' + Wn, '<br/>', 'Proporcional:' + Kp, '<br/>', 'Integral:' + Ki, '<br/>', 'Progressivo:' + Kd];
+  
+  return [csi, Wn, Kp, Ki, Kd];
 };
 
 // Retorna o comprimento de um vetor

@@ -1,4 +1,7 @@
 const Exemplos = '';
+
+const OlaMundo = 'escreva("Olá, mundo!");';
+
 const Classe = `classe Animal {
   correr() {
       escreva("Correndo Loucamente");
@@ -256,6 +259,7 @@ mostrar_fila();`
 
 const demos = {
   Exemplos,
+  OlaMundo,
   Classe,
   MergeSort,
   Bhaskara,

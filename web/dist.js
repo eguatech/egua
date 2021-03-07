@@ -1378,8 +1378,20 @@ module.exports = class Interpreter {
         }
     }
 
-    visitVariableExpr(expr) {
-        return this.lookupVar(expr.name, expr);
+    stringify(object) {
+        if (object === null) return "nulo";
+        if (typeof object === "boolean") {
+            return object ? "verdadeiro" : "falso";
+        }
+
+        if (object instanceof Date) {
+            formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            return formato.format(object);
+        }
+        
+        if (Array.isArray(object)) return object;
+
+        return object.toString();
     }
 
     visitExpressionStmt(stmt) {
@@ -1646,29 +1658,54 @@ module.exports = class Interpreter {
         return null;
     }
 
-    visitContinueStmt(stmt) {
-        throw new ContinueException();
-    }
+module.exports.graus = function (angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.graus(ângulo)."
+    );
 
-    visitBreakStmt(stmt) {
-        throw new BreakException();
-    }
+  return angle * (180 / Math.PI);
+};
 
-    visitReturnStmt(stmt) {
-        let value = null;
-        if (stmt.value != null) value = this.evaluate(stmt.value);
+//Mediana de uma matriz
+module.exports.mediana = function (a) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mediana(a)."
+    );
 
-        throw new ReturnException(value);
-    }
+  a.sort(function (a, b) { return a - b; });
+  const mid = a.length / 2;
+  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
+};
+
+module.exports.nula = function () {
+  const nula = null;
+  return nula;
+};
 
     visitFunctionExpr(expr) {
         return new EguaFunction(null, expr, this.environment, false);
     }
 
-    visitAssignsubscriptExpr(expr) {
-        let obj = this.evaluate(expr.obj);
-        let index = this.evaluate(expr.index);
-        let value = this.evaluate(expr.value);
+module.exports.radiano = function (angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.radiano(Ângulo)."
+    );
+
+  return angle * (Math.PI / 180);
+};
+
+module.exports.raiz = function (num, root) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Número dado a mat.raiz(numero, raiz) precisa ser um número."
+    );
 
         if (Array.isArray(obj)) {
             if (index < 0 && obj.length !== 0) {
@@ -1677,40 +1714,17 @@ module.exports = class Interpreter {
                 }
             }
 
-            while (obj.length < index) {
-                obj.push(null);
-            }
+  const originalRoot = root;
 
-            obj[index] = value;
-        } else if (
-            obj.constructor == Object ||
-            obj instanceof EguaInstance ||
-            obj instanceof EguaFunction ||
-            obj instanceof EguaClass ||
-            obj instanceof EguaModule
-        ) {
-            obj[index] = value;
-        }
+  const negateFlag = root % 2 == 1 && num < 0;
+  if (negateFlag) num = -num;
+  const possible = Math.pow(num, 1 / root);
+  root = Math.pow(possible, root);
+  if (Math.abs(num - root) < 1 && num > 0 == root > 0)
+    return negateFlag ? -possible : possible;
 
-        else {
-            throw new RuntimeError(
-                expr.obj.name,
-                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
-            );
-        }
-    }
-
-    visitSubscriptExpr(expr) {
-        let obj = this.evaluate(expr.callee);
-
-        let index = this.evaluate(expr.index);
-        if (Array.isArray(obj)) {
-            if (!Number.isInteger(index)) {
-                throw new RuntimeError(
-                    expr.closeBracket,
-                    "Somente inteiros podem ser usados para indexar um vetor."
-                );
-            }
+  throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
+};
 
             if (index < 0 && obj.length !== 0) {
                 while (index < 0) {
@@ -1724,61 +1738,136 @@ module.exports = class Interpreter {
             return obj[index];
         }
 
-        else if (
-            obj.constructor == Object ||
-            obj instanceof EguaInstance ||
-            obj instanceof EguaFunction ||
-            obj instanceof EguaClass ||
-            obj instanceof EguaModule
-        ) {
-            return obj[index] || null;
-        }
+//Intervalo Preenchido
+module.exports.linspace = function (startValue, stopValue, cardinality) {
+  if (isNaN(startValue) || startValue === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para linspace(valor1,valor2,valor3)."
+    );
+  const lista = [];
+  const step = (stopValue - startValue) / (cardinality - 1);
+  for (var i = 0; i < cardinality; i++) {
+    arr.push(startValue + (step * i));
+  }
+  return lista;
+};
 
-        else if (typeof obj === "string") {
-            if (!Number.isInteger(index)) {
-                throw new RuntimeError(
-                    expr.closeBracket,
-                    "Somente inteiros podem ser usados para indexar um vetor."
-                );
-            }
+//Raízes da Função Quadrática
+module.exports.fun2R = function (a, b, c) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para fun2R(a,b,c)."
+    );
+  const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const xv = (-1 * b) / (2 * a);
+  const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
+  return ["Xv: " + xv + " Yv: " + yv];
+};
 
-            if (index < 0 && obj.length !== 0) {
-                while (index < 0) {
-                    index += obj.length;
-                }
-            }
-
-            if (index >= obj.length) {
-                throw new RuntimeError(expr.closeBracket, "Index fora do tamanho.");
-            }
-            return obj.charAt(index);
-        }
-
-        else {
-            throw new RuntimeError(
-                expr.callee.name,
-                "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
-            );
-        }
+//Matriz aleatória bidimensional
+module.exports.rand = function (n1, n2, e) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para rand(n1,n2,e)."
+    );
+  if (e == undefined) { e = 0; }
+  if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
+  const data = Array.from(Array(n1), () => new Array(n2));
+  // benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
+  for (var i = 0; i < n1; i++) {
+    for (var j = 0; j < n2; j++) {
+      data[i][j] = e + Math.random() * 2 - 1;
     }
+  }
+  return aprox(data, 5);
+};
 
-    visitSetExpr(expr) {
-        let obj = this.evaluate(expr.object);
+//Aproximação de valores
+module.exports.aprox = function (x, z) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para aprox(x,z)."
+    );
+  if (z == undefined) { z = 2; }
+  if (typeof (x) == "number") { x = x.toFixed(z) }
+  else if (x[0].length == undefined) { // 1D array
+    for (let i = 0; i < x.length; i++) {
+      x[i] = parseFloat(x[i].toFixed(z));
+    }
+  } else
+    for (let i = 0; i < x.length; i++) { // 2D array
+      for (let j = 0; j < x[0].length; j++) {
+        x[i][j] = parseFloat(x[i][j].toFixed(z));
+      }
+    }
+  return x; //OK
+};
 
-        if (!(obj instanceof EguaInstance) && obj.constructor !== Object) {
-            throw new RuntimeError(
-                expr.object.name,
-                "Somente instâncias e dicionários podem possuir campos."
-            );
-        }
+//Parâmetros da Função
+module.exports.matrizn = function (z) {
+  if (isNaN(z) || z === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para matrizn(z)."
+    );
+  const n = arguments.length;
+  const data = Array.from(Array(1), () => new Array(n));
+  for (let i = 0; i < n; i++) { data[0][i] = arguments[i]; }
+  return matriz(data);
+};
 
-        let value = this.evaluate(expr.value);
-        if (obj instanceof EguaInstance) {
-            obj.set(expr.name, value);
-            return value;
-        } else if (obj.constructor == Object) {
-            obj[expr.name.lexeme] = value;
-        }
+//Vetor de pontos aleatórios
+module.exports.pale = function (n) {
+  if (isNaN(n) || n === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para pale(n)."
+    );
+  if (ex == undefined) { ex = 0; }
+  const x = [];
+  x[0] = 100;
+  for (let i = 1; i < n; i++) {
+    x[i] = ex + x[i - 1] + Math.random() * 2 - 1;
+  }
+  const xx = aprox(x, 2);
+  return xx;
+};
+
+//Intervalo A-B
+module.exports.vet = function (a, b) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para vet(a,b)."
+    );
+  const data = Array.from(Array(1), () => new Array(b - a + 1));
+  // the benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
+  for (let i = 0; i < data[0].length; i++) {
+    data[0][i] = a + i;
+  }
+  return matrizn(data);
+};
+
+//Contagem de Elementos
+module.exports.qtd = function (a, b) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para qtd(a,b)."
+    );
+  let count = 0;
+  if (b == undefined) {
+    count = a.length;
+  } else {
+    count = 0;
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] == b)
+        count++;
     }
 
     visitFunctionStmt(stmt) {
@@ -1810,82 +1899,73 @@ module.exports = class Interpreter {
             this.environment.defineVar("super", superclass);
         }
 
-        let methods = {};
-        let definedMethods = stmt.methods;
-        for (let i = 0; i < stmt.methods.length; i++) {
-            let currentMethod = definedMethods[i];
-            let isInitializer = currentMethod.name.lexeme === "construtor";
-            let func = new EguaFunction(
-                currentMethod.name.lexeme,
-                currentMethod.func,
-                this.environment,
-                isInitializer
-            );
-            methods[currentMethod.name.lexeme] = func;
-        }
+//Soma de determinada matriz
+module.exports.smtr = function (a) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para smtr(a)."
+    );
 
-        let created = new EguaClass(stmt.name.lexeme, superclass, methods);
+  let z = 0;
+  if (a.length == 1) {   // a is a 1D row array
+    for (let j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
+  }
+  else if (a[0].length == 1) {   // a is a 1D column array
+    for (let i = 0; i < a.length; i++) { z = z + a[i][0]; }
+  }
+  else {
+    for (let j = 0; j < a.length; j++) { z = z + a[j]; }
+  }
 
-        if (superclass !== null) {
-            this.environment = this.environment.enclosing;
-        }
-
-        this.environment.assignVar(stmt.name, created);
-        return null;
-    }
-
-    visitGetExpr(expr) {
-        let object = this.evaluate(expr.object);
-        if (object instanceof EguaInstance) {
-            return object.get(expr.name) || null;
-        } else if (object.constructor == Object) {
-            return object[expr.name.lexeme] || null;
-        } else if (object instanceof EguaModule) {
-            return object[expr.name.lexeme] || null;
-        }
-
-        throw new RuntimeError(
-            expr.name,
-            "Você só pode acessar métodos do objeto e dicionários."
-        );
-    }
+  toggleOrCheckIfFunctionCall(false);
+  return aprox(z, 2);
+};
 
     visitThisExpr(expr) {
         return this.lookupVar(expr.keyword, expr);
     }
 
-    visitDictionaryExpr(expr) {
-        let dict = {};
-        for (let i = 0; i < expr.keys.length; i++) {
-            dict[this.evaluate(expr.keys[i])] = this.evaluate(expr.values[i]);
-        }
-        return dict;
-    }
+  if (argumentsLength <= 0) {
+    throw new RuntimeError(
+      this.token,
+      "Você deve fornecer um parâmetro para a função."
+    );
+  }
 
-    visitArrayExpr(expr) {
-        let values = [];
-        for (let i = 0; i < expr.values.length; i++) {
-            values.push(this.evaluate(expr.values[i]));
-        }
-        return values;
-    }
+  if (argumentsLength > 1) {
+    throw new RuntimeError(
+      this.token,
+      "A função recebe apenas um parâmetro."
+    );
+  }
 
     visitSuperExpr(expr) {
         let distance = this.locals.get(expr);
         let superclass = this.environment.getVarAt(distance, "super");
 
-        let object = this.environment.getVarAt(distance - 1, "isto");
+  if (!Array.isArray(args)) {
+    throw new RuntimeError(
+      this.token,
+      "Você deve fornecer um parâmetro do tipo vetor."
+    );
+  }
 
-        let method = superclass.findMethod(expr.method.lexeme);
+  // Valida se o array está vazio.
+  if (!args.length) {
+    throw new RuntimeError(
+      this.token,
+      "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
+    );
+  }
 
-        if (method === undefined) {
-            throw new RuntimeError(
-                expr.method,
-                "Método chamado indefinido."
-            );
-        }
-
-        return method.bind(object);
+  // Valida se o array contém apenas valores do tipo número.
+  args.forEach(item => {
+    if (typeof item !== 'number') {
+      throw new RuntimeError(
+        this.token,
+        "Você deve fornecer um vetor contendo apenas valores do tipo número."
+      );
     }
 
     stringify(object) {
@@ -1908,49 +1988,37 @@ module.exports = class Interpreter {
         stmt.accept(this);
     }
 
-    interpret(statements) {
-        try {
-            for (let i = 0; i < statements.length; i++) {
-                this.execute(statements[i]);
-            }
-        } catch (error) {
-            this.Egua.runtimeError(error);
-        }
-    }
+//Soma dos quadrados dos resíduos (sqr) de uma matriz
+module.exports.sqr = function (a) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para sqr(a)."
+    );
+
+  const mean = ve(array);
+  let sum = 0;
+  let i = array.length;
+  let tmp;
+  while (--i >= 0) {
+    tmp = array[i] - mean;
+    sum += tmp * tmp;
+  }
+  return sum;
 };
 },{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":11,"./lib/importStdlib.js":12,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 
-const reservedWords = {
-    e: tokenTypes.E,
-    em: tokenTypes.EM,
-    classe: tokenTypes.CLASSE,
-    senao: tokenTypes.SENAO,
-    falso: tokenTypes.FALSO,
-    para: tokenTypes.PARA,
-    funcao: tokenTypes.FUNCAO,
-    se: tokenTypes.SE,
-    senaose: tokenTypes.SENAOSE,
-    nulo: tokenTypes.NULO,
-    ou: tokenTypes.OU,
-    escreva: tokenTypes.ESCREVA,
-    retorna: tokenTypes.RETORNA,
-    super: tokenTypes.SUPER,
-    isto: tokenTypes.ISTO,
-    verdadeiro: tokenTypes.VERDADEIRO,
-    var: tokenTypes.VAR,
-    fazer: tokenTypes.FAZER,
-    enquanto: tokenTypes.ENQUANTO,
-    pausa: tokenTypes.PAUSA,
-    continua: tokenTypes.CONTINUA,
-    escolha: tokenTypes.ESCOLHA,
-    caso: tokenTypes.CASO,
-    padrao: tokenTypes.PADRAO,
-    importar: tokenTypes.IMPORTAR,
-    tente: tokenTypes.TENTE,
-    pegue: tokenTypes.PEGUE,
-    finalmente: tokenTypes.FINALMENTE,
-    herda: tokenTypes.HERDA
+//Variação de uma matriz
+module.exports.variancia = function (array, flag) {
+  if (isNaN(array) || array === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para variancia(matriz, flag)."
+    );
+
+  if (flag == undefined) { flag = 1; }
+  return sqr(array) / (array.length - (flag ? 1 : 0));
 };
 
 class Token {
@@ -1966,10 +2034,22 @@ class Token {
     }
 }
 
-module.exports = class Lexer {
-    constructor(code, Egua) {
-        this.Egua = Egua;
-        this.code = code;
+//Covariância de duas matrizes
+module.exports.covar = function (array1, array2) {
+  if (isNaN(array1) || array1 === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para covar(matriz1, matriz2)."
+    );
+
+  var u = ve(array1);
+  var v = ve(array2);
+  var arr1Len = array1.length;
+  var sq_dev = new Array(arr1Len);
+  for (var i = 0; i < arr1Len; i++)
+    sq_dev[i] = (array1[i] - u) * (array2[i] - v);
+  return smtr(sq_dev) / (arr1Len - 1);
+};
 
         this.tokens = [];
 
@@ -2031,11 +2111,17 @@ module.exports = class Lexer {
         return this.code.charAt(this.current - 1);
     }
 
-    parseString(stringChar = '"') {
-        while (this.peek() !== stringChar && !this.endOfCode()) {
-            if (this.peek() === "\n") this.line = +1;
-            this.advance();
-        }
+// Retorna a base elevada ao expoente
+module.exports.potencia = function (base, expoente) {
+  if (typeof base !== 'number' || typeof expoente !== 'number') {
+    throw new RuntimeError(
+      this.token,
+      "Os parâmetros devem ser do tipo número."
+    );
+  }
+
+  return Math.pow(base, expoente);
+};
 
         if (this.endOfCode()) {
             this.Egua.lexerError(
@@ -2074,163 +2160,89 @@ module.exports = class Lexer {
             this.advance();
         }
 
-        const c = this.code.substring(this.start, this.current);
-        const type = c in reservedWords ? reservedWords[c] : tokenTypes.IDENTIFIER;
+  if (
+    velocidadeFinal === null ||
+    velocidadeInicial === null ||
+    tempoFinal === null ||
+    tempoInicial === null
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Devem ser fornecidos quatro parâmetros obrigatórios."
+    );
+  }
 
-        this.addToken(type);
-    }
+  if (
+    typeof velocidadeFinal !== 'number' ||
+    typeof velocidadeInicial !== 'number' ||
+    typeof tempoFinal !== 'number' ||
+    typeof tempoInicial !== 'number'
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Todos os parâmetros devem ser do tipo número."
+    );
+  }
 
-    scanToken() {
-        const char = this.advance();
+  return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
+};
 
-        switch (char) {
-            case "[":
-                this.addToken(tokenTypes.LEFT_SQUARE_BRACKET);
-                break;
-            case "]":
-                this.addToken(tokenTypes.RIGHT_SQUARE_BRACKET);
-                break;
-            case "(":
-                this.addToken(tokenTypes.LEFT_PAREN);
-                break;
-            case ")":
-                this.addToken(tokenTypes.RIGHT_PAREN);
-                break;
-            case "{":
-                this.addToken(tokenTypes.LEFT_BRACE);
-                break;
-            case "}":
-                this.addToken(tokenTypes.RIGHT_BRACE);
-                break;
-            case ",":
-                this.addToken(tokenTypes.COMMA);
-                break;
-            case ".":
-                this.addToken(tokenTypes.DOT);
-                break;
-            case "-":
-                this.addToken(tokenTypes.MINUS);
-                break;
-            case "+":
-                this.addToken(tokenTypes.PLUS);
-                break;
-            case ":":
-                this.addToken(tokenTypes.COLON);
-                break;
-            case ";":
-                this.addToken(tokenTypes.SEMICOLON);
-                break;
-            case "%":
-                this.addToken(tokenTypes.MODULUS);
-                break;
-            case "*":
-                if (this.peek() === "*") {
-                    this.advance();
-                    this.addToken(tokenTypes.STAR_STAR);
-                    break;
-                }
-                this.addToken(tokenTypes.STAR);
-                break;
-            case "!":
-                this.addToken(
-                    this.match("=") ? tokenTypes.BANG_EQUAL : tokenTypes.BANG
-                );
-                break;
-            case "=":
-                this.addToken(
-                    this.match("=") ? tokenTypes.EQUAL_EQUAL : tokenTypes.EQUAL
-                );
-                break;
+//Função Horária da Posição (M.R.U)
+module.exports.mrufh = function (s0, v, t) {
+  if (isNaN(s0) || s0 === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mrufh(s0,v,t)."
+    );
+  t = t + 1;
+  const s = new Array();
+  let index = 0;
+  for (var i = 0; i < t; i++) {
+    s[index] = s0 + v * i;
+    index++;
+  }
 
-            case "&":
-                this.addToken(tokenTypes.BIT_AND);
-                break;
+  return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
+};
 
-            case "~":
-                this.addToken(tokenTypes.BIT_NOT);
-                break;
+//Gráfico da velocidade (M.R.U.V)
+module.exports.mruvvel = function (s0, s, a) {
+  if (isNaN(s0) || s0 === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mruvvel(Pi, Vf, A)."
+    );
+  const vf = new Array();
+  const x = new Array();
+  let v = new Array();
+  let index = 0;
+  for (var i = 0; i < s; i++) {
+    v = index;
+    vf[index] = Math.sqrt(2 * a * (index - s0));
+    x[index] = i;
+    index++;
+  }
 
-            case "|":
-                this.addToken(tokenTypes.BIT_OR);
-                break;
-
-            case "^":
-                this.addToken(tokenTypes.BIT_XOR);
-                break;
-
-            case "<":
-                if (this.match("=")) {
-                    this.addToken(tokenTypes.LESS_EQUAL);
-                } else if (this.match("<")) {
-                    this.addToken(tokenTypes.LESSER_LESSER);
-                } else {
-                    this.addToken(tokenTypes.LESS);
-                }
-                break;
-
-            case ">":
-                if (this.match("=")) {
-                    this.addToken(tokenTypes.GREATER_EQUAL);
-                } else if (this.match(">")) {
-                    this.addToken(tokenTypes.GREATER_GREATER);
-                } else {
-                    this.addToken(tokenTypes.GREATER);
-                }
-                break;
-
-            case "/":
-                if (this.match("/")) {
-                    while (this.peek() != "\n" && !this.endOfCode()) this.advance();
-                } else {
-                    this.addToken(tokenTypes.SLASH);
-                }
-                break;
-
-            // Esta sessão ignora espaços em branco na tokenização
-            case " ":
-            case "\r":
-            case "\t":
-                break;
-
-            // tentativa de pulhar linha com \n que ainda não funciona
-            case "\n":
-                this.line += 1;
-                break;
-
-            case '"':
-                this.parseString('"');
-                break;
-
-            case "'":
-                this.parseString("'");
-                break;
-
-            default:
-                if (this.isDigit(char)) this.parseNumber();
-                else if (this.isAlpha(char)) this.identifyKeyword();
-                else this.Egua.lexerError(this.line, char, "Caractere inesperado.");
-        }
-    }
-
-    scan() {
-        while (!this.endOfCode()) {
-            this.start = this.current;
-            this.scanToken();
-        }
-
-        this.tokens.push(new Token(tokenTypes.EOF, "", null, this.line));
-        return this.tokens;
-    }
+  return vf;
 };
 },{"./tokenTypes.js":23}],10:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
-module.exports.graus = function (angle) {
-  if (isNaN(angle) || angle === null)
+/*Controle e Servomecanismos*/
+module.exports.pid = function (Mo, t, K, T1, T2) {
+  if (
+    isNaN(Mo) || Mo === null ||
+    isNaN(t) || t == null ||
+    isNaN(K) || K == null ||
+    isNaN(T1) || T1 == null ||
+    isNaN(T2) || T2 == null
+  ) {
     throw new RuntimeError(
       this.token,
       "Você deve prover um número para mat.graus(ângulo)."
     );
+  }
+  pi = Math.PI;//Pi da bilbioteca Math.js
 
   return angle * (180 / Math.PI);
 };
@@ -2248,13 +2260,10 @@ module.exports.mediana = function (a) {
   return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
 };
 
-/**
- * Função que sempre returna `nulo`. 
- * Útil para comparações entre outras funções que também retornam nulo.
- * @returns `null` do JavaScript.
- */
-module.exports.nula = function () {
-  return null;
+  //Controlador Derivativo (D)
+  Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
+  
+  return [csi, Wn, Kp, Ki, Kd];
 };
 
 /**
@@ -2263,15 +2272,7 @@ module.exports.nula = function () {
  */
 module.exports.pi = Math.PI;
 
-/**
- * Calcula o valor radiano de um ângulo. O radiano é o comprimento do arco formado 
- * por um ângulo em uma circunferência.
- * @param {inteiro} angulo O ângulo, em graus, do valor radiano desejado.
- * @returns O valor, em radianos, do arco formado pelo ângulo.
- * @see https://pt.wikipedia.org/wiki/Radiano
- */
-module.exports.radiano = function (angulo) {
-  if (!Number.isInteger(angulo))
+  if (!Array.isArray(array)) {
     throw new RuntimeError(
       this.token,
       "Você deve prover um número inteiro para o parâmetro `angulo`, em radiano(angulo)."
@@ -2280,12 +2281,26 @@ module.exports.radiano = function (angulo) {
   return angulo * (Math.PI / 180);
 };
 
-module.exports.raiz = function (num, root) {
-  if (isNaN(num) || num === null)
+// Retorna o menor número inteiro dentre o valor de "value"
+module.exports.minaprox = function (value) {
+
+  if (typeof value !== 'number') {
     throw new RuntimeError(
       this.token,
       "Número dado a mat.raiz(numero, raiz) precisa ser um número."
     );
+  }
+
+  return Math.floor(value);
+};
+
+},{"../errors.js":3}],8:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError,
+    EguaFunction = require("../structures/function.js"),
+    EguaInstance = require("../structures/instance.js"),
+    StandardFn = require("../structures/standardFn.js"),
+    EguaClass = require("../structures/class.js");
+
 
   if (isNaN(root) || root === null)
     throw new RuntimeError(
