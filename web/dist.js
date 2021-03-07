@@ -1,4 +1,725 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Egua = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+
+},{}],2:[function(require,module,exports){
+(function (process){(function (){
+// 'path' module extracted from Node.js v8.11.1 (only the posix part)
+// transplited with Babel
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+function assertPath(path) {
+  if (typeof path !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
+  }
+}
+
+// Resolves . and .. elements in a path with directory names
+function normalizeStringPosix(path, allowAboveRoot) {
+  var res = '';
+  var lastSegmentLength = 0;
+  var lastSlash = -1;
+  var dots = 0;
+  var code;
+  for (var i = 0; i <= path.length; ++i) {
+    if (i < path.length)
+      code = path.charCodeAt(i);
+    else if (code === 47 /*/*/)
+      break;
+    else
+      code = 47 /*/*/;
+    if (code === 47 /*/*/) {
+      if (lastSlash === i - 1 || dots === 1) {
+        // NOOP
+      } else if (lastSlash !== i - 1 && dots === 2) {
+        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 /*.*/ || res.charCodeAt(res.length - 2) !== 46 /*.*/) {
+          if (res.length > 2) {
+            var lastSlashIndex = res.lastIndexOf('/');
+            if (lastSlashIndex !== res.length - 1) {
+              if (lastSlashIndex === -1) {
+                res = '';
+                lastSegmentLength = 0;
+              } else {
+                res = res.slice(0, lastSlashIndex);
+                lastSegmentLength = res.length - 1 - res.lastIndexOf('/');
+              }
+              lastSlash = i;
+              dots = 0;
+              continue;
+            }
+          } else if (res.length === 2 || res.length === 1) {
+            res = '';
+            lastSegmentLength = 0;
+            lastSlash = i;
+            dots = 0;
+            continue;
+          }
+        }
+        if (allowAboveRoot) {
+          if (res.length > 0)
+            res += '/..';
+          else
+            res = '..';
+          lastSegmentLength = 2;
+        }
+      } else {
+        if (res.length > 0)
+          res += '/' + path.slice(lastSlash + 1, i);
+        else
+          res = path.slice(lastSlash + 1, i);
+        lastSegmentLength = i - lastSlash - 1;
+      }
+      lastSlash = i;
+      dots = 0;
+    } else if (code === 46 /*.*/ && dots !== -1) {
+      ++dots;
+    } else {
+      dots = -1;
+    }
+  }
+  return res;
+}
+
+function _format(sep, pathObject) {
+  var dir = pathObject.dir || pathObject.root;
+  var base = pathObject.base || (pathObject.name || '') + (pathObject.ext || '');
+  if (!dir) {
+    return base;
+  }
+  if (dir === pathObject.root) {
+    return dir + base;
+  }
+  return dir + sep + base;
+}
+
+var posix = {
+  // path.resolve([from ...], to)
+  resolve: function resolve() {
+    var resolvedPath = '';
+    var resolvedAbsolute = false;
+    var cwd;
+
+    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+      var path;
+      if (i >= 0)
+        path = arguments[i];
+      else {
+        if (cwd === undefined)
+          cwd = process.cwd();
+        path = cwd;
+      }
+
+      assertPath(path);
+
+      // Skip empty entries
+      if (path.length === 0) {
+        continue;
+      }
+
+      resolvedPath = path + '/' + resolvedPath;
+      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    }
+
+    // At this point the path should be resolved to a full absolute path, but
+    // handle relative paths to be safe (might happen when process.cwd() fails)
+
+    // Normalize the path
+    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
+
+    if (resolvedAbsolute) {
+      if (resolvedPath.length > 0)
+        return '/' + resolvedPath;
+      else
+        return '/';
+    } else if (resolvedPath.length > 0) {
+      return resolvedPath;
+    } else {
+      return '.';
+    }
+  },
+
+  normalize: function normalize(path) {
+    assertPath(path);
+
+    if (path.length === 0) return '.';
+
+    var isAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    var trailingSeparator = path.charCodeAt(path.length - 1) === 47 /*/*/;
+
+    // Normalize the path
+    path = normalizeStringPosix(path, !isAbsolute);
+
+    if (path.length === 0 && !isAbsolute) path = '.';
+    if (path.length > 0 && trailingSeparator) path += '/';
+
+    if (isAbsolute) return '/' + path;
+    return path;
+  },
+
+  isAbsolute: function isAbsolute(path) {
+    assertPath(path);
+    return path.length > 0 && path.charCodeAt(0) === 47 /*/*/;
+  },
+
+  join: function join() {
+    if (arguments.length === 0)
+      return '.';
+    var joined;
+    for (var i = 0; i < arguments.length; ++i) {
+      var arg = arguments[i];
+      assertPath(arg);
+      if (arg.length > 0) {
+        if (joined === undefined)
+          joined = arg;
+        else
+          joined += '/' + arg;
+      }
+    }
+    if (joined === undefined)
+      return '.';
+    return posix.normalize(joined);
+  },
+
+  relative: function relative(from, to) {
+    assertPath(from);
+    assertPath(to);
+
+    if (from === to) return '';
+
+    from = posix.resolve(from);
+    to = posix.resolve(to);
+
+    if (from === to) return '';
+
+    // Trim any leading backslashes
+    var fromStart = 1;
+    for (; fromStart < from.length; ++fromStart) {
+      if (from.charCodeAt(fromStart) !== 47 /*/*/)
+        break;
+    }
+    var fromEnd = from.length;
+    var fromLen = fromEnd - fromStart;
+
+    // Trim any leading backslashes
+    var toStart = 1;
+    for (; toStart < to.length; ++toStart) {
+      if (to.charCodeAt(toStart) !== 47 /*/*/)
+        break;
+    }
+    var toEnd = to.length;
+    var toLen = toEnd - toStart;
+
+    // Compare paths to find the longest common path from root
+    var length = fromLen < toLen ? fromLen : toLen;
+    var lastCommonSep = -1;
+    var i = 0;
+    for (; i <= length; ++i) {
+      if (i === length) {
+        if (toLen > length) {
+          if (to.charCodeAt(toStart + i) === 47 /*/*/) {
+            // We get here if `from` is the exact base path for `to`.
+            // For example: from='/foo/bar'; to='/foo/bar/baz'
+            return to.slice(toStart + i + 1);
+          } else if (i === 0) {
+            // We get here if `from` is the root
+            // For example: from='/'; to='/foo'
+            return to.slice(toStart + i);
+          }
+        } else if (fromLen > length) {
+          if (from.charCodeAt(fromStart + i) === 47 /*/*/) {
+            // We get here if `to` is the exact base path for `from`.
+            // For example: from='/foo/bar/baz'; to='/foo/bar'
+            lastCommonSep = i;
+          } else if (i === 0) {
+            // We get here if `to` is the root.
+            // For example: from='/foo'; to='/'
+            lastCommonSep = 0;
+          }
+        }
+        break;
+      }
+      var fromCode = from.charCodeAt(fromStart + i);
+      var toCode = to.charCodeAt(toStart + i);
+      if (fromCode !== toCode)
+        break;
+      else if (fromCode === 47 /*/*/)
+        lastCommonSep = i;
+    }
+
+    var out = '';
+    // Generate the relative path based on the path difference between `to`
+    // and `from`
+    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
+      if (i === fromEnd || from.charCodeAt(i) === 47 /*/*/) {
+        if (out.length === 0)
+          out += '..';
+        else
+          out += '/..';
+      }
+    }
+
+    // Lastly, append the rest of the destination (`to`) path that comes after
+    // the common path parts
+    if (out.length > 0)
+      return out + to.slice(toStart + lastCommonSep);
+    else {
+      toStart += lastCommonSep;
+      if (to.charCodeAt(toStart) === 47 /*/*/)
+        ++toStart;
+      return to.slice(toStart);
+    }
+  },
+
+  _makeLong: function _makeLong(path) {
+    return path;
+  },
+
+  dirname: function dirname(path) {
+    assertPath(path);
+    if (path.length === 0) return '.';
+    var code = path.charCodeAt(0);
+    var hasRoot = code === 47 /*/*/;
+    var end = -1;
+    var matchedSlash = true;
+    for (var i = path.length - 1; i >= 1; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          if (!matchedSlash) {
+            end = i;
+            break;
+          }
+        } else {
+        // We saw the first non-path separator
+        matchedSlash = false;
+      }
+    }
+
+    if (end === -1) return hasRoot ? '/' : '.';
+    if (hasRoot && end === 1) return '//';
+    return path.slice(0, end);
+  },
+
+  basename: function basename(path, ext) {
+    if (ext !== undefined && typeof ext !== 'string') throw new TypeError('"ext" argument must be a string');
+    assertPath(path);
+
+    var start = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i;
+
+    if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
+      if (ext.length === path.length && ext === path) return '';
+      var extIdx = ext.length - 1;
+      var firstNonSlashEnd = -1;
+      for (i = path.length - 1; i >= 0; --i) {
+        var code = path.charCodeAt(i);
+        if (code === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else {
+          if (firstNonSlashEnd === -1) {
+            // We saw the first non-path separator, remember this index in case
+            // we need it if the extension ends up not matching
+            matchedSlash = false;
+            firstNonSlashEnd = i + 1;
+          }
+          if (extIdx >= 0) {
+            // Try to match the explicit extension
+            if (code === ext.charCodeAt(extIdx)) {
+              if (--extIdx === -1) {
+                // We matched the extension, so mark this as the end of our path
+                // component
+                end = i;
+              }
+            } else {
+              // Extension does not match, so our result is the entire path
+              // component
+              extIdx = -1;
+              end = firstNonSlashEnd;
+            }
+          }
+        }
+      }
+
+      if (start === end) end = firstNonSlashEnd;else if (end === -1) end = path.length;
+      return path.slice(start, end);
+    } else {
+      for (i = path.length - 1; i >= 0; --i) {
+        if (path.charCodeAt(i) === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else if (end === -1) {
+          // We saw the first non-path separator, mark this as the end of our
+          // path component
+          matchedSlash = false;
+          end = i + 1;
+        }
+      }
+
+      if (end === -1) return '';
+      return path.slice(start, end);
+    }
+  },
+
+  extname: function extname(path) {
+    assertPath(path);
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+    for (var i = path.length - 1; i >= 0; --i) {
+      var code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1)
+            startDot = i;
+          else if (preDotState !== 1)
+            preDotState = 1;
+      } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+        // We saw a non-dot character immediately before the dot
+        preDotState === 0 ||
+        // The (right-most) trimmed path component is exactly '..'
+        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      return '';
+    }
+    return path.slice(startDot, end);
+  },
+
+  format: function format(pathObject) {
+    if (pathObject === null || typeof pathObject !== 'object') {
+      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
+    }
+    return _format('/', pathObject);
+  },
+
+  parse: function parse(path) {
+    assertPath(path);
+
+    var ret = { root: '', dir: '', base: '', ext: '', name: '' };
+    if (path.length === 0) return ret;
+    var code = path.charCodeAt(0);
+    var isAbsolute = code === 47 /*/*/;
+    var start;
+    if (isAbsolute) {
+      ret.root = '/';
+      start = 1;
+    } else {
+      start = 0;
+    }
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i = path.length - 1;
+
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+
+    // Get non-dir info
+    for (; i >= start; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1) startDot = i;else if (preDotState !== 1) preDotState = 1;
+        } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+    // We saw a non-dot character immediately before the dot
+    preDotState === 0 ||
+    // The (right-most) trimmed path component is exactly '..'
+    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      if (end !== -1) {
+        if (startPart === 0 && isAbsolute) ret.base = ret.name = path.slice(1, end);else ret.base = ret.name = path.slice(startPart, end);
+      }
+    } else {
+      if (startPart === 0 && isAbsolute) {
+        ret.name = path.slice(1, startDot);
+        ret.base = path.slice(1, end);
+      } else {
+        ret.name = path.slice(startPart, startDot);
+        ret.base = path.slice(startPart, end);
+      }
+      ret.ext = path.slice(startDot, end);
+    }
+
+    if (startPart > 0) ret.dir = path.slice(0, startPart - 1);else if (isAbsolute) ret.dir = '/';
+
+    return ret;
+  },
+
+  sep: '/',
+  delimiter: ':',
+  win32: null,
+  posix: null
+};
+
+posix.posix = posix;
+
+module.exports = posix;
+
+}).call(this)}).call(this,require('_process'))
+},{"_process":3}],3:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],4:[function(require,module,exports){
 (function (process){(function (){
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
@@ -103,7 +824,7 @@ module.exports.Egua = class Egua {
     }
 };
 }).call(this)}).call(this,require('_process'))
-},{"./interpreter.js":5,"./lexer.js":6,"./parser.js":11,"./resolver.js":12,"./tokenTypes.js":20,"_process":24,"fs":22,"path":23,"readline":22}],2:[function(require,module,exports){
+},{"./interpreter.js":8,"./lexer.js":9,"./parser.js":14,"./resolver.js":15,"./tokenTypes.js":23,"_process":3,"fs":1,"path":2,"readline":1}],5:[function(require,module,exports){
 const RuntimeError = require("./errors.js").RuntimeError;
 
 module.exports = class Environment {
@@ -157,7 +878,7 @@ module.exports = class Environment {
         throw new RuntimeError(token, "Variável não definida '" + token.lexeme + "'.");
     }
 };
-},{"./errors.js":3}],3:[function(require,module,exports){
+},{"./errors.js":6}],6:[function(require,module,exports){
 module.exports.RuntimeError = class RuntimeError extends Error {
   constructor(token, message) {
     super(message);
@@ -175,7 +896,7 @@ module.exports.ReturnException = class ReturnException extends Error {
     this.value = value;
   }
 };
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 class Expr {
     accept(visitor) {}
 }
@@ -404,7 +1125,7 @@ module.exports = {
     Unary,
     Variable
 };
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js"),
     Environment = require("./environment.js"),
     Egua = require("./egua.js"),
@@ -1172,6 +1893,11 @@ module.exports = class Interpreter {
         if (typeof object === "boolean") {
             return object ? "verdadeiro" : "falso";
         }
+
+        if (object instanceof Date) {
+            formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            return formato.format(object);
+        }
         
         if (Array.isArray(object)) return object;
 
@@ -1192,7 +1918,7 @@ module.exports = class Interpreter {
         }
     }
 };
-},{"./egua.js":1,"./environment.js":2,"./errors.js":3,"./lib/globalLib.js":8,"./lib/importStdlib.js":9,"./structures/callable.js":14,"./structures/class.js":15,"./structures/function.js":16,"./structures/instance.js":17,"./structures/module.js":18,"./structures/standardFn.js":19,"./tokenTypes.js":20,"fs":22,"path":23}],6:[function(require,module,exports){
+},{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":11,"./lib/importStdlib.js":12,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 
 const reservedWords = {
@@ -1496,22 +2222,8 @@ module.exports = class Lexer {
         return this.tokens;
     }
 };
-},{"./tokenTypes.js":20}],7:[function(require,module,exports){
+},{"./tokenTypes.js":23}],10:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
-
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
-}
-module.exports.radiano = function (angle) {
-  if (isNaN(angle) || angle === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.radiano(Ângulo)."
-    );
-
-  return angle * (Math.PI / 180);
-};
 
 module.exports.graus = function (angle) {
   if (isNaN(angle) || angle === null)
@@ -1523,7 +2235,50 @@ module.exports.graus = function (angle) {
   return angle * (180 / Math.PI);
 };
 
+//Mediana de uma matriz
+module.exports.mediana = function (a) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mediana(a)."
+    );
+
+  a.sort(function (a, b) { return a - b; });
+  const mid = a.length / 2;
+  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
+};
+
+/**
+ * Função que sempre returna `nulo`. 
+ * Útil para comparações entre outras funções que também retornam nulo.
+ * @returns `null` do JavaScript.
+ */
+module.exports.nula = function () {
+  return null;
+};
+
+/**
+ * Constante pi.
+ * @see https://pt.wikipedia.org/wiki/Pi
+ */
 module.exports.pi = Math.PI;
+
+/**
+ * Calcula o valor radiano de um ângulo. O radiano é o comprimento do arco formado 
+ * por um ângulo em uma circunferência.
+ * @param {inteiro} angulo O ângulo, em graus, do valor radiano desejado.
+ * @returns O valor, em radianos, do arco formado pelo ângulo.
+ * @see https://pt.wikipedia.org/wiki/Radiano
+ */
+module.exports.radiano = function (angulo) {
+  if (!Number.isInteger(angulo))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número inteiro para o parâmetro `angulo`, em radiano(angulo)."
+    );
+
+  return angulo * (Math.PI / 180);
+};
 
 module.exports.raiz = function (num, root) {
   if (isNaN(num) || num === null)
@@ -1538,35 +2293,51 @@ module.exports.raiz = function (num, root) {
       "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
     );
 
-  let originalRoot = root;
+  const originalRoot = root;
 
-  let negateFlag = root % 2 == 1 && num < 0;
+  const negateFlag = root % 2 == 1 && num < 0;
   if (negateFlag) num = -num;
-  let possible = Math.pow(num, 1 / root);
+  const possible = Math.pow(num, 1 / root);
   root = Math.pow(possible, root);
   if (Math.abs(num - root) < 1 && num > 0 == root > 0)
     return negateFlag ? -possible : possible;
 
-  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
-};
-
-
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
+  throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
 };
 
 //FUNÇÃO AFIM E QUADRÁTICA
-//Valores das Abscissas
-module.exports.fun1 = function (a, b) {
-  if (isNaN(a) || a === null)
+/**
+ * Gera valores para abscissa.
+ * @param {inteiro} distancia A distância entra dois pontos. 
+ * @param {inteiro} valorPontoCentral O ponto central na abscissa.
+ * @param {inteiro} numeroPontos Número de pontos a serem gerados (padrão: 7).
+ * @returns Um vetor, contendo o número de pontos informado ou definido por padrão em uma abscissa.
+ *          Se o número informado é par, um ponto negativo a mais é gerado.
+ */
+module.exports.gerarPontosAbscissa = function (distancia, valorPontoCentral, numeroPontos) {
+  if (!Number.isInteger(distancia))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para fun1(valor1,valor2)."
+      "Você deve prover um valor inteiro para o parâmetro `distancia`, em gerarPontosAbscissa(distancia, valorInicial)."
     );
-  x = [b - 4, b - 3, b - 2, b - 1, b, b + 1, b + 2, b + 3, b + 4];
-  f = x.map(function (x) { return ((x * a) + b); });
-  return ['f(x)= ' + f];
+
+  if (!Number.isInteger(valorPontoCentral))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um valor inteiro para o parâmetro `valorInicial`, em gerarPontosAbscissa(distancia, valorInicial)."
+    );
+
+  if (!numeroPontos) {
+    numeroPontos = 7;
+  }
+
+  const elementoInicial = valorPontoCentral - (((numeroPontos / 2) >> 0) * distancia);
+  const x = [];
+  for (let i = 0; i < numeroPontos; i++) {
+    x.push(elementoInicial + (i * distancia));
+  }
+
+  return x;
 };
 
 //Raíz da Função Afim
@@ -1574,7 +2345,7 @@ module.exports.fun1R = function (a, b) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para fun1(valor1,valor2)."
+      "Você deve prover valores para fun1R(valor1,valor2)."
     );
   x = (-1 * b) / a;
   return ['f(0)= ' + x];
@@ -1587,8 +2358,8 @@ module.exports.linspace = function (startValue, stopValue, cardinality) {
       this.token,
       "Você deve prover valores para linspace(valor1,valor2,valor3)."
     );
-  var lista = [];
-  var step = (stopValue - startValue) / (cardinality - 1);
+  const lista = [];
+  const step = (stopValue - startValue) / (cardinality - 1);
   for (var i = 0; i < cardinality; i++) {
     arr.push(startValue + (step * i));
   }
@@ -1602,10 +2373,10 @@ module.exports.fun2R = function (a, b, c) {
       this.token,
       "Você deve prover valores para fun2R(a,b,c)."
     );
-  r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
-  r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
-  xv = (-1 * b) / (2 * a);
-  yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
+  const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const xv = (-1 * b) / (2 * a);
+  const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
   return ["Xv: " + xv + " Yv: " + yv];
 };
 
@@ -1618,7 +2389,7 @@ module.exports.rand = function (n1, n2, e) {
     );
   if (e == undefined) { e = 0; }
   if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
-  var data = Array.from(Array(n1), () => new Array(n2));
+  const data = Array.from(Array(n1), () => new Array(n2));
   // benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
   for (var i = 0; i < n1; i++) {
     for (var j = 0; j < n2; j++) {
@@ -1636,15 +2407,14 @@ module.exports.aprox = function (x, z) {
       "Você deve prover valores para aprox(x,z)."
     );
   if (z == undefined) { z = 2; }
-  console.log("type of = " + typeof (x));
   if (typeof (x) == "number") { x = x.toFixed(z) }
   else if (x[0].length == undefined) { // 1D array
-    for (var i = 0; i < x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
       x[i] = parseFloat(x[i].toFixed(z));
     }
   } else
-    for (var i = 0; i < x.length; i++) { // 2D array
-      for (var j = 0; j < x[0].length; j++) {
+    for (let i = 0; i < x.length; i++) { // 2D array
+      for (let j = 0; j < x[0].length; j++) {
         x[i][j] = parseFloat(x[i][j].toFixed(z));
       }
     }
@@ -1658,10 +2428,9 @@ module.exports.matrizn = function (z) {
       this.token,
       "Você deve prover valores para matrizn(z)."
     );
-  n = arguments.length;
-  console.log("n = " + n);
-  var data = Array.from(Array(1), () => new Array(n));
-  for (var i = 0; i < n; i++) { data[0][i] = arguments[i]; }
+  const n = arguments.length;
+  const data = Array.from(Array(1), () => new Array(n));
+  for (let i = 0; i < n; i++) { data[0][i] = arguments[i]; }
   return matriz(data);
 };
 
@@ -1673,13 +2442,12 @@ module.exports.pale = function (n) {
       "Você deve prover valores para pale(n)."
     );
   if (ex == undefined) { ex = 0; }
-  var x = [];
+  const x = [];
   x[0] = 100;
-  for (var i = 1; i < n; i++) {
+  for (let i = 1; i < n; i++) {
     x[i] = ex + x[i - 1] + Math.random() * 2 - 1;
   }
-  var xx = aprox(x, 2);
-  console.log(xx);
+  const xx = aprox(x, 2);
   return xx;
 };
 
@@ -1690,78 +2458,73 @@ module.exports.vet = function (a, b) {
       this.token,
       "Você deve prover valores para vet(a,b)."
     );
-  var data = Array.from(Array(1), () => new Array(b - a + 1));
+  const data = Array.from(Array(1), () => new Array(b - a + 1));
   // the benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
-  for (var i = 0; i < data[0].length; i++) {
+  for (let i = 0; i < data[0].length; i++) {
     data[0][i] = a + i;
   }
   return matrizn(data);
 };
 
-//Contagem de Elementos
-module.exports.qtd = function (a, b) {
-  if (isNaN(a) || a === null)
+
+/**
+ * Conta quantas vezes um determinado valor aparece em um vetor.
+ * @param {qualquer[]} vetor Vetor de elementos
+ * @param {qualquer} valor Valor a ser encontrado no vetor
+ * @returns Valor inteiro, com o número de vezes que `valor` foi encontrado em `vetor`.
+ */
+module.exports.numeroOcorrencias = function (vetor, valor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para qtd(a,b)."
+      "Parâmetro `vetor` deve ser um vetor, em numeroOcorrencias(vetor, valor)."
     );
-  if (b == undefined) {
-    var count = a.length;
-  } else {
-    var count = 0;
-    for (var i = 0; i < a.length; ++i) {
-      if (a[i] == b)
-        count++;
-    }
-  }
-  return count;
+
+  return vetor.filter((v) => (v === valor)).length;
 };
 
-/*ESTATÍSTICA*/
-//Valor Máximo de uma matriz
-module.exports.max = function (a) {
-  if (isNaN(a) || a === null)
+/* ESTATÍSTICA */
+
+/**
+ * Encontra o elemento máximo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O maior número encontrado em um vetor.
+ */
+module.exports.max = function (vetor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para max(a)."
+      "Parâmetro `vetor` deve ser um vetor, em max(vetor)."
     );
 
-  return Math.max.apply(null, a);
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em max(vetor)."
+    );
+
+  return Math.max.apply(null, vetor);
 };
 
-//Valor Mínimo de uma matriz
-module.exports.min = function (a) {
-  if (isNaN(num) || num === null)
+/**
+ * Encontra o elemento mínimo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O menor número encontrado em um vetor.
+ */
+module.exports.min = function (vetor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para min(a)."
+      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
     );
 
-  return Math.min.apply(null, a);
-};
-
-//Intervalo (max - min) de uma matriz
-module.exports.intervalo = function (a) {
-  if (isNaN(a) || a === null)
+  if (vetor.some(isNaN))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para intervalo(a)."
+      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
     );
 
-  return max(a) - min(a);
-};
-
-//Mediana de uma matriz
-module.exports.mediana = function (a) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mediana(a)."
-    );
-
-  a.sort(function (a, b) { return a - b; });
-  var mid = a.length / 2;
-  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
+  return Math.min.apply(null, vetor);
 };
 
 //Soma de determinada matriz
@@ -1772,18 +2535,17 @@ module.exports.smtr = function (a) {
       "Você deve prover valores para smtr(a)."
     );
 
-  var z = 0;
+  let z = 0;
   if (a.length == 1) {   // a is a 1D row array
-    for (var j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
+    for (let j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
   }
   else if (a[0].length == 1) {   // a is a 1D column array
-    console.log("column array");
-    for (var i = 0; i < a.length; i++) { z = z + a[i][0]; }
+    for (let i = 0; i < a.length; i++) { z = z + a[i][0]; }
   }
   else {
-    for (var j = 0; j < a.length; j++) { z = z + a[j]; }
+    for (let j = 0; j < a.length; j++) { z = z + a[j]; }
   }
-  toggleOrCheckIfFunctionCall(false);
+
   return aprox(z, 2);
 };
 
@@ -1791,14 +2553,14 @@ module.exports.smtr = function (a) {
 module.exports.media = function () {
   const argumentsLength = Object.keys(arguments).length;
 
-  if (argumentsLength <= 0){
+  if (argumentsLength <= 0) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro para a função."
     );
   }
 
-  if (argumentsLength > 1){
+  if (argumentsLength > 1) {
     throw new RuntimeError(
       this.token,
       "A função recebe apenas um parâmetro."
@@ -1808,7 +2570,7 @@ module.exports.media = function () {
   // Pega o primeiro argumento do objeto de argumentos
   const args = arguments['0'];
 
-  if (!Array.isArray(args)){
+  if (!Array.isArray(args)) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro do tipo vetor."
@@ -1816,7 +2578,7 @@ module.exports.media = function () {
   }
 
   // Valida se o array está vazio.
-  if (!args.length){
+  if (!args.length) {
     throw new RuntimeError(
       this.token,
       "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
@@ -1825,7 +2587,7 @@ module.exports.media = function () {
 
   // Valida se o array contém apenas valores do tipo número.
   args.forEach(item => {
-    if (typeof item !== 'number'){
+    if (typeof item !== 'number') {
       throw new RuntimeError(
         this.token,
         "Você deve fornecer um vetor contendo apenas valores do tipo número."
@@ -1861,10 +2623,11 @@ module.exports.sqr = function (a) {
       this.token,
       "Você deve prover valores para sqr(a)."
     );
-  var mean = ve(array);
-  var sum = 0;
-  var i = array.length;
-  var tmp;
+
+  const mean = ve(array);
+  let sum = 0;
+  let i = array.length;
+  let tmp;
   while (--i >= 0) {
     tmp = array[i] - mean;
     sum += tmp * tmp;
@@ -1879,6 +2642,7 @@ module.exports.variancia = function (array, flag) {
       this.token,
       "Você deve prover valores para variancia(matriz, flag)."
     );
+
   if (flag == undefined) { flag = 1; }
   return sqr(array) / (array.length - (flag ? 1 : 0));
 };
@@ -1902,6 +2666,7 @@ module.exports.covar = function (array1, array2) {
       this.token,
       "Você deve prover valores para covar(matriz1, matriz2)."
     );
+
   var u = ve(array1);
   var v = ve(array2);
   var arr1Len = array1.length;
@@ -2024,13 +2789,13 @@ module.exports.log = function (x) {
 
 // Retorna a base elevada ao expoente
 module.exports.potencia = function (base, expoente) {
-  if (typeof base !== 'number' || typeof expoente !== 'number'){
+  if (typeof base !== 'number' || typeof expoente !== 'number') {
     throw new RuntimeError(
       this.token,
       "Os parâmetros devem ser do tipo número."
     );
   }
-    
+
   return Math.pow(base, expoente);
 };
 
@@ -2085,11 +2850,11 @@ module.exports.aceleracao = function (
   velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
 
   if (
-    velocidadeFinal === null || 
-    velocidadeInicial === null || 
-    tempoFinal === null || 
+    velocidadeFinal === null ||
+    velocidadeInicial === null ||
+    tempoFinal === null ||
     tempoInicial === null
-    ){
+  ) {
     throw new RuntimeError(
       this.token,
       "Devem ser fornecidos quatro parâmetros obrigatórios."
@@ -2101,12 +2866,12 @@ module.exports.aceleracao = function (
     typeof velocidadeInicial !== 'number' ||
     typeof tempoFinal !== 'number' ||
     typeof tempoInicial !== 'number'
-    ){
-      throw new RuntimeError(
-        this.token,
-        "Todos os parâmetros devem ser do tipo número."
-      );
-    }
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Todos os parâmetros devem ser do tipo número."
+    );
+  }
 
   return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
@@ -2119,13 +2884,13 @@ module.exports.mrufh = function (s0, v, t) {
       "Você deve prover valores para mrufh(s0,v,t)."
     );
   t = t + 1;
-  var s = new Array();
-  var index = 0;
+  const s = new Array();
+  let index = 0;
   for (var i = 0; i < t; i++) {
     s[index] = s0 + v * i;
     index++;
-    console.log(s[i]);
   }
+
   return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
 };
 
@@ -2136,17 +2901,17 @@ module.exports.mruvvel = function (s0, s, a) {
       this.token,
       "Você deve prover valores para mruvvel(Pi, Vf, A)."
     );
-  var vf = new Array();
-  var x = new Array();
-  var v = new Array();
-  var index = 0;
+  const vf = new Array();
+  const x = new Array();
+  let v = new Array();
+  let index = 0;
   for (var i = 0; i < s; i++) {
     v = index;
     vf[index] = Math.sqrt(2 * a * (index - s0));
     x[index] = i;
     index++;
-    console.log(vf[i]);
   }
+
   return vf;
 };
 
@@ -2179,7 +2944,7 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
 // Retorna o comprimento de um vetor
 module.exports.comp = function (array) {
 
-  if (!Array.isArray(array)){
+  if (!Array.isArray(array)) {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um vetor."
@@ -2190,18 +2955,19 @@ module.exports.comp = function (array) {
 };
 
 // Retorna o menor número inteiro dentre o valor de "value"
-module.exports.minaprox = function(value) {
-  
-  if (typeof value !== 'number'){
+module.exports.minaprox = function (value) {
+
+  if (typeof value !== 'number') {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um número."
     );
   }
-  
-  return Math.floor(value);  
+
+  return Math.floor(value);
 };
-},{"../errors.js":3}],8:[function(require,module,exports){
+
+},{"../errors.js":6}],11:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError,
     EguaFunction = require("../structures/function.js"),
     EguaInstance = require("../structures/instance.js"),
@@ -2374,7 +3140,7 @@ module.exports = function (interpreter, globals) {
     return globals;
 };
 
-},{"../errors.js":3,"../structures/class.js":15,"../structures/function.js":16,"../structures/instance.js":17,"../structures/standardFn.js":19}],9:[function(require,module,exports){
+},{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],12:[function(require,module,exports){
 const StandardFn = require("../structures/standardFn.js");
 const EguaModule = require("../structures/module.js");
 
@@ -2409,7 +3175,7 @@ module.exports = function (name) {
 
     return null;
 };
-},{"../structures/module.js":18,"../structures/standardFn.js":19,"./eguamat.js":7,"./tempo.js":10}],10:[function(require,module,exports){
+},{"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
 // Retorna uma data completa
@@ -2456,7 +3222,7 @@ function convertDateFromPtbrToISO(date) {
 
 	return `${year}-${month}-${day}`;
 }
-},{"../errors.js":3}],11:[function(require,module,exports){
+},{"../errors.js":6}],14:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
@@ -3279,7 +4045,7 @@ module.exports = class Parser {
         return statements
     }
 };
-},{"./expr.js":4,"./stmt.js":13,"./tokenTypes.js":20}],12:[function(require,module,exports){
+},{"./expr.js":7,"./stmt.js":16,"./tokenTypes.js":23}],15:[function(require,module,exports){
 class ResolverError extends Error {
     constructor(msg) {
         super(msg);
@@ -3699,7 +4465,7 @@ module.exports = class Resolver {
         return null;
     }
 };
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 class Stmt {
     accept(visitor) { }
 }
@@ -3915,13 +4681,13 @@ module.exports = {
     Continua,
     Var
 };
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = class Callable {
     arity() {
         return this.arityValue;
     }
 };
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 const Callable = require("./callable.js");
 const EguaInstance = require("./instance.js");
 
@@ -3965,7 +4731,7 @@ module.exports = class EguaClass extends Callable {
         return instance;
     }
 };
-},{"./callable.js":14,"./instance.js":17}],16:[function(require,module,exports){
+},{"./callable.js":17,"./instance.js":20}],19:[function(require,module,exports){
 const Callable = require("./callable.js");
 const Environment = require("../environment.js");
 const ReturnExpection = require("../errors.js").ReturnException;
@@ -4028,7 +4794,7 @@ module.exports = class EguaFunction extends Callable {
         );
     }
 };
-},{"../environment.js":2,"../errors.js":3,"./callable.js":14}],17:[function(require,module,exports){
+},{"../environment.js":5,"../errors.js":6,"./callable.js":17}],20:[function(require,module,exports){
 module.exports = class EguaInstance {
     constructor(creatorClass) {
         this.creatorClass = creatorClass;
@@ -4054,7 +4820,7 @@ module.exports = class EguaInstance {
         return "<Objeto " + this.creatorClass.name + ">";
     }
 };
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = class EguaModule {
     constructor(name) {
         if (name !== undefined) this.name = name;
@@ -4064,7 +4830,7 @@ module.exports = class EguaModule {
         return this.name ? `<module ${this.name}>` : "<module>";
     }
 };
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 const Callable = require("./callable.js");
 
 module.exports = class StandardFn extends Callable {
@@ -4083,7 +4849,7 @@ module.exports = class StandardFn extends Callable {
         return "<função>";
     }
 };
-},{"./callable.js":14}],20:[function(require,module,exports){
+},{"./callable.js":17}],23:[function(require,module,exports){
 module.exports = {
     LEFT_PAREN: "LEFT_PAREN",
     RIGHT_PAREN: "RIGHT_PAREN",
@@ -4149,7 +4915,7 @@ module.exports = {
     FINALMENTE: "FINALMENTE",
     EOF: "EOF"
 };
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){(function (){
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
@@ -4222,726 +4988,5 @@ module.exports.Egua = class Egua {
   }
 };
 }).call(this)}).call(this,require('_process'))
-},{"./interpreter.js":5,"./lexer.js":6,"./parser.js":11,"./resolver.js":12,"./tokenTypes.js":20,"_process":24}],22:[function(require,module,exports){
-
-},{}],23:[function(require,module,exports){
-(function (process){(function (){
-// 'path' module extracted from Node.js v8.11.1 (only the posix part)
-// transplited with Babel
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-function assertPath(path) {
-  if (typeof path !== 'string') {
-    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
-  }
-}
-
-// Resolves . and .. elements in a path with directory names
-function normalizeStringPosix(path, allowAboveRoot) {
-  var res = '';
-  var lastSegmentLength = 0;
-  var lastSlash = -1;
-  var dots = 0;
-  var code;
-  for (var i = 0; i <= path.length; ++i) {
-    if (i < path.length)
-      code = path.charCodeAt(i);
-    else if (code === 47 /*/*/)
-      break;
-    else
-      code = 47 /*/*/;
-    if (code === 47 /*/*/) {
-      if (lastSlash === i - 1 || dots === 1) {
-        // NOOP
-      } else if (lastSlash !== i - 1 && dots === 2) {
-        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 /*.*/ || res.charCodeAt(res.length - 2) !== 46 /*.*/) {
-          if (res.length > 2) {
-            var lastSlashIndex = res.lastIndexOf('/');
-            if (lastSlashIndex !== res.length - 1) {
-              if (lastSlashIndex === -1) {
-                res = '';
-                lastSegmentLength = 0;
-              } else {
-                res = res.slice(0, lastSlashIndex);
-                lastSegmentLength = res.length - 1 - res.lastIndexOf('/');
-              }
-              lastSlash = i;
-              dots = 0;
-              continue;
-            }
-          } else if (res.length === 2 || res.length === 1) {
-            res = '';
-            lastSegmentLength = 0;
-            lastSlash = i;
-            dots = 0;
-            continue;
-          }
-        }
-        if (allowAboveRoot) {
-          if (res.length > 0)
-            res += '/..';
-          else
-            res = '..';
-          lastSegmentLength = 2;
-        }
-      } else {
-        if (res.length > 0)
-          res += '/' + path.slice(lastSlash + 1, i);
-        else
-          res = path.slice(lastSlash + 1, i);
-        lastSegmentLength = i - lastSlash - 1;
-      }
-      lastSlash = i;
-      dots = 0;
-    } else if (code === 46 /*.*/ && dots !== -1) {
-      ++dots;
-    } else {
-      dots = -1;
-    }
-  }
-  return res;
-}
-
-function _format(sep, pathObject) {
-  var dir = pathObject.dir || pathObject.root;
-  var base = pathObject.base || (pathObject.name || '') + (pathObject.ext || '');
-  if (!dir) {
-    return base;
-  }
-  if (dir === pathObject.root) {
-    return dir + base;
-  }
-  return dir + sep + base;
-}
-
-var posix = {
-  // path.resolve([from ...], to)
-  resolve: function resolve() {
-    var resolvedPath = '';
-    var resolvedAbsolute = false;
-    var cwd;
-
-    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-      var path;
-      if (i >= 0)
-        path = arguments[i];
-      else {
-        if (cwd === undefined)
-          cwd = process.cwd();
-        path = cwd;
-      }
-
-      assertPath(path);
-
-      // Skip empty entries
-      if (path.length === 0) {
-        continue;
-      }
-
-      resolvedPath = path + '/' + resolvedPath;
-      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
-    }
-
-    // At this point the path should be resolved to a full absolute path, but
-    // handle relative paths to be safe (might happen when process.cwd() fails)
-
-    // Normalize the path
-    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
-
-    if (resolvedAbsolute) {
-      if (resolvedPath.length > 0)
-        return '/' + resolvedPath;
-      else
-        return '/';
-    } else if (resolvedPath.length > 0) {
-      return resolvedPath;
-    } else {
-      return '.';
-    }
-  },
-
-  normalize: function normalize(path) {
-    assertPath(path);
-
-    if (path.length === 0) return '.';
-
-    var isAbsolute = path.charCodeAt(0) === 47 /*/*/;
-    var trailingSeparator = path.charCodeAt(path.length - 1) === 47 /*/*/;
-
-    // Normalize the path
-    path = normalizeStringPosix(path, !isAbsolute);
-
-    if (path.length === 0 && !isAbsolute) path = '.';
-    if (path.length > 0 && trailingSeparator) path += '/';
-
-    if (isAbsolute) return '/' + path;
-    return path;
-  },
-
-  isAbsolute: function isAbsolute(path) {
-    assertPath(path);
-    return path.length > 0 && path.charCodeAt(0) === 47 /*/*/;
-  },
-
-  join: function join() {
-    if (arguments.length === 0)
-      return '.';
-    var joined;
-    for (var i = 0; i < arguments.length; ++i) {
-      var arg = arguments[i];
-      assertPath(arg);
-      if (arg.length > 0) {
-        if (joined === undefined)
-          joined = arg;
-        else
-          joined += '/' + arg;
-      }
-    }
-    if (joined === undefined)
-      return '.';
-    return posix.normalize(joined);
-  },
-
-  relative: function relative(from, to) {
-    assertPath(from);
-    assertPath(to);
-
-    if (from === to) return '';
-
-    from = posix.resolve(from);
-    to = posix.resolve(to);
-
-    if (from === to) return '';
-
-    // Trim any leading backslashes
-    var fromStart = 1;
-    for (; fromStart < from.length; ++fromStart) {
-      if (from.charCodeAt(fromStart) !== 47 /*/*/)
-        break;
-    }
-    var fromEnd = from.length;
-    var fromLen = fromEnd - fromStart;
-
-    // Trim any leading backslashes
-    var toStart = 1;
-    for (; toStart < to.length; ++toStart) {
-      if (to.charCodeAt(toStart) !== 47 /*/*/)
-        break;
-    }
-    var toEnd = to.length;
-    var toLen = toEnd - toStart;
-
-    // Compare paths to find the longest common path from root
-    var length = fromLen < toLen ? fromLen : toLen;
-    var lastCommonSep = -1;
-    var i = 0;
-    for (; i <= length; ++i) {
-      if (i === length) {
-        if (toLen > length) {
-          if (to.charCodeAt(toStart + i) === 47 /*/*/) {
-            // We get here if `from` is the exact base path for `to`.
-            // For example: from='/foo/bar'; to='/foo/bar/baz'
-            return to.slice(toStart + i + 1);
-          } else if (i === 0) {
-            // We get here if `from` is the root
-            // For example: from='/'; to='/foo'
-            return to.slice(toStart + i);
-          }
-        } else if (fromLen > length) {
-          if (from.charCodeAt(fromStart + i) === 47 /*/*/) {
-            // We get here if `to` is the exact base path for `from`.
-            // For example: from='/foo/bar/baz'; to='/foo/bar'
-            lastCommonSep = i;
-          } else if (i === 0) {
-            // We get here if `to` is the root.
-            // For example: from='/foo'; to='/'
-            lastCommonSep = 0;
-          }
-        }
-        break;
-      }
-      var fromCode = from.charCodeAt(fromStart + i);
-      var toCode = to.charCodeAt(toStart + i);
-      if (fromCode !== toCode)
-        break;
-      else if (fromCode === 47 /*/*/)
-        lastCommonSep = i;
-    }
-
-    var out = '';
-    // Generate the relative path based on the path difference between `to`
-    // and `from`
-    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
-      if (i === fromEnd || from.charCodeAt(i) === 47 /*/*/) {
-        if (out.length === 0)
-          out += '..';
-        else
-          out += '/..';
-      }
-    }
-
-    // Lastly, append the rest of the destination (`to`) path that comes after
-    // the common path parts
-    if (out.length > 0)
-      return out + to.slice(toStart + lastCommonSep);
-    else {
-      toStart += lastCommonSep;
-      if (to.charCodeAt(toStart) === 47 /*/*/)
-        ++toStart;
-      return to.slice(toStart);
-    }
-  },
-
-  _makeLong: function _makeLong(path) {
-    return path;
-  },
-
-  dirname: function dirname(path) {
-    assertPath(path);
-    if (path.length === 0) return '.';
-    var code = path.charCodeAt(0);
-    var hasRoot = code === 47 /*/*/;
-    var end = -1;
-    var matchedSlash = true;
-    for (var i = path.length - 1; i >= 1; --i) {
-      code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          if (!matchedSlash) {
-            end = i;
-            break;
-          }
-        } else {
-        // We saw the first non-path separator
-        matchedSlash = false;
-      }
-    }
-
-    if (end === -1) return hasRoot ? '/' : '.';
-    if (hasRoot && end === 1) return '//';
-    return path.slice(0, end);
-  },
-
-  basename: function basename(path, ext) {
-    if (ext !== undefined && typeof ext !== 'string') throw new TypeError('"ext" argument must be a string');
-    assertPath(path);
-
-    var start = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i;
-
-    if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
-      if (ext.length === path.length && ext === path) return '';
-      var extIdx = ext.length - 1;
-      var firstNonSlashEnd = -1;
-      for (i = path.length - 1; i >= 0; --i) {
-        var code = path.charCodeAt(i);
-        if (code === 47 /*/*/) {
-            // If we reached a path separator that was not part of a set of path
-            // separators at the end of the string, stop now
-            if (!matchedSlash) {
-              start = i + 1;
-              break;
-            }
-          } else {
-          if (firstNonSlashEnd === -1) {
-            // We saw the first non-path separator, remember this index in case
-            // we need it if the extension ends up not matching
-            matchedSlash = false;
-            firstNonSlashEnd = i + 1;
-          }
-          if (extIdx >= 0) {
-            // Try to match the explicit extension
-            if (code === ext.charCodeAt(extIdx)) {
-              if (--extIdx === -1) {
-                // We matched the extension, so mark this as the end of our path
-                // component
-                end = i;
-              }
-            } else {
-              // Extension does not match, so our result is the entire path
-              // component
-              extIdx = -1;
-              end = firstNonSlashEnd;
-            }
-          }
-        }
-      }
-
-      if (start === end) end = firstNonSlashEnd;else if (end === -1) end = path.length;
-      return path.slice(start, end);
-    } else {
-      for (i = path.length - 1; i >= 0; --i) {
-        if (path.charCodeAt(i) === 47 /*/*/) {
-            // If we reached a path separator that was not part of a set of path
-            // separators at the end of the string, stop now
-            if (!matchedSlash) {
-              start = i + 1;
-              break;
-            }
-          } else if (end === -1) {
-          // We saw the first non-path separator, mark this as the end of our
-          // path component
-          matchedSlash = false;
-          end = i + 1;
-        }
-      }
-
-      if (end === -1) return '';
-      return path.slice(start, end);
-    }
-  },
-
-  extname: function extname(path) {
-    assertPath(path);
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    // Track the state of characters (if any) we see before our first dot and
-    // after any path separator we find
-    var preDotState = 0;
-    for (var i = path.length - 1; i >= 0; --i) {
-      var code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          // If we reached a path separator that was not part of a set of path
-          // separators at the end of the string, stop now
-          if (!matchedSlash) {
-            startPart = i + 1;
-            break;
-          }
-          continue;
-        }
-      if (end === -1) {
-        // We saw the first non-path separator, mark this as the end of our
-        // extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46 /*.*/) {
-          // If this is our first dot, mark it as the start of our extension
-          if (startDot === -1)
-            startDot = i;
-          else if (preDotState !== 1)
-            preDotState = 1;
-      } else if (startDot !== -1) {
-        // We saw a non-dot and non-path separator before our dot, so we should
-        // have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (startDot === -1 || end === -1 ||
-        // We saw a non-dot character immediately before the dot
-        preDotState === 0 ||
-        // The (right-most) trimmed path component is exactly '..'
-        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      return '';
-    }
-    return path.slice(startDot, end);
-  },
-
-  format: function format(pathObject) {
-    if (pathObject === null || typeof pathObject !== 'object') {
-      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
-    }
-    return _format('/', pathObject);
-  },
-
-  parse: function parse(path) {
-    assertPath(path);
-
-    var ret = { root: '', dir: '', base: '', ext: '', name: '' };
-    if (path.length === 0) return ret;
-    var code = path.charCodeAt(0);
-    var isAbsolute = code === 47 /*/*/;
-    var start;
-    if (isAbsolute) {
-      ret.root = '/';
-      start = 1;
-    } else {
-      start = 0;
-    }
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i = path.length - 1;
-
-    // Track the state of characters (if any) we see before our first dot and
-    // after any path separator we find
-    var preDotState = 0;
-
-    // Get non-dir info
-    for (; i >= start; --i) {
-      code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          // If we reached a path separator that was not part of a set of path
-          // separators at the end of the string, stop now
-          if (!matchedSlash) {
-            startPart = i + 1;
-            break;
-          }
-          continue;
-        }
-      if (end === -1) {
-        // We saw the first non-path separator, mark this as the end of our
-        // extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46 /*.*/) {
-          // If this is our first dot, mark it as the start of our extension
-          if (startDot === -1) startDot = i;else if (preDotState !== 1) preDotState = 1;
-        } else if (startDot !== -1) {
-        // We saw a non-dot and non-path separator before our dot, so we should
-        // have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (startDot === -1 || end === -1 ||
-    // We saw a non-dot character immediately before the dot
-    preDotState === 0 ||
-    // The (right-most) trimmed path component is exactly '..'
-    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      if (end !== -1) {
-        if (startPart === 0 && isAbsolute) ret.base = ret.name = path.slice(1, end);else ret.base = ret.name = path.slice(startPart, end);
-      }
-    } else {
-      if (startPart === 0 && isAbsolute) {
-        ret.name = path.slice(1, startDot);
-        ret.base = path.slice(1, end);
-      } else {
-        ret.name = path.slice(startPart, startDot);
-        ret.base = path.slice(startPart, end);
-      }
-      ret.ext = path.slice(startDot, end);
-    }
-
-    if (startPart > 0) ret.dir = path.slice(0, startPart - 1);else if (isAbsolute) ret.dir = '/';
-
-    return ret;
-  },
-
-  sep: '/',
-  delimiter: ':',
-  win32: null,
-  posix: null
-};
-
-posix.posix = posix;
-
-module.exports = posix;
-
-}).call(this)}).call(this,require('_process'))
-},{"_process":24}],24:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}]},{},[21])(21)
+},{"./interpreter.js":8,"./lexer.js":9,"./parser.js":14,"./resolver.js":15,"./tokenTypes.js":23,"_process":3}]},{},[24])(24)
 });
