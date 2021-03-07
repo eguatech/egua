@@ -22,9 +22,9 @@ funcao startTest(){
 }
 
 funcao tSeSenao(){
-  escreva("-------------------------");
+  escreva("----------------------------");
   escreva("Iniciando Teste: Se - Se Não");
-  escreva("-------------------------");
+  escreva("----------------------------");
   var a = 1;
   var b = 1;
   se (a == b)
@@ -395,6 +395,22 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Função aprox:");
 taprox();
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função numeroOcorrencias():");
+escreva(m.numeroOcorrencias([1, 2, 3, 4, 5], 3));
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função max():");
+escreva(m.max([1, 2, 3, 4, 5]));
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função min():");
+escreva(m.min([1, 2, 3, 4, 5]));
+
 escreva("|");
 escreva("--------------------------------");
 escreva("Função sen:");
