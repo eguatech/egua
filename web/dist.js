@@ -1172,6 +1172,11 @@ module.exports = class Interpreter {
         if (typeof object === "boolean") {
             return object ? "verdadeiro" : "falso";
         }
+
+        if (object instanceof Date) {
+            formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            return formato.format(object);
+        }
         
         if (Array.isArray(object)) return object;
 
@@ -1499,20 +1504,6 @@ module.exports = class Lexer {
 },{"./tokenTypes.js":20}],7:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
-}
-module.exports.radiano = function (angle) {
-  if (isNaN(angle) || angle === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.radiano(Ângulo)."
-    );
-
-  return angle * (Math.PI / 180);
-};
-
 module.exports.graus = function (angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
@@ -1523,7 +1514,35 @@ module.exports.graus = function (angle) {
   return angle * (180 / Math.PI);
 };
 
+//Mediana de uma matriz
+module.exports.mediana = function (a) {
+  if (isNaN(num) || num === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mediana(a)."
+    );
+
+  a.sort(function (a, b) { return a - b; });
+  const mid = a.length / 2;
+  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
+};
+
+module.exports.nula = function () {
+  const nula = null;
+  return nula;
+};
+
 module.exports.pi = Math.PI;
+
+module.exports.radiano = function (angle) {
+  if (isNaN(angle) || angle === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número para mat.radiano(Ângulo)."
+    );
+
+  return angle * (Math.PI / 180);
+};
 
 module.exports.raiz = function (num, root) {
   if (isNaN(num) || num === null)
@@ -1538,22 +1557,16 @@ module.exports.raiz = function (num, root) {
       "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
     );
 
-  let originalRoot = root;
+  const originalRoot = root;
 
-  let negateFlag = root % 2 == 1 && num < 0;
+  const negateFlag = root % 2 == 1 && num < 0;
   if (negateFlag) num = -num;
-  let possible = Math.pow(num, 1 / root);
+  const possible = Math.pow(num, 1 / root);
   root = Math.pow(possible, root);
   if (Math.abs(num - root) < 1 && num > 0 == root > 0)
     return negateFlag ? -possible : possible;
 
-  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
-};
-
-
-module.exports.nula = function () {
-  var nula = null;
-  return nula;
+  throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
 };
 
 //FUNÇÃO AFIM E QUADRÁTICA
@@ -1587,8 +1600,8 @@ module.exports.linspace = function (startValue, stopValue, cardinality) {
       this.token,
       "Você deve prover valores para linspace(valor1,valor2,valor3)."
     );
-  var lista = [];
-  var step = (stopValue - startValue) / (cardinality - 1);
+  const lista = [];
+  const step = (stopValue - startValue) / (cardinality - 1);
   for (var i = 0; i < cardinality; i++) {
     arr.push(startValue + (step * i));
   }
@@ -1602,10 +1615,10 @@ module.exports.fun2R = function (a, b, c) {
       this.token,
       "Você deve prover valores para fun2R(a,b,c)."
     );
-  r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
-  r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
-  xv = (-1 * b) / (2 * a);
-  yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
+  const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const xv = (-1 * b) / (2 * a);
+  const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
   return ["Xv: " + xv + " Yv: " + yv];
 };
 
@@ -1618,7 +1631,7 @@ module.exports.rand = function (n1, n2, e) {
     );
   if (e == undefined) { e = 0; }
   if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
-  var data = Array.from(Array(n1), () => new Array(n2));
+  const data = Array.from(Array(n1), () => new Array(n2));
   // benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
   for (var i = 0; i < n1; i++) {
     for (var j = 0; j < n2; j++) {
@@ -1636,15 +1649,14 @@ module.exports.aprox = function (x, z) {
       "Você deve prover valores para aprox(x,z)."
     );
   if (z == undefined) { z = 2; }
-  console.log("type of = " + typeof (x));
   if (typeof (x) == "number") { x = x.toFixed(z) }
   else if (x[0].length == undefined) { // 1D array
-    for (var i = 0; i < x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
       x[i] = parseFloat(x[i].toFixed(z));
     }
   } else
-    for (var i = 0; i < x.length; i++) { // 2D array
-      for (var j = 0; j < x[0].length; j++) {
+    for (let i = 0; i < x.length; i++) { // 2D array
+      for (let j = 0; j < x[0].length; j++) {
         x[i][j] = parseFloat(x[i][j].toFixed(z));
       }
     }
@@ -1658,10 +1670,9 @@ module.exports.matrizn = function (z) {
       this.token,
       "Você deve prover valores para matrizn(z)."
     );
-  n = arguments.length;
-  console.log("n = " + n);
-  var data = Array.from(Array(1), () => new Array(n));
-  for (var i = 0; i < n; i++) { data[0][i] = arguments[i]; }
+  const n = arguments.length;
+  const data = Array.from(Array(1), () => new Array(n));
+  for (let i = 0; i < n; i++) { data[0][i] = arguments[i]; }
   return matriz(data);
 };
 
@@ -1673,13 +1684,12 @@ module.exports.pale = function (n) {
       "Você deve prover valores para pale(n)."
     );
   if (ex == undefined) { ex = 0; }
-  var x = [];
+  const x = [];
   x[0] = 100;
-  for (var i = 1; i < n; i++) {
+  for (let i = 1; i < n; i++) {
     x[i] = ex + x[i - 1] + Math.random() * 2 - 1;
   }
-  var xx = aprox(x, 2);
-  console.log(xx);
+  const xx = aprox(x, 2);
   return xx;
 };
 
@@ -1690,9 +1700,9 @@ module.exports.vet = function (a, b) {
       this.token,
       "Você deve prover valores para vet(a,b)."
     );
-  var data = Array.from(Array(1), () => new Array(b - a + 1));
+  const data = Array.from(Array(1), () => new Array(b - a + 1));
   // the benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
-  for (var i = 0; i < data[0].length; i++) {
+  for (let i = 0; i < data[0].length; i++) {
     data[0][i] = a + i;
   }
   return matrizn(data);
@@ -1705,11 +1715,12 @@ module.exports.qtd = function (a, b) {
       this.token,
       "Você deve prover valores para qtd(a,b)."
     );
+  let count = 0;
   if (b == undefined) {
-    var count = a.length;
+    count = a.length;
   } else {
-    var count = 0;
-    for (var i = 0; i < a.length; ++i) {
+    count = 0;
+    for (let i = 0; i < a.length; ++i) {
       if (a[i] == b)
         count++;
     }
@@ -1740,30 +1751,6 @@ module.exports.min = function (a) {
   return Math.min.apply(null, a);
 };
 
-//Intervalo (max - min) de uma matriz
-module.exports.intervalo = function (a) {
-  if (isNaN(a) || a === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para intervalo(a)."
-    );
-
-  return max(a) - min(a);
-};
-
-//Mediana de uma matriz
-module.exports.mediana = function (a) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para mediana(a)."
-    );
-
-  a.sort(function (a, b) { return a - b; });
-  var mid = a.length / 2;
-  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
-};
-
 //Soma de determinada matriz
 module.exports.smtr = function (a) {
   if (isNaN(a) || a === null)
@@ -1772,17 +1759,17 @@ module.exports.smtr = function (a) {
       "Você deve prover valores para smtr(a)."
     );
 
-  var z = 0;
+  let z = 0;
   if (a.length == 1) {   // a is a 1D row array
-    for (var j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
+    for (let j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
   }
   else if (a[0].length == 1) {   // a is a 1D column array
-    console.log("column array");
-    for (var i = 0; i < a.length; i++) { z = z + a[i][0]; }
+    for (let i = 0; i < a.length; i++) { z = z + a[i][0]; }
   }
   else {
-    for (var j = 0; j < a.length; j++) { z = z + a[j]; }
+    for (let j = 0; j < a.length; j++) { z = z + a[j]; }
   }
+
   toggleOrCheckIfFunctionCall(false);
   return aprox(z, 2);
 };
@@ -1791,14 +1778,14 @@ module.exports.smtr = function (a) {
 module.exports.media = function () {
   const argumentsLength = Object.keys(arguments).length;
 
-  if (argumentsLength <= 0){
+  if (argumentsLength <= 0) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro para a função."
     );
   }
 
-  if (argumentsLength > 1){
+  if (argumentsLength > 1) {
     throw new RuntimeError(
       this.token,
       "A função recebe apenas um parâmetro."
@@ -1808,7 +1795,7 @@ module.exports.media = function () {
   // Pega o primeiro argumento do objeto de argumentos
   const args = arguments['0'];
 
-  if (!Array.isArray(args)){
+  if (!Array.isArray(args)) {
     throw new RuntimeError(
       this.token,
       "Você deve fornecer um parâmetro do tipo vetor."
@@ -1816,7 +1803,7 @@ module.exports.media = function () {
   }
 
   // Valida se o array está vazio.
-  if (!args.length){
+  if (!args.length) {
     throw new RuntimeError(
       this.token,
       "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
@@ -1825,7 +1812,7 @@ module.exports.media = function () {
 
   // Valida se o array contém apenas valores do tipo número.
   args.forEach(item => {
-    if (typeof item !== 'number'){
+    if (typeof item !== 'number') {
       throw new RuntimeError(
         this.token,
         "Você deve fornecer um vetor contendo apenas valores do tipo número."
@@ -1861,10 +1848,11 @@ module.exports.sqr = function (a) {
       this.token,
       "Você deve prover valores para sqr(a)."
     );
-  var mean = ve(array);
-  var sum = 0;
-  var i = array.length;
-  var tmp;
+
+  const mean = ve(array);
+  let sum = 0;
+  let i = array.length;
+  let tmp;
   while (--i >= 0) {
     tmp = array[i] - mean;
     sum += tmp * tmp;
@@ -1879,6 +1867,7 @@ module.exports.variancia = function (array, flag) {
       this.token,
       "Você deve prover valores para variancia(matriz, flag)."
     );
+
   if (flag == undefined) { flag = 1; }
   return sqr(array) / (array.length - (flag ? 1 : 0));
 };
@@ -1902,6 +1891,7 @@ module.exports.covar = function (array1, array2) {
       this.token,
       "Você deve prover valores para covar(matriz1, matriz2)."
     );
+
   var u = ve(array1);
   var v = ve(array2);
   var arr1Len = array1.length;
@@ -2024,13 +2014,13 @@ module.exports.log = function (x) {
 
 // Retorna a base elevada ao expoente
 module.exports.potencia = function (base, expoente) {
-  if (typeof base !== 'number' || typeof expoente !== 'number'){
+  if (typeof base !== 'number' || typeof expoente !== 'number') {
     throw new RuntimeError(
       this.token,
       "Os parâmetros devem ser do tipo número."
     );
   }
-    
+
   return Math.pow(base, expoente);
 };
 
@@ -2085,11 +2075,11 @@ module.exports.aceleracao = function (
   velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
 
   if (
-    velocidadeFinal === null || 
-    velocidadeInicial === null || 
-    tempoFinal === null || 
+    velocidadeFinal === null ||
+    velocidadeInicial === null ||
+    tempoFinal === null ||
     tempoInicial === null
-    ){
+  ) {
     throw new RuntimeError(
       this.token,
       "Devem ser fornecidos quatro parâmetros obrigatórios."
@@ -2101,12 +2091,12 @@ module.exports.aceleracao = function (
     typeof velocidadeInicial !== 'number' ||
     typeof tempoFinal !== 'number' ||
     typeof tempoInicial !== 'number'
-    ){
-      throw new RuntimeError(
-        this.token,
-        "Todos os parâmetros devem ser do tipo número."
-      );
-    }
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Todos os parâmetros devem ser do tipo número."
+    );
+  }
 
   return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
 };
@@ -2119,13 +2109,13 @@ module.exports.mrufh = function (s0, v, t) {
       "Você deve prover valores para mrufh(s0,v,t)."
     );
   t = t + 1;
-  var s = new Array();
-  var index = 0;
+  const s = new Array();
+  let index = 0;
   for (var i = 0; i < t; i++) {
     s[index] = s0 + v * i;
     index++;
-    console.log(s[i]);
   }
+
   return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
 };
 
@@ -2136,27 +2126,34 @@ module.exports.mruvvel = function (s0, s, a) {
       this.token,
       "Você deve prover valores para mruvvel(Pi, Vf, A)."
     );
-  var vf = new Array();
-  var x = new Array();
-  var v = new Array();
-  var index = 0;
+  const vf = new Array();
+  const x = new Array();
+  let v = new Array();
+  let index = 0;
   for (var i = 0; i < s; i++) {
     v = index;
     vf[index] = Math.sqrt(2 * a * (index - s0));
     x[index] = i;
     index++;
-    console.log(vf[i]);
   }
+
   return vf;
 };
 
 /*Controle e Servomecanismos*/
 module.exports.pid = function (Mo, t, K, T1, T2) {
-  if (isNaN(Mo) || Mo === null)
+  if (
+    isNaN(Mo) || Mo === null ||
+    isNaN(t) || t == null ||
+    isNaN(K) || K == null ||
+    isNaN(T1) || T1 == null ||
+    isNaN(T2) || T2 == null
+  ) {
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para pid(Ov, Ts, K, T1, T2)."
     );
+  }
   pi = Math.PI;//Pi da bilbioteca Math.js
 
   //Amortecimento Relativo
@@ -2173,13 +2170,14 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
 
   //Controlador Derivativo (D)
   Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
-  return ['csi:' + csi, '<br/>', 'Wn:' + Wn, '<br/>', 'Proporcional:' + Kp, '<br/>', 'Integral:' + Ki, '<br/>', 'Progressivo:' + Kd];
+  
+  return [csi, Wn, Kp, Ki, Kd];
 };
 
 // Retorna o comprimento de um vetor
 module.exports.comp = function (array) {
 
-  if (!Array.isArray(array)){
+  if (!Array.isArray(array)) {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um vetor."
@@ -2190,17 +2188,18 @@ module.exports.comp = function (array) {
 };
 
 // Retorna o menor número inteiro dentre o valor de "value"
-module.exports.minaprox = function(value) {
-  
-  if (typeof value !== 'number'){
+module.exports.minaprox = function (value) {
+
+  if (typeof value !== 'number') {
     throw new RuntimeError(
       this.token,
       "O valor passado pra função deve ser um número."
     );
   }
-  
-  return Math.floor(value);  
+
+  return Math.floor(value);
 };
+
 },{"../errors.js":3}],8:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError,
     EguaFunction = require("../structures/function.js"),
