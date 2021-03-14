@@ -767,7 +767,7 @@ module.exports = class Interpreter {
         }
 
         if (object instanceof Date) {
-            formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
             return formato.format(object);
         }
         
