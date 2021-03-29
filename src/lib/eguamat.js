@@ -127,7 +127,11 @@ module.exports.fun1R = function (a, b) {
 
 //Intervalo Preenchido
 module.exports.linspace = function (startValue, stopValue, cardinality) {
-  if (isNaN(startValue) || startValue === null)
+  if (
+    isNaN(startValue) || startValue === null ||
+    isNaN(stopValue) || stopValue === null ||
+    isNaN(cardinality) || cardinality === null
+    )
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para linspace(valor1,valor2,valor3)."
@@ -147,11 +151,14 @@ module.exports.fun2R = function (a, b, c) {
       this.token,
       "Você deve prover valores para fun2R(a,b,c)."
     );
+    
   const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
   const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+
   const xv = (-1 * b) / (2 * a);
   const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
-  return ["Xv: " + xv + " Yv: " + yv];
+  
+  return [xv, yv];
 };
 
 //Matriz aleatória bidimensional
