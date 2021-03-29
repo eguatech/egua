@@ -117,13 +117,12 @@ module.exports.gerarPontosAbscissa = function (distancia, valorPontoCentral, num
 
 //Raíz da Função Afim
 module.exports.fun1R = function (a, b) {
-  if (isNaN(a) || a === null)
+  if (isNaN(a) || a === null || isNaN(b) || b === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para fun1R(valor1,valor2)."
     );
-  x = (-1 * b) / a;
-  return ['f(0)= ' + x];
+  return (-1 * b) / a;
 };
 
 //Intervalo Preenchido
