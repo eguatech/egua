@@ -1516,7 +1516,7 @@ module.exports.graus = function (angle) {
 
 //Mediana de uma matriz
 module.exports.mediana = function (a) {
-  if (isNaN(num) || num === null)
+  if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para mediana(a)."
@@ -1635,7 +1635,7 @@ module.exports.linspace = function (startValue, stopValue, cardinality) {
     isNaN(startValue) || startValue === null ||
     isNaN(stopValue) || stopValue === null ||
     isNaN(cardinality) || cardinality === null
-    )
+  )
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para linspace(valor1,valor2,valor3)."
@@ -1655,13 +1655,13 @@ module.exports.fun2R = function (a, b, c) {
       this.token,
       "Você deve prover valores para fun2R(a,b,c)."
     );
-    
+
   const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
   const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
 
   const xv = (-1 * b) / (2 * a);
   const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
-  
+
   return [xv, yv];
 };
 
@@ -1675,7 +1675,7 @@ module.exports.rand = function (n1, n2, e) {
   if (e == undefined) { e = 0; }
   if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
   const data = Array.from(Array(n1), () => new Array(n2));
-  // benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
+
   for (var i = 0; i < n1; i++) {
     for (var j = 0; j < n2; j++) {
       data[i][j] = e + Math.random() * 2 - 1;
@@ -1686,7 +1686,7 @@ module.exports.rand = function (n1, n2, e) {
 
 //Aproximação de valores
 module.exports.aprox = function (x, z) {
-  if (isNaN(x) || x === null)
+  if (isNaN(x) || x === null || isNaN(z) || z === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para aprox(x,z)."
@@ -1703,7 +1703,7 @@ module.exports.aprox = function (x, z) {
         x[i][j] = parseFloat(x[i][j].toFixed(z));
       }
     }
-  return x; //OK
+  return x;
 };
 
 //Parâmetros da Função
@@ -1720,7 +1720,7 @@ module.exports.matrizn = function (z) {
 };
 
 //Vetor de pontos aleatórios
-module.exports.pale = function (n) {
+module.exports.pontosAleatorios = function (n) {
   if (isNaN(n) || n === null)
     throw new RuntimeError(
       this.token,
@@ -1738,13 +1738,13 @@ module.exports.pale = function (n) {
 
 //Intervalo A-B
 module.exports.vet = function (a, b) {
-  if (isNaN(a) || a === null)
+  if (isNaN(a) || a === null || isNaN(b) || b === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para vet(a,b)."
     );
   const data = Array.from(Array(1), () => new Array(b - a + 1));
-  // the benefit from creating array this way is a.length = number of rows and a[0].length = number of columns
+
   for (let i = 0; i < data[0].length; i++) {
     data[0][i] = a + i;
   }
@@ -1903,7 +1903,7 @@ module.exports.ve = function (a) {
 
 //Soma dos quadrados dos resíduos (sqr) de uma matriz
 module.exports.sqr = function (a) {
-  if (isNaN(num) || num === null)
+  if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para sqr(a)."
@@ -1963,7 +1963,7 @@ module.exports.covar = function (array1, array2) {
 
 //Coeficiente de variação para uma matriz
 module.exports.coefvar = function (array) {
-  if (isNaN(num) || num === null)
+  if (isNaN(array) || array === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para coefvar(matriz)."
@@ -2098,19 +2098,19 @@ module.exports.raizq = function (x) {
 /*CINEMÁTICA*/
 
 //Velocidade média
-module.exports.vmed = function (s, t) {
-  if (isNaN(s) || s === null)
+module.exports.velocidadeMedia = function (s, t) {
+  if (isNaN(s) || s === null || isNaN(t) || t === null)
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para vmed(d,t)."
+      "Você deve prover valores para velocidadeMedia(d,t)."
     );
 
   return (s / t);
 };
 
 //Espaço percorrido
-module.exports.deltas = function (s0, s) {
-  if (isNaN(s0) || s0 === null)
+module.exports.deltaS = function (s0, s) {
+  if (isNaN(s0) || s0 === null || isNaN(s) || s === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para deltas(e0,e1)."
@@ -2120,8 +2120,8 @@ module.exports.deltas = function (s0, s) {
 };
 
 //Tempo Percorrido
-module.exports.deltat = function (t0, t) {
-  if (isNaN(t0) || t0 === null)
+module.exports.deltaT = function (t0, t) {
+  if (isNaN(t0) || t0 === null || isNaN(t) || t === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para deltat(t0,t1)."
@@ -2180,11 +2180,15 @@ module.exports.mrufh = function (s0, v, t) {
 };
 
 //Gráfico da velocidade (M.R.U.V)
-module.exports.mruvvel = function (s0, s, a) {
-  if (isNaN(s0) || s0 === null)
+module.exports.mruv = function (s0, s, a) {
+  if (
+    isNaN(s0) || s0 === null ||
+    isNaN(s) || s === null ||
+    isNaN(a) || a === null
+  )
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para mruvvel(Pi, Vf, A)."
+      "Você deve prover valores para mruv(Pi, Vf, A)."
     );
   const vf = new Array();
   const x = new Array();
@@ -2230,7 +2234,7 @@ module.exports.pid = function (Mo, t, K, T1, T2) {
 
   //Controlador Derivativo (D)
   Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
-  
+
   return [csi, Wn, Kp, Ki, Kd];
 };
 

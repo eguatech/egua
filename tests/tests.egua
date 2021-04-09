@@ -315,7 +315,7 @@ funcao traizq(){
 }
 
 funcao tvmed(){
-  var vmed = m.vmed(30,10);
+  var vmed = m.velocidadeMedia(30,10);
 
   se (vmed != nula)
     escreva(vmed);
@@ -326,7 +326,7 @@ funcao tvmed(){
 }
 
 funcao tdeltas(){
-  var deltas = m.deltas(10,30);
+  var deltas = m.deltaS(10,30);
 
   se (deltas != nula)
     escreva(deltas);
@@ -337,7 +337,7 @@ funcao tdeltas(){
 }
 
 funcao tdeltat(){
-  var deltat = m.deltat(10,30);
+  var deltat = m.deltaT(10,30);
 
   se (deltat != nula)
     escreva(deltat);
@@ -370,7 +370,7 @@ funcao tmrufh(){
 }
 
 funcao tmruvvel(){
-  var mruvvel = m.mruvvel(0,30,15,2);
+  var mruvvel = m.mruv(0,30,15,2);
 
   se (mruvvel != nula)
     escreva(mruvvel);
