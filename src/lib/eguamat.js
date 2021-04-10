@@ -55,31 +55,6 @@ module.exports.radiano = function (angulo) {
   return angulo * (Math.PI / 180);
 };
 
-module.exports.raiz = function (num, root) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Número dado a mat.raiz(numero, raiz) precisa ser um número."
-    );
-
-  if (isNaN(root) || root === null)
-    throw new RuntimeError(
-      this.token,
-      "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
-    );
-
-  const originalRoot = root;
-
-  const negateFlag = root % 2 == 1 && num < 0;
-  if (negateFlag) num = -num;
-  const possible = Math.pow(num, 1 / root);
-  root = Math.pow(possible, root);
-  if (Math.abs(num - root) < 1 && num > 0 == root > 0)
-    return negateFlag ? -possible : possible;
-
-  throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${originalRoot} de ${num}.`)
-};
-
 //FUNÇÃO AFIM E QUADRÁTICA
 /**
  * Gera valores para abscissa.
@@ -159,25 +134,6 @@ module.exports.fun2R = function (a, b, c) {
   const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
 
   return [xv, yv];
-};
-
-//Matriz aleatória bidimensional
-module.exports.rand = function (n1, n2, e) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para rand(n1,n2,e)."
-    );
-  if (e == undefined) { e = 0; }
-  if (n1 == undefined && n2 == undefined) { return Math.random() * 2 - 1; }
-  const data = Array.from(Array(n1), () => new Array(n2));
-
-  for (var i = 0; i < n1; i++) {
-    for (var j = 0; j < n2; j++) {
-      data[i][j] = e + Math.random() * 2 - 1;
-    }
-  }
-  return aprox(data, 5);
 };
 
 //Aproximação de valores
@@ -386,7 +342,7 @@ module.exports.media = function () {
 
 //Média aritmética de uma matriz
 module.exports.ve = function (a) {
-  if (isNaN(num) || num === null)
+  if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para ve(a)."
@@ -418,7 +374,7 @@ module.exports.sqr = function (a) {
 
 //Variação de uma matriz
 module.exports.variancia = function (array, flag) {
-  if (isNaN(array) || array === null)
+  if (isNaN(array) || array === null || isNaN(flag) || flag === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para variancia(matriz, flag)."
@@ -428,21 +384,9 @@ module.exports.variancia = function (array, flag) {
   return sqr(array) / (array.length - (flag ? 1 : 0));
 };
 
-//Desvio padrão de uma matriz
-module.exports.devpad = function (matriz, flag) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para devpad(matriz, flag)."
-    );
-
-  if (flag == undefined) { flag = 1; }
-  return aprox(Math.sqrt(variancia(array, flag)));
-};
-
 //Covariância de duas matrizes
 module.exports.covar = function (array1, array2) {
-  if (isNaN(array1) || array1 === null)
+  if (isNaN(array1) || array1 === null || isNaN(array1) || array2 === null)
     throw new RuntimeError(
       this.token,
       "Você deve prover valores para covar(matriz1, matriz2)."
@@ -455,28 +399,6 @@ module.exports.covar = function (array1, array2) {
   for (var i = 0; i < arr1Len; i++)
     sq_dev[i] = (array1[i] - u) * (array2[i] - v);
   return smtr(sq_dev) / (arr1Len - 1);
-};
-
-//Coeficiente de variação para uma matriz
-module.exports.coefvar = function (array) {
-  if (isNaN(array) || array === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para coefvar(matriz)."
-    );
-
-  return devpad(array, 1) / ex(array);
-};
-
-//Coeficiente de correlação de pearson para duas matrizes
-module.exports.coefcorr = function (array1, array2) {
-  if (isNaN(array1) || array1 === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover valores para coefcorr(array1, array2)."
-    );
-
-  return aprox(covar(array1, array2) / devpad(array1, 1) / devpad(array2, 1));
 };
 
 /*TRIGONOMETRIA*/
@@ -704,10 +626,10 @@ module.exports.mruv = function (s0, s, a) {
 module.exports.pid = function (Mo, t, K, T1, T2) {
   if (
     isNaN(Mo) || Mo === null ||
-    isNaN(t) || t == null ||
-    isNaN(K) || K == null ||
-    isNaN(T1) || T1 == null ||
-    isNaN(T2) || T2 == null
+    isNaN(t) || t === null ||
+    isNaN(K) || K === null ||
+    isNaN(T1) || T1 === null ||
+    isNaN(T2) || T2 === null
   ) {
     throw new RuntimeError(
       this.token,
