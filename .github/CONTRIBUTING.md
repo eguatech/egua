@@ -69,6 +69,8 @@ Solicitamos também que você atualize a chave `version` do arquivo `package.jso
 
 Por fim, seu PR deve ser efetuado na branch `desenvolvimento` e solicitamos que você abra uma issue no repositório [Docs](https://github.com/eguatech/docs) informando a sua implementação e uma breve explicação para ser adicionado na documentação.
 
+Ao submeter suas alterações para desenvolvimento, a ferramenta de Integração Contínua irá subir o projeto para o ambiente de desenvolvimento que está hospedado no Microsoft Azure: https://blue-meadow-0f18a2410.azurestaticapps.net/
+
 
 ## Resumo
 
