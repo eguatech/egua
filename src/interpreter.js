@@ -765,6 +765,11 @@ module.exports = class Interpreter {
         if (typeof object === "boolean") {
             return object ? "verdadeiro" : "falso";
         }
+
+        if (object instanceof Date) {
+            const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            return formato.format(object);
+        }
         
         if (Array.isArray(object)) return object;
 

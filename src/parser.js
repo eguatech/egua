@@ -765,7 +765,7 @@ module.exports = class Parser {
         }
 
         this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
-        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo ${kind}.`);
+        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo do ${kind}.`);
 
         let body = this.block();
 
@@ -785,7 +785,7 @@ module.exports = class Parser {
 
         let methods = [];
         while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
-            methods.push(this.function("method"));
+            methods.push(this.function("método"));
         }
 
         this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
