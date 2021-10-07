@@ -31,7 +31,7 @@ const clearOutput = function() {
 const editor = new CodeFlask("#editor", {
   language: 'js',
   lineNumbers: true,
-  defaultTheme: false 
+  defaultTheme: false
 });
 
 clearOutput();
@@ -41,8 +41,14 @@ function loadDemo(name) {
   editor.updateCode(demos[name]);
 }
 
-demoKeys.forEach(demo => {
+demoKeys.forEach((demo, index) => {
   const option = document.createElement("option");
+  if (index === 0) {
+    option.disabled = true;
+    option.selected = true;
+    option.hidden = true;
+  }
+
   option.textContent = demo.capitalize();
   option.value = demo;
   demoSelector.appendChild(option);
