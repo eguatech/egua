@@ -1,3 +1,5 @@
+const {RuntimeError} = require("../../web/dist");
+
 module.exports = class EguaInstance {
     constructor(creatorClass) {
         this.creatorClass = creatorClass;
