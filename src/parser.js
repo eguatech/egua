@@ -17,7 +17,7 @@ module.exports = class Parser {
         this.advance();
 
         while (!this.isAtEnd()) {
-            if (this.previous().type == tokenTypes.SEMICOLON) return;
+            if (this.previous().type === tokenTypes.SEMICOLON) return;
 
             switch (this.peek().type) {
                 case tokenTypes.CLASSE:
@@ -64,7 +64,7 @@ module.exports = class Parser {
     }
 
     isAtEnd() {
-        return this.peek().type == tokenTypes.EOF;
+        return this.peek().type === tokenTypes.EOF;
     }
 
     advance() {
