@@ -1,6 +1,10 @@
-html {
-  font-family: "Roboto Mono";
+html, body {
+  font-family: "Roboto Mono", serif;
   color: black;
+}
+
+* {
+  font-family: "Roboto Mono", serif;
 }
 
 #runBtn {
@@ -37,13 +41,13 @@ html {
 }
 
 @media only screen and (max-width: 768px) {
-   
+
   #editor {
     width: 100% !important;
     height: 70% !important;
     position: relative !important;
   }
-  
+
   #output {
     width: 100% !important;
     height: 29% !important;
