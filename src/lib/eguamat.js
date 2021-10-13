@@ -24,6 +24,48 @@ module.exports.mediana = function (a) {
 };
 
 /**
+ * Calcula a moda de um vetor. A moda é o valor, ou valores, que mais são 
+ * presentes em um conjunto.
+ * @param {inteiro[]} vetor O conjunto a ser avaliado.
+ * @returns O novo conjunto com os valores da moda.
+ * @see https://pt.wikipedia.org/wiki/Moda_(estat%C3%ADstica)
+ */
+module.exports.moda = function (vetor) {
+  if (!Array.isArray(vetor))
+    throw new RuntimeError(
+      this.token,
+      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
+    );
+
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
+    );
+
+  const objectArr = vetor.reduce(
+    function (acc, curr) { 
+      return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc 
+    },
+    {}
+  )
+  const counter = []
+  Object.keys(objectArr).filter(function (pos) {
+    counter.push(objectArr[pos])
+  })
+  const max = Math.max.apply(null, counter)
+  
+  if (max === 1) {
+    return []
+  }
+
+  return Object.keys(objectArr).filter(function (pos) {
+    return objectArr[pos] === max 
+      ? objectArr[pos]
+      : null
+  }).map(item => Number(item))
+}
+/**
  * Função que sempre returna `nulo`. 
  * Útil para comparações entre outras funções que também retornam nulo.
  * @returns `null` do JavaScript.
