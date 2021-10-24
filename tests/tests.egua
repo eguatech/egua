@@ -380,6 +380,35 @@ funcao tmruvvel(){
   }
 }
 
+funcao tmoda(){
+  var i = [1,2,2,3,4];
+  var modaUm = m.moda(i);
+  var j = [1,2,2,3,3];
+  var modaDois = m.moda(j);
+  var k = [1,2,3,4,5];
+  var modaTres = m.moda(k);
+  
+  se (modaUm[0] == 2)
+    escreva(modaUm);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+  se (modaDois[0] == 2 e modaDois[1] == 3)
+    escreva(modaDois);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+
+  se (modaTres)
+    escreva(modaTres);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
 escreva("--------------------------------");
 escreva("Função gerarPontosAbscissa:");
 teste_gerarPontosAbscissa();
@@ -475,6 +504,10 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Função mruvvel:");
 tmruvvel();
+escreva("--------------------------------");
+escreva("Função moda:");
+tmoda();
+escreva("|");
 
 escreva("--------------------------------");
 escreva("Testes Funções Internas - Linguagem Egua");
@@ -592,7 +625,6 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Função interna: Aleatório Entre");
 taleatorioEntre();
-
 escreva("|");
 escreva("--------------------------------");
 escreva("Teste terminado com " + texto(errosM) + " erro(s)!");
