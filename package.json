@@ -7,9 +7,8 @@
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
     "npm-publish": "npm publish",
     "testes": "./bin/egua tests/tests.egua",
-    "test": "jest",
+    "testes-unitarios": "jest",
     "production": "npm run build-web && npm run npm-publish",
-    "testes": "./bin/egua tests/tests.egua",
     "build:azure": "ls /github/workspace"
   },
   "repository": {
