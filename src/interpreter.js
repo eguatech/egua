@@ -49,11 +49,11 @@ module.exports = class Interpreter {
     }
 
     isTruthy(object) {
-        if (object === null) 
+        if (object === null)
             return false;
-        if (typeof object === "boolean") 
+        if (typeof object === "boolean")
             return Boolean(object);
-        
+
         return true;
     }
 
@@ -79,9 +79,9 @@ module.exports = class Interpreter {
     }
 
     isEqual(left, right) {
-        if (left === null && right === null) 
+        if (left === null && right === null)
             return true;
-        if (left === null) 
+        if (left === null)
             return false;
 
         return left === right;
@@ -267,7 +267,7 @@ module.exports = class Interpreter {
 
             if (Array.isArray(right) || typeof right === "string") {
                 return right.includes(left);
-            } else if (right.constructor == Object) {
+            } else if (right.constructor === Object) {
                 return left in right;
             } else {
                 throw new RuntimeError("Tipo de chamada inválida com 'em'.");
@@ -555,7 +555,7 @@ module.exports = class Interpreter {
 
             obj[index] = value;
         } else if (
-            obj.constructor == Object ||
+            obj.constructor === Object ||
             obj instanceof EguaInstance ||
             obj instanceof EguaFunction ||
             obj instanceof EguaClass ||
@@ -597,7 +597,7 @@ module.exports = class Interpreter {
         }
 
         else if (
-            obj.constructor == Object ||
+            obj.constructor === Object ||
             obj instanceof EguaInstance ||
             obj instanceof EguaFunction ||
             obj instanceof EguaClass ||
@@ -648,7 +648,7 @@ module.exports = class Interpreter {
         if (obj instanceof EguaInstance) {
             obj.set(expr.name, value);
             return value;
-        } else if (obj.constructor == Object) {
+        } else if (obj.constructor === Object) {
             obj[expr.name.lexeme] = value;
         }
     }
@@ -710,7 +710,7 @@ module.exports = class Interpreter {
         let object = this.evaluate(expr.object);
         if (object instanceof EguaInstance) {
             return object.get(expr.name) || null;
-        } else if (object.constructor == Object) {
+        } else if (object.constructor === Object) {
             return object[expr.name.lexeme] || null;
         } else if (object instanceof EguaModule) {
             return object[expr.name.lexeme] || null;
@@ -770,7 +770,7 @@ module.exports = class Interpreter {
             const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
             return formato.format(object);
         }
-        
+
         if (Array.isArray(object)) return object;
 
         return object.toString();
