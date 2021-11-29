@@ -1,75 +1,599 @@
-escreva("Testes internos - Linguagem Egua");
-var testes = 2;
+escreva("--------------------------------");
+escreva("Testes Internos - Linguagem Egua");
+escreva("--------------------------------");
+escreva("|");
 
+var erros = 0;
 
-escreva("");
-escreva("Teste Classes - [1/" + texto(testes)+"]");
-classe Animal {
-  correr() {
+funcao startTest(){
+  escreva(tSeSenao());
+  escreva("|");
+  escreva(tEnquanto());
+  escreva("|");
+  escreva(tPara());
+  escreva("|");
+  escreva(tFacaEnquanto());
+  escreva("|");
+  escreva(tCasoEscolha());
+  escreva("|");
+  escreva(tTentePegue());
+  escreva("|");
+  escreva(tClasse());
+}
+
+funcao tSeSenao(){
+  escreva("----------------------------");
+  escreva("Iniciando Teste: Se - Se Não");
+  escreva("----------------------------");
+  var a = 1;
+  var b = 1;
+  se (a == b)
+    retorna("Se - Se não: OK!");
+  senao {
+    erros = erros + 1;
+    retorna("Se - Se não: ERRO!");
+  }
+}
+
+funcao tEnquanto(){
+  escreva("------------------------");
+  escreva("Iniciando Teste: Enquanto");
+  escreva("------------------------");
+  var a = 0;
+  enquanto(a<5){
+    a = a + 1;
+  }
+  se (a == 5)
+    retorna("Enquanto: OK!");
+  senao {
+    erros = erros + 1;
+    retorna("Enquanto: ERRO!");
+  }
+  escreva(a);
+}
+
+funcao tPara(){
+  escreva("--------------------");
+  escreva("Iniciando Teste: Para");
+  escreva("--------------------");
+  var a = 0;
+  para (var i = 0; i < 5; i = i + 1) {
+  a = a + 1;
+  }
+  se (a == 5)
+    retorna("Para: OK!");
+  senao {
+    erros = erros + 1;
+    retorna("Para: ERRO!");
+  }
+}
+
+funcao tFacaEnquanto(){
+  escreva("-----------------------------");
+  escreva("Iniciando Teste: Faça - Enquanto");
+  escreva("-----------------------------");
+  var a = 0;
+  fazer {
+    a = a + 1;
+  } enquanto(a<5){
+  }
+  se (a == 5)
+    retorna("Faça - Enquanto: OK!");
+  senao {
+    erros = erros + 1;
+    retorna("Faça - Enquanto: ERRO!");
+  }
+}
+
+funcao tCasoEscolha(){
+  escreva("--------------------");
+  escreva("Iniciando Teste: Caso - Escolha");
+  escreva("--------------------");
+  escolha(1){
+    caso 1: 
+    retorna("Caso - Escolha: OK!");  
+    caso 2:
+    retorna("Caso - Escolha: ERRO!");
+  }
+}
+
+funcao tTentePegue(){
+  escreva("--------------------");
+  escreva("Iniciando Teste: Tente - Pegue");
+  escreva("--------------------");
+  tente {
+  1 > "1";
+  escreva("Tente - Pegue: ERRO!");
+  } pegue {
+  escreva("Tente - Pegue: OK!");
+  } finalmente {
+  retorna(" ");  
+  }
+}
+
+funcao tClasse(){
+  escreva("--------------------");
+  escreva("Iniciando Teste: Classe");
+  escreva("--------------------");
+  tente{
+  classe Animal {
+    correr() {
       escreva("Correndo Loucamente");
+    }
   }
-}
-classe Cachorro herda Animal {
-  latir() {
+  classe Cachorro herda Animal {
+    latir() {
       escreva("Au Au Au Au");
+    }
+  }
+  var nomeDoCachorro = Cachorro();
+  nomeDoCachorro.correr();
+  nomeDoCachorro.latir();
+  escreva("Classe: OK!");
+  } pegue {
+  escreva("Classe: ERRO!");  
+  } finalmente {
+  retorna(" ");
   }
 }
-var nomeDoCachorro = Cachorro();
-nomeDoCachorro.correr();
-nomeDoCachorro.latir();
-escreva("[PASSED]");
+
+startTest();
+escreva("----------------------------");
+escreva("Teste terminado com " + texto(erros) + " erro(s)!");
+escreva("----------------------------");
 
 
-escreva("");
-escreva("Teste MergeSort - [2/" + texto(testes)+"]");
-var vetor1 = [8, 2, 9, 5];
-var a=0;
-var aux=0;
-var i=0;
-escreva ("Vetor: Posição[0]:"+texto(vetor1[0]));
-escreva ("Vetor: Posição[1]:"+texto(vetor1[1]));
-escreva ("Vetor: Posição[2]:"+texto(vetor1[2]));
-escreva ("Vetor: Posição[3]:"+texto(vetor1[3]));
-para (i=0; i<3; i=i+1){
-  se (vetor1[i]>vetor1[i+1]){
-    
-    escreva ("Vetor "+texto(i));
-    aux = vetor1[i];
-    vetor1[i] = vetor1[i+1];
-    vetor1[i+1] = aux;
-    escreva(vetor1[i]);
-    escreva(vetor1[i+1]);
+escreva("--------------------------------");
+escreva("Testes Internos - Biblioteca EguaMat");
+escreva("--------------------------------");
+escreva("|");
+
+var errosM = 0;
+
+
+var m = importar("eguamat");
+var nula = m.nula();
+
+var o = [1,1,2,3,15];
+var p = [2,6,7,10,20];
+
+
+funcao teste_gerarPontosAbscissa() {
+  var gerarPontosAbscissa = m.gerarPontosAbscissa(2,3);
+
+  se (gerarPontosAbscissa != nula)
+    escreva (gerarPontosAbscissa);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
   }
 }
-var vetor2 = [vetor1[0], vetor1[1]];
-var vetor3 = [vetor1[2], vetor1[3]];
-var vetor4 = [];
-para (a=0; a<4; a=a+1){
-  escreva ("vetor1("+texto(a)+")");
-  escreva (vetor1[a]);
+
+funcao tfun1R(){
+  var fun1R = m.fun1R(2,3);
+  
+  se (fun1R != nula)
+        escreva (fun1R);
+      senao {
+        errosM = errosM+1;
+        escreva(errosM);
+      }
 }
-para (a=0; a<2; a=a+1){
-  escreva ("vetor2("+texto(a)+")");
-  escreva (vetor2[a]);
-}
-para (a=0; a<2; a=a+1){
-  escreva ("vetor3("+texto(a)+")");
-  escreva (vetor3[a]);
-}
-se (vetor2[0]<vetor3[0] e vetor2[1]<vetor3[1]){
-  vetor4[0]=vetor2[0];
-  se (vetor3[0]<vetor2[1]){
-  vetor4[1]=vetor3[0];
-  vetor4[2]=vetor2[1];
-  vetor4[3]=vetor3[1];
-  }senao{
-  vetor4[1]=vetor2[1];
-  vetor4[2]=vetor3[0];
-  vetor4[3]=vetor3[1];
+
+funcao tfun2R(){
+  var fun2R = m.fun2R(2,-4,3);
+  
+  se (fun2R != nula)
+    escreva (fun2R);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
   }
 }
-    
-para (a=0; a<4; a=a+1){
-  escreva ("vetor4("+texto(vetor4[a])+")");
+
+funcao taprox(){
+  var aprox = m.aprox(1,10);
+  
+  se (aprox != nula)
+        escreva (aprox);
+  senao {
+        errosM = errosM+1;
+        escreva(errosM);
+
+    }
 }
-escreva("[PASSED]");
+
+
+funcao tsen(){
+  var sen = m.sen(60);
+  
+  se (sen != nula)
+        escreva (sen);
+      senao {
+        errosM = errosM+1;
+        escreva(errosM);
+      }
+}
+
+funcao tcos(){
+  var cos = m.cos(60);
+  
+  se (cos != nula)
+        escreva (cos);
+      senao {
+        errosM = errosM+1;
+        escreva(errosM);
+      }
+}
+
+funcao ttan(){
+  var tan = m.tan(60);
+
+  se (tan != nula)
+    escreva (tan);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tarsen(){
+  var arsen = m.arsen(60);
+
+  se (arsen != nula)
+    escreva (arsen);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tarcos(){
+  var arcos = m.arcos(60);
+
+  se (arcos != nula)
+    escreva (arcos);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tartan(){
+  var artan = m.artan(60);
+
+  se (artan != nula)
+    escreva (artan);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao texp(){
+  var exp = m.exp(10);
+
+  se (exp != nula)
+    escreva (exp);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tlog(){
+  var log = m.log(10);
+  
+  se (log != nula)
+    escreva(log);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tpotencia(){
+  var pot = m.potencia(2,3);
+  
+  se (pot != nula)
+    escreva(pot);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao traizq(){
+  var raizq = m.raizq(49);
+
+  se (raizq != nula)
+    escreva(raizq);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tvmed(){
+  var vmed = m.velocidadeMedia(30,10);
+
+  se (vmed != nula)
+    escreva(vmed);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tdeltas(){
+  var deltas = m.deltaS(10,30);
+
+  se (deltas != nula)
+    escreva(deltas);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tdeltat(){
+  var deltat = m.deltaT(10,30);
+
+  se (deltat != nula)
+    escreva(deltat);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tacel(){
+  var acel= m.aceleracao(30,0,60,0);
+  
+  se (acel != nula)
+    escreva(acel);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tmrufh(){
+  var mrufh = m.mrufh(0,30,15);
+
+  se (mrufh != nula)
+    escreva(mrufh);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tmruvvel(){
+  var mruvvel = m.mruv(0,30,15,2);
+
+  se (mruvvel != nula)
+    escreva(mruvvel);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+escreva("--------------------------------");
+escreva("Função gerarPontosAbscissa:");
+teste_gerarPontosAbscissa();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função fun1R:");
+tfun1R();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função fun2R:");
+tfun2R();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função aprox:");
+taprox();
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função numeroOcorrencias():");
+escreva(m.numeroOcorrencias([1, 2, 3, 4, 5], 3));
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função max():");
+escreva(m.max([1, 2, 3, 4, 5]));
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função min():");
+escreva(m.min([1, 2, 3, 4, 5]));
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Função sen:");
+tsen();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função cos:");
+tcos();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função tan:");
+ttan();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função arsen:");
+tarsen();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função arcos:");
+tarcos();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função artan:");
+tartan();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função exp:");
+texp();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função log:");
+tlog();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função potencia:");
+tpotencia();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função raizq:");
+traizq();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função vmed:");
+tvmed();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função deltas:");
+tdeltas();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função deltat:");
+tdeltat();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função acel:");
+tacel();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função mruhfh:");
+tmrufh();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função mruvvel:");
+tmruvvel();
+
+escreva("--------------------------------");
+escreva("Testes Funções Internas - Linguagem Egua");
+escreva("--------------------------------");
+escreva("|");
+
+funcao ttamanho(){
+  var array = [1,2,3];
+  var tam = tamanho(array);
+
+  se (tam != nula)
+    escreva(tam);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao ttexto(){
+  var t = 123;
+  var text = texto(t);
+
+  se (text != nula)
+    escreva(text);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao treal(){
+  var n = '123.05';
+  var rel = real(n);
+
+  se (rel != nula)
+    escreva(rel);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tinteiro(){
+  var i = '50.56';
+  var int = inteiro(i);
+
+  se (int != nula)
+    escreva(int);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao tordenar(){
+  var i = [4,2,1,5,3];
+  var ord = ordenar(i);
+
+  se (ord != nula)
+    escreva(ord);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao taleatorio(){
+  var ran = aleatorio();
+  se (ran != nula)
+    escreva(ran);
+  senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+funcao taleatorioEntre(){
+  var ran = aleatorioEntre(0,3);
+  se (ran == 0)
+    escreva(ran);
+  senao se (ran == 1) {
+    escreva(ran);
+  } senao se (ran == 2){
+    escreva(ran);
+  } senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+}
+
+escreva("--------------------------------");
+escreva("Função interna: Tamanho");
+ttamanho();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Texto");
+ttexto();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Real");
+treal();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Inteiro");
+tinteiro();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Ordenar");
+tordenar();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Aleatório");
+taleatorio();
+escreva("|");
+escreva("--------------------------------");
+escreva("Função interna: Aleatório Entre");
+taleatorioEntre();
+
+escreva("|");
+escreva("--------------------------------");
+escreva("Teste terminado com " + texto(errosM) + " erro(s)!");
+escreva("----------------------------");

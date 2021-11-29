@@ -1,5 +1,5 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Egua = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-(function (process){
+(function (process){(function (){
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
 const Resolver = require("./resolver.js");
@@ -19,7 +19,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.0.4");
+        console.log("Console da Linguagem Egua v1.1.15");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -102,7 +102,7 @@ module.exports.Egua = class Egua {
         this.hadRuntimeError = true;
     }
 };
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"./interpreter.js":5,"./lexer.js":6,"./parser.js":11,"./resolver.js":12,"./tokenTypes.js":20,"_process":24,"fs":22,"path":23,"readline":22}],2:[function(require,module,exports){
 const RuntimeError = require("./errors.js").RuntimeError;
 
@@ -405,20 +405,20 @@ module.exports = {
     Variable
 };
 },{}],5:[function(require,module,exports){
-const tokenTypes = require("./tokenTypes.js");
-const Environment = require("./environment.js");
-const Egua = require("./egua.js");
-const loadGlobalLib = require("./lib/globalLib.js");
-const path = require("path");
-const fs = require("fs");
-const checkStdLib = require("./lib/importStdlib.js");
+const tokenTypes = require("./tokenTypes.js"),
+    Environment = require("./environment.js"),
+    Egua = require("./egua.js"),
+    loadGlobalLib = require("./lib/globalLib.js"),
+    path = require("path"),
+    fs = require("fs"),
+    checkStdLib = require("./lib/importStdlib.js");
 
-const Callable = require("./structures/callable.js");
-const StandardFn = require("./structures/standardFn.js");
-const EguaClass = require("./structures/class.js");
-const EguaFunction = require("./structures/function.js");
-const EguaInstance = require("./structures/instance.js");
-const EguaModule = require("./structures/module.js");
+const Callable = require("./structures/callable.js"),
+    StandardFn = require("./structures/standardFn.js"),
+    EguaClass = require("./structures/class.js"),
+    EguaFunction = require("./structures/function.js"),
+    EguaInstance = require("./structures/instance.js"),
+    EguaModule = require("./structures/module.js");
 
 const {
     RuntimeError,
@@ -436,7 +436,7 @@ module.exports = class Interpreter {
         this.environment = this.globals;
         this.locals = new Map();
 
-        this.globals = loadGlobalLib(this.globals);
+        this.globals = loadGlobalLib(this, this.globals);
     }
 
     resolve(expr, depth) {
@@ -456,9 +456,12 @@ module.exports = class Interpreter {
     }
 
     isTruthy(object) {
-        if (object === null) return false;
-        else if (typeof object === "boolean") return Boolean(object);
-        else return true;
+        if (object === null) 
+            return false;
+        if (typeof object === "boolean") 
+            return Boolean(object);
+        
+        return true;
     }
 
     checkNumberOperand(operator, operand) {
@@ -483,8 +486,10 @@ module.exports = class Interpreter {
     }
 
     isEqual(left, right) {
-        if (left === null && right === null) return true;
-        else if (left === null) return false;
+        if (left === null && right === null) 
+            return true;
+        if (left === null) 
+            return false;
 
         return left === right;
     }
@@ -1164,6 +1169,15 @@ module.exports = class Interpreter {
 
     stringify(object) {
         if (object === null) return "nulo";
+        if (typeof object === "boolean") {
+            return object ? "verdadeiro" : "falso";
+        }
+
+        if (object instanceof Date) {
+            const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
+            return formato.format(object);
+        }
+        
         if (Array.isArray(object)) return object;
 
         return object.toString();
@@ -1204,7 +1218,7 @@ const reservedWords = {
     isto: tokenTypes.ISTO,
     verdadeiro: tokenTypes.VERDADEIRO,
     var: tokenTypes.VAR,
-    faca: tokenTypes.FACA,
+    fazer: tokenTypes.FAZER,
     enquanto: tokenTypes.ENQUANTO,
     pausa: tokenTypes.PAUSA,
     continua: tokenTypes.CONTINUA,
@@ -1490,77 +1504,7 @@ module.exports = class Lexer {
 },{"./tokenTypes.js":20}],7:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
-module.exports.aprox = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.aprox(número)."
-    );
-
-  return Math.round(num);
-};
-
-module.exports.raizq = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.raizq(número)."
-    );
-
-  return Math.sqrt(num);
-};
-
-/* module.exports.floor = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.floor(número)."
-    );
-
-  return Math.floor(num);
-} */
-
-module.exports.sen = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.sen(número)."
-    );
-
-  return Math.sin(num);
-};
-
-module.exports.cos = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.cos(número)."
-    );
-
-  return Math.cos(num);
-};
-
-module.exports.tan = function(num) {
-  if (isNaN(num) || num === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.tan(número)."
-    );
-
-  return Math.tan(num);
-};
-
-module.exports.radiano = function(angle) {
-  if (isNaN(angle) || angle === null)
-    throw new RuntimeError(
-      this.token,
-      "Você deve prover um número para mat.radiano(Ângulo)."
-    );
-
-  return angle * (Math.PI / 180);
-};
-
-module.exports.graus = function(angle) {
+module.exports.graus = function (angle) {
   if (isNaN(angle) || angle === null)
     throw new RuntimeError(
       this.token,
@@ -1570,127 +1514,851 @@ module.exports.graus = function(angle) {
   return angle * (180 / Math.PI);
 };
 
-module.exports.pi = Math.PI; 
-
-module.exports.raiz = function(num, root) {
-  if (isNaN(num) || num === null)
+//Mediana de uma matriz
+module.exports.mediana = function (a) {
+  if (isNaN(a) || a === null)
     throw new RuntimeError(
       this.token,
-      "Número dado a mat.raiz(numero, raiz) precisa ser um número."
+      "Você deve prover valores para mediana(a)."
     );
 
-  if (isNaN(root) || root === null)
-    throw new RuntimeError(
-      this.token,
-      "Raiz dada a mat.raiz(numero, raiz) precisa ser um número."
-    );
-
-  let originalRoot = root;
-
-  let negateFlag = root % 2 == 1 && num < 0;
-  if (negateFlag) num = -num;
-  let possible = Math.pow(num, 1 / root);
-  root = Math.pow(possible, root);
-  if (Math.abs(num - root) < 1 && num > 0 == root > 0)
-    return negateFlag ? -possible : possible;
-
-  else throw new RuntimeError(this.token, `Erro ao encontrar a raiz ${ originalRoot } de ${ num }.`)
+  a.sort(function (a, b) { return a - b; });
+  const mid = a.length / 2;
+  return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
 };
-},{"../errors.js":3}],8:[function(require,module,exports){
-const RuntimeError = require("../errors.js").RuntimeError;
-const EguaFunction = require("../structures/function.js");
-const EguaInstance = require("../structures/instance.js");
-const StandardFn = require("../structures/standardFn.js");
-const EguaClass = require("../structures/class.js");
 
 /**
- * 
+ * Função que sempre returna `nulo`. 
+ * Útil para comparações entre outras funções que também retornam nulo.
+ * @returns `null` do JavaScript.
  */
-module.exports = function (globals) {
-  globals.defineVar(
-    "tamanho",
-    new StandardFn(1, function (obj) {
-      if (!isNaN(obj)) {
-        throw new RuntimeError(
-          this.token,
-          "Não é possível encontrar o tamanho de um número."
-        );
-      }
-
-      if (obj instanceof EguaInstance) {
-        throw new RuntimeError(
-          this.token,
-          "Você não pode encontrar o tamanho de uma declaração."
-        );
-      }
-
-      if (obj instanceof EguaFunction) {
-        return obj.declaration.params.length;
-      }
-
-      if (obj instanceof StandardFn) {
-        return obj.arityValue;
-      }
-
-      if (obj instanceof EguaClass) {
-        let methods = obj.methods;
-        let length = 0;
-
-        if (methods.init && methods.init.isInitializer) {
-          length = methods.init.declaration.params.length;
-        }
-
-        return length;
-      }
-
-      return obj.length;
-    })
-  );
-
-  globals.defineVar(
-    "texto",
-    new StandardFn(1, function (value) {
-      return `${value}`;
-    })
-  );
-
-  globals.defineVar(
-    "real",
-    new StandardFn(1, function (value) {
-      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para real."
-        );
-      return parseFloat(value);
-    })
-  );
-
-  globals.defineVar(
-    "inteiro",
-    new StandardFn(1, function (value) {
-      if (value === undefined || value === null) {
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para inteiro."
-        );
-      }
-
-      if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
-        throw new RuntimeError(
-          this.token,
-          "Somente números podem passar para inteiro."
-        );
-      }
-
-      return parseInt(value);
-    })
-  );
-
-  globals.defineVar("exports", {});
-
-  return globals;
+module.exports.nula = function () {
+  return null;
 };
+
+/**
+ * Constante pi.
+ * @see https://pt.wikipedia.org/wiki/Pi
+ */
+module.exports.pi = Math.PI;
+
+/**
+ * Calcula o valor radiano de um ângulo. O radiano é o comprimento do arco formado 
+ * por um ângulo em uma circunferência.
+ * @param {inteiro} angulo O ângulo, em graus, do valor radiano desejado.
+ * @returns O valor, em radianos, do arco formado pelo ângulo.
+ * @see https://pt.wikipedia.org/wiki/Radiano
+ */
+module.exports.radiano = function (angulo) {
+  if (!Number.isInteger(angulo))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um número inteiro para o parâmetro `angulo`, em radiano(angulo)."
+    );
+
+  return angulo * (Math.PI / 180);
+};
+
+//FUNÇÃO AFIM E QUADRÁTICA
+/**
+ * Gera valores para abscissa.
+ * @param {inteiro} distancia A distância entra dois pontos. 
+ * @param {inteiro} valorPontoCentral O ponto central na abscissa.
+ * @param {inteiro} numeroPontos Número de pontos a serem gerados (padrão: 7).
+ * @returns Um vetor, contendo o número de pontos informado ou definido por padrão em uma abscissa.
+ *          Se o número informado é par, um ponto negativo a mais é gerado.
+ */
+module.exports.gerarPontosAbscissa = function (distancia, valorPontoCentral, numeroPontos) {
+  if (!Number.isInteger(distancia))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um valor inteiro para o parâmetro `distancia`, em gerarPontosAbscissa(distancia, valorInicial)."
+    );
+
+  if (!Number.isInteger(valorPontoCentral))
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover um valor inteiro para o parâmetro `valorInicial`, em gerarPontosAbscissa(distancia, valorInicial)."
+    );
+
+  if (!numeroPontos) {
+    numeroPontos = 7;
+  }
+
+  const elementoInicial = valorPontoCentral - (((numeroPontos / 2) >> 0) * distancia);
+  const x = [];
+  for (let i = 0; i < numeroPontos; i++) {
+    x.push(elementoInicial + (i * distancia));
+  }
+
+  return x;
+};
+
+//Raíz da Função Afim
+module.exports.fun1R = function (a, b) {
+  if (isNaN(a) || a === null || isNaN(b) || b === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para fun1R(valor1,valor2)."
+    );
+  return (-1 * b) / a;
+};
+
+//Intervalo Preenchido
+module.exports.linspace = function (startValue, stopValue, cardinality) {
+  if (
+    isNaN(startValue) || startValue === null ||
+    isNaN(stopValue) || stopValue === null ||
+    isNaN(cardinality) || cardinality === null
+  )
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para linspace(valor1,valor2,valor3)."
+    );
+  const lista = [];
+  const step = (stopValue - startValue) / (cardinality - 1);
+  for (var i = 0; i < cardinality; i++) {
+    arr.push(startValue + (step * i));
+  }
+  return lista;
+};
+
+//Raízes da Função Quadrática
+module.exports.fun2R = function (a, b, c) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para fun2R(a,b,c)."
+    );
+
+  const r1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+  const r2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+
+  const xv = (-1 * b) / (2 * a);
+  const yv = (-1 * (Math.pow(b, 2) - (4 * a * c))) / 4 * a;
+
+  return [xv, yv];
+};
+
+//Aproximação de valores
+module.exports.aprox = function (x, z) {
+  if (isNaN(x) || x === null || isNaN(z) || z === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para aprox(x,z)."
+    );
+  if (z == undefined) { z = 2; }
+  if (typeof (x) == "number") { x = x.toFixed(z) }
+  else if (x[0].length == undefined) { // 1D array
+    for (let i = 0; i < x.length; i++) {
+      x[i] = parseFloat(x[i].toFixed(z));
+    }
+  } else
+    for (let i = 0; i < x.length; i++) { // 2D array
+      for (let j = 0; j < x[0].length; j++) {
+        x[i][j] = parseFloat(x[i][j].toFixed(z));
+      }
+    }
+  return x;
+};
+
+//Parâmetros da Função
+module.exports.matrizn = function (z) {
+  if (isNaN(z) || z === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para matrizn(z)."
+    );
+  const n = arguments.length;
+  const data = Array.from(Array(1), () => new Array(n));
+  for (let i = 0; i < n; i++) { data[0][i] = arguments[i]; }
+  return matriz(data);
+};
+
+//Vetor de pontos aleatórios
+module.exports.pontosAleatorios = function (n) {
+  if (isNaN(n) || n === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para pale(n)."
+    );
+  if (ex == undefined) { ex = 0; }
+  const x = [];
+  x[0] = 100;
+  for (let i = 1; i < n; i++) {
+    x[i] = ex + x[i - 1] + Math.random() * 2 - 1;
+  }
+  const xx = aprox(x, 2);
+  return xx;
+};
+
+//Intervalo A-B
+module.exports.vet = function (a, b) {
+  if (isNaN(a) || a === null || isNaN(b) || b === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para vet(a,b)."
+    );
+  const data = Array.from(Array(1), () => new Array(b - a + 1));
+
+  for (let i = 0; i < data[0].length; i++) {
+    data[0][i] = a + i;
+  }
+  return matrizn(data);
+};
+
+
+/**
+ * Conta quantas vezes um determinado valor aparece em um vetor.
+ * @param {qualquer[]} vetor Vetor de elementos
+ * @param {qualquer} valor Valor a ser encontrado no vetor
+ * @returns Valor inteiro, com o número de vezes que `valor` foi encontrado em `vetor`.
+ */
+module.exports.numeroOcorrencias = function (vetor, valor) {
+  if (!Array.isArray(vetor))
+    throw new RuntimeError(
+      this.token,
+      "Parâmetro `vetor` deve ser um vetor, em numeroOcorrencias(vetor, valor)."
+    );
+
+  return vetor.filter((v) => (v === valor)).length;
+};
+
+/* ESTATÍSTICA */
+
+/**
+ * Encontra o elemento máximo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O maior número encontrado em um vetor.
+ */
+module.exports.max = function (vetor) {
+  if (!Array.isArray(vetor))
+    throw new RuntimeError(
+      this.token,
+      "Parâmetro `vetor` deve ser um vetor, em max(vetor)."
+    );
+
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em max(vetor)."
+    );
+
+  return Math.max.apply(null, vetor);
+};
+
+/**
+ * Encontra o elemento mínimo em um vetor.
+ * @param {inteiro[]} vetor Um vetor de números inteiros.
+ * @returns O menor número encontrado em um vetor.
+ */
+module.exports.min = function (vetor) {
+  if (!Array.isArray(vetor))
+    throw new RuntimeError(
+      this.token,
+      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
+    );
+
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
+    );
+
+  return Math.min.apply(null, vetor);
+};
+
+//Soma de determinada matriz
+module.exports.smtr = function (a) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para smtr(a)."
+    );
+
+  let z = 0;
+  if (a.length == 1) {   // a is a 1D row array
+    for (let j = 0; j < a[0].length; j++) { z = z + a[0][j]; }
+  }
+  else if (a[0].length == 1) {   // a is a 1D column array
+    for (let i = 0; i < a.length; i++) { z = z + a[i][0]; }
+  }
+  else {
+    for (let j = 0; j < a.length; j++) { z = z + a[j]; }
+  }
+
+  return aprox(z, 2);
+};
+
+// Retorna a média de um vetor de números
+module.exports.media = function () {
+  const argumentsLength = Object.keys(arguments).length;
+
+  if (argumentsLength <= 0) {
+    throw new RuntimeError(
+      this.token,
+      "Você deve fornecer um parâmetro para a função."
+    );
+  }
+
+  if (argumentsLength > 1) {
+    throw new RuntimeError(
+      this.token,
+      "A função recebe apenas um parâmetro."
+    );
+  }
+
+  // Pega o primeiro argumento do objeto de argumentos
+  const args = arguments['0'];
+
+  if (!Array.isArray(args)) {
+    throw new RuntimeError(
+      this.token,
+      "Você deve fornecer um parâmetro do tipo vetor."
+    );
+  }
+
+  // Valida se o array está vazio.
+  if (!args.length) {
+    throw new RuntimeError(
+      this.token,
+      "Vetor vazio. Você deve fornecer ao menos um valor ao vetor."
+    );
+  }
+
+  // Valida se o array contém apenas valores do tipo número.
+  args.forEach(item => {
+    if (typeof item !== 'number') {
+      throw new RuntimeError(
+        this.token,
+        "Você deve fornecer um vetor contendo apenas valores do tipo número."
+      );
+    }
+  })
+
+  // Soma todos os itens.
+  const valoresSomados = args.reduce(
+    (acumulador, itemAtual) => acumulador + itemAtual, 0);
+
+  // Faz o cáculo da média em si e retorna.
+  return (valoresSomados / args.length);
+};
+
+//Média aritmética de uma matriz
+module.exports.ve = function (a) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para ve(a)."
+    );
+
+  if (a.length == 1) { return aprox(smtr(a) / a[0].length, 4); } // a is a row array
+  if (a[0].length == 1) { return aprox(smtr(a) / a.length, 4); } // a is a column array
+  if (a[0].length == undefined) { return aprox(smtr(a) / a.length, 4); }
+};
+
+//Soma dos quadrados dos resíduos (sqr) de uma matriz
+module.exports.sqr = function (a) {
+  if (isNaN(a) || a === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para sqr(a)."
+    );
+
+  const mean = ve(array);
+  let sum = 0;
+  let i = array.length;
+  let tmp;
+  while (--i >= 0) {
+    tmp = array[i] - mean;
+    sum += tmp * tmp;
+  }
+  return sum;
+};
+
+//Variação de uma matriz
+module.exports.variancia = function (array, flag) {
+  if (isNaN(array) || array === null || isNaN(flag) || flag === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para variancia(matriz, flag)."
+    );
+
+  if (flag == undefined) { flag = 1; }
+  return sqr(array) / (array.length - (flag ? 1 : 0));
+};
+
+//Covariância de duas matrizes
+module.exports.covar = function (array1, array2) {
+  if (isNaN(array1) || array1 === null || isNaN(array1) || array2 === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para covar(matriz1, matriz2)."
+    );
+
+  var u = ve(array1);
+  var v = ve(array2);
+  var arr1Len = array1.length;
+  var sq_dev = new Array(arr1Len);
+  for (var i = 0; i < arr1Len; i++)
+    sq_dev[i] = (array1[i] - u) * (array2[i] - v);
+  return smtr(sq_dev) / (arr1Len - 1);
+};
+
+/*TRIGONOMETRIA*/
+//Seno de um número
+module.exports.sen = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para sen(x)."
+    );
+
+  return Math.sin(x);
+};
+
+//Cosseno de um número
+module.exports.cos = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para cos(x)."
+    );
+
+  return Math.cos(x);
+};
+
+//Tangente de um número
+module.exports.tan = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para tan(x)."
+    );
+
+  return Math.tan(x);
+};
+
+//Arco cosseno de um número
+module.exports.arcos = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para arcos(x)."
+    );
+
+  return Math.acos(x);
+};
+
+//Arco seno de um número
+module.exports.arsen = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para arsen(x)."
+    );
+
+  return Math.asin(x);
+};
+
+//Arco tangente de um número
+module.exports.artan = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para artan(x)."
+    );
+
+  return Math.atan(x)
+};
+
+//Exponencial
+module.exports.exp = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para exp(x)."
+    );
+
+  return Math.exp(x);
+};
+
+//Logaritmo natural
+module.exports.log = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para log(x)."
+    );
+
+  return Math.log(x);
+};
+
+// Retorna a base elevada ao expoente
+module.exports.potencia = function (base, expoente) {
+  if (typeof base !== 'number' || typeof expoente !== 'number') {
+    throw new RuntimeError(
+      this.token,
+      "Os parâmetros devem ser do tipo número."
+    );
+  }
+
+  return Math.pow(base, expoente);
+};
+
+//Raíz quadrada
+module.exports.raizq = function (x) {
+  if (isNaN(x) || x === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para raizq(x)."
+    );
+
+  return Math.sqrt(x);
+};
+
+/*CINEMÁTICA*/
+
+//Velocidade média
+module.exports.velocidadeMedia = function (s, t) {
+  if (isNaN(s) || s === null || isNaN(t) || t === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para velocidadeMedia(d,t)."
+    );
+
+  return (s / t);
+};
+
+//Espaço percorrido
+module.exports.deltaS = function (s0, s) {
+  if (isNaN(s0) || s0 === null || isNaN(s) || s === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para deltas(e0,e1)."
+    );
+  ds = s - s0;
+  return ds;
+};
+
+//Tempo Percorrido
+module.exports.deltaT = function (t0, t) {
+  if (isNaN(t0) || t0 === null || isNaN(t) || t === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para deltat(t0,t1)."
+    );
+  dt = t - t;
+  return dt;
+};
+
+// Cálculo de aceleração
+module.exports.aceleracao = function (
+  velocidadeFinal, velocidadeInicial, tempoFinal, tempoInicial) {
+
+  if (
+    velocidadeFinal === null ||
+    velocidadeInicial === null ||
+    tempoFinal === null ||
+    tempoInicial === null
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Devem ser fornecidos quatro parâmetros obrigatórios."
+    );
+  }
+
+  if (
+    typeof velocidadeFinal !== 'number' ||
+    typeof velocidadeInicial !== 'number' ||
+    typeof tempoFinal !== 'number' ||
+    typeof tempoInicial !== 'number'
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Todos os parâmetros devem ser do tipo número."
+    );
+  }
+
+  return (velocidadeFinal - velocidadeInicial) / (tempoFinal - tempoInicial);
+};
+
+//Função Horária da Posição (M.R.U)
+module.exports.mrufh = function (s0, v, t) {
+  if (isNaN(s0) || s0 === null)
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mrufh(s0,v,t)."
+    );
+  t = t + 1;
+  const s = new Array();
+  let index = 0;
+  for (var i = 0; i < t; i++) {
+    s[index] = s0 + v * i;
+    index++;
+  }
+
+  return ["Função: " + s0 + "+(" + v + ")*t" + "<br>" + "Posições: " + s];
+};
+
+//Gráfico da velocidade (M.R.U.V)
+module.exports.mruv = function (s0, s, a) {
+  if (
+    isNaN(s0) || s0 === null ||
+    isNaN(s) || s === null ||
+    isNaN(a) || a === null
+  )
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para mruv(Pi, Vf, A)."
+    );
+  const vf = new Array();
+  const x = new Array();
+  let v = new Array();
+  let index = 0;
+  for (var i = 0; i < s; i++) {
+    v = index;
+    vf[index] = Math.sqrt(2 * a * (index - s0));
+    x[index] = i;
+    index++;
+  }
+
+  return vf;
+};
+
+/*Controle e Servomecanismos*/
+module.exports.pid = function (Mo, t, K, T1, T2) {
+  if (
+    isNaN(Mo) || Mo === null ||
+    isNaN(t) || t === null ||
+    isNaN(K) || K === null ||
+    isNaN(T1) || T1 === null ||
+    isNaN(T2) || T2 === null
+  ) {
+    throw new RuntimeError(
+      this.token,
+      "Você deve prover valores para pid(Ov, Ts, K, T1, T2)."
+    );
+  }
+  pi = Math.PI;//Pi da bilbioteca Math.js
+
+  //Amortecimento Relativo
+  csi = (-1 * (Math.log((Mo / 100)))) / (Math.sqrt(Math.pow(pi, 2) + (pot((Math.log((Mo / 100))), 2))));
+
+  //Frequência Natural
+  Wn = (4) / (t * csi);
+
+  //Controlador Proporcional (P)
+  Kp = 20 * (Math.pow(csi, 2) * Math.pow(Wn, 2) * T1 * T2) + ((Math.pow(Wn, 2) * T1 * T2) - 1) / (K);
+
+  //Controlador Integral (I)
+  Ki = (10 * csi * (Math.pow(Wn, 3)) * T1 * T2) / (K);
+
+  //Controlador Derivativo (D)
+  Kd = (12 * csi * Wn * T1 * T2 - T1 - T2) / (K);
+
+  return [csi, Wn, Kp, Ki, Kd];
+};
+
+// Retorna o comprimento de um vetor
+module.exports.comp = function (array) {
+
+  if (!Array.isArray(array)) {
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um vetor."
+    );
+  }
+
+  return array.length;
+};
+
+// Retorna o menor número inteiro dentre o valor de "value"
+module.exports.minaprox = function (value) {
+
+  if (typeof value !== 'number') {
+    throw new RuntimeError(
+      this.token,
+      "O valor passado pra função deve ser um número."
+    );
+  }
+
+  return Math.floor(value);
+};
+
+},{"../errors.js":3}],8:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError,
+    EguaFunction = require("../structures/function.js"),
+    EguaInstance = require("../structures/instance.js"),
+    StandardFn = require("../structures/standardFn.js"),
+    EguaClass = require("../structures/class.js");
+
+
+module.exports = function (interpreter, globals) {
+    // Retorna um número aleatório entre 0 e 1.
+    globals.defineVar(
+        "aleatorio",
+        new StandardFn(1, function () {
+            return Math.random();
+        })
+    );
+
+    // Retorna um número aleatório de acordo com o parâmetro passado.
+    // MIN(inclusivo) - MAX(exclusivo)
+    globals.defineVar(
+        "aleatorioEntre",
+        new StandardFn(1, function (min, max) {
+            if (typeof min !== 'number' || typeof max !== 'number') {
+                throw new RuntimeError(
+                    this.token,
+                    "Os dois parâmetros devem ser do tipo número."
+                );
+            }
+
+            return Math.floor(Math.random() * (max - min)) + min;
+        })
+    );    
+
+    globals.defineVar(
+        "inteiro",
+        new StandardFn(1, function (value) {
+            if (value === undefined || value === null) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
+
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
+
+            return parseInt(value);
+        })
+    );
+
+    globals.defineVar(
+        "mapear",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            let provisorio = [];
+            for (let index = 0; index < array.length; ++index) {
+                provisorio.push(
+                    callback.call(
+                        interpreter, [array[index]]
+                    )
+                );
+            }
+
+            return provisorio;
+        })
+    );
+
+    globals.defineVar(
+        "ordenar",
+        new StandardFn(1, function (obj) {
+            if (Array.isArray(obj) == false) {
+                throw new RuntimeError(
+                    this.token,
+                    "Valor Inválido. Objeto inserido não é um vetor."
+                );
+            }
+
+            let trocado;
+            let length = obj.length;
+            do {
+                trocado = false;
+                for (var i = 0; i < length - 1; i++) {
+                    if (obj[i] > obj[i + 1]) {
+                        [obj[i], obj[i + 1]] = [obj[i + 1], obj[i]];
+                        trocado = true;
+                    }
+                }
+            } while (trocado);
+            return obj;
+        })
+    );
+
+    globals.defineVar(
+        "real",
+        new StandardFn(1, function (value) {
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para real."
+                );
+            return parseFloat(value);
+        })
+    );
+
+    globals.defineVar(
+        "tamanho",
+        new StandardFn(1, function (obj) {
+            if (!isNaN(obj)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Não é possível encontrar o tamanho de um número."
+                );
+            }
+
+            if (obj instanceof EguaInstance) {
+                throw new RuntimeError(
+                    this.token,
+                    "Você não pode encontrar o tamanho de uma declaração."
+                );
+            }
+
+            if (obj instanceof EguaFunction) {
+                return obj.declaration.params.length;
+            }
+
+            if (obj instanceof StandardFn) {
+                return obj.arityValue;
+            }
+
+            if (obj instanceof EguaClass) {
+                let methods = obj.methods;
+                let length = 0;
+
+                if (methods.init && methods.init.isInitializer) {
+                    length = methods.init.declaration.params.length;
+                }
+
+                return length;
+            }
+
+            return obj.length;
+        })
+    );
+
+    globals.defineVar(
+        "texto",
+        new StandardFn(1, function (value) {
+            return `${value}`;
+        })
+    );
+
+    globals.defineVar("exports", {});
+
+    return globals;
+};
+
 },{"../errors.js":3,"../structures/class.js":15,"../structures/function.js":16,"../structures/instance.js":17,"../structures/standardFn.js":19}],9:[function(require,module,exports){
 const StandardFn = require("../structures/standardFn.js");
 const EguaModule = require("../structures/module.js");
@@ -1713,35 +2381,71 @@ const loadModule = function (moduleName, modulePath) {
     return newModule;
 };
 
-require("./time.js");
+require("./tempo.js");
 require("./eguamat.js");
 
 module.exports = function (name) {
     switch (name) {
-        case "time":
-            return loadModule("time", "./time.js");
+        case "tempo":
+            return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
     }
 
     return null;
 };
-},{"../structures/module.js":18,"../structures/standardFn.js":19,"./eguamat.js":7,"./time.js":10}],10:[function(require,module,exports){
-module.exports.time = function () {
-    return +new Date();
+},{"../structures/module.js":18,"../structures/standardFn.js":19,"./eguamat.js":7,"./tempo.js":10}],10:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError;
+
+// Retorna uma data completa
+module.exports.tempo = function () {
+	return new Date();
 };
 
-module.exports.hora = function (timestamp) {
-    let timeFormatted = timestamp !== null ? new Date(timestamp) : new Date();
-    return timeFormatted;
+// Retorna os segundos atuais do sistema
+module.exports.segundos = function () {
+	return new Date().getSeconds();
 };
 
-module.exports.dormir = function (ms) {
-    let now = new Date().getTime();
-    while (new Date().getTime() < now + ms) { }
-    return null;
+// Retorna os minutos atuais do sistema
+module.exports.minutos = function () {
+	return new Date().getMinutes();
 };
-},{}],11:[function(require,module,exports){
+
+// Retorna a hora atual do sistema
+module.exports.horas = function () {
+	return new Date().getHours();
+};
+
+/**
+ * Retorna uma instância de Date do JavaScript da data passada por parâmetro, no formato DD/MM/AAAA.
+ * @param {string} dataComoTexto A data a ser convertida como texto, no formato DD/MM/AAAA.
+ * @returns A data como um objeto Date to JavaScript.
+ */
+module.exports.textoParaData = function (dataComoTexto) {
+	const regex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
+
+	if (typeof dataComoTexto !== 'string' || !regex.test(dataComoTexto)) {
+		throw new RuntimeError(
+			this.token,
+			"O parâmetro passado deve ser um texto com a data no formato DD/MM/AAAA. Ex: '01/01/2014'"
+		);
+	}
+
+	const date = new Date(converterDataPtParaIso(dataComoTexto));
+	const timezoneOffset = date.getTimezoneOffset();
+
+	return new Date(date.getTime() + timezoneOffset * 60 * 1000);
+}
+
+function converterDataPtParaIso(date) {
+	const day = date.split("/")[0];
+	const month = date.split("/")[1];
+	const year = date.split("/")[2];
+
+	return `${year}-${month}-${day}`;
+}
+},{"../errors.js":3}],11:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 const Expr = require("./expr.js");
 const Stmt = require("./stmt.js");
@@ -2419,7 +3123,7 @@ module.exports = class Parser {
 
             this.consume(
                 tokenTypes.ENQUANTO,
-                "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
             );
             this.consume(
                 tokenTypes.LEFT_PAREN,
@@ -2433,14 +3137,14 @@ module.exports = class Parser {
                 "Esperado ')' após declaração do 'enquanto'."
             );
 
-            return new Stmt.Faca(doBranch, whileCondition);
+            return new Stmt.Fazer(doBranch, whileCondition);
         } finally {
             this.loopDepth -= 1;
         }
     }
 
     statement() {
-        if (this.match(tokenTypes.FACA)) return this.doStatement();
+        if (this.match(tokenTypes.FAZER)) return this.doStatement();
         if (this.match(tokenTypes.TENTE)) return this.tryStatement();
         if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
@@ -2509,7 +3213,7 @@ module.exports = class Parser {
         }
 
         this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
-        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo ${kind}.`);
+        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo do ${kind}.`);
 
         let body = this.block();
 
@@ -2529,7 +3233,7 @@ module.exports = class Parser {
 
         let methods = [];
         while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
-            methods.push(this.function("method"));
+            methods.push(this.function("método"));
         }
 
         this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
@@ -2614,7 +3318,7 @@ const LoopType = {
     ENQUANTO: "ENQUANTO",
     ESCOLHA: "ESCOLHA",
     PARA: "PARA",
-    FACA: "FACA"
+    FAZER: "FAZER"
 };
 
 module.exports = class Resolver {
@@ -2894,7 +3598,7 @@ module.exports = class Resolver {
         this.resolve(stmt.whileCondition);
 
         let enclosingType = this.currentLoop;
-        this.currentLoop = LoopType.FACA;
+        this.currentLoop = LoopType.FAZER;
         this.resolve(stmt.doBranch);
         this.currentLoop = enclosingType;
         return null;
@@ -3071,7 +3775,7 @@ class Importar extends Stmt {
     }
 }
 
-class Faca extends Stmt {
+class Fazer extends Stmt {
     constructor(doBranch, whileCondition) {
       super();
       this.doBranch = doBranch;
@@ -3190,7 +3894,7 @@ module.exports = {
     Block,
     Escreva,
     Importar,
-    Faca,
+    Fazer,
     Enquanto,
     Para,
     Tente,
@@ -3255,7 +3959,7 @@ const Callable = require("./callable.js");
 const Environment = require("../environment.js");
 const ReturnExpection = require("../errors.js").ReturnException;
 
-module.exports =  class EguaFunction extends Callable {
+module.exports = class EguaFunction extends Callable {
     constructor(name, declaration, closure, isInitializer = false) {
         super();
         this.name = name;
@@ -3336,7 +4040,7 @@ module.exports = class EguaInstance {
     }
 
     toString() {
-        return "<" + this.creatorClass.name + " instância>";
+        return "<Objeto " + this.creatorClass.name + ">";
     }
 };
 },{}],18:[function(require,module,exports){
@@ -3428,14 +4132,14 @@ module.exports = {
     CONTINUA: "CONTINUA",
     HERDA: "HERDA",
     IMPORTAR: "IMPORTAR",
-    FACA: "FACA",
+    FAZER: "FAZER",
     TENTE: "TENTE",
     PEGUE: "PEGUE",
     FINALMENTE: "FINALMENTE",
     EOF: "EOF"
 };
 },{}],21:[function(require,module,exports){
-(function (process){
+(function (process){(function (){
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
 const Resolver = require("./resolver.js");
@@ -3506,13 +4210,13 @@ module.exports.Egua = class Egua {
     this.hadRuntimeError = true;
   }
 };
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"./interpreter.js":5,"./lexer.js":6,"./parser.js":11,"./resolver.js":12,"./tokenTypes.js":20,"_process":24}],22:[function(require,module,exports){
 
 },{}],23:[function(require,module,exports){
-(function (process){
-// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
-// backported and transplited with Babel, with backwards-compat fixes
+(function (process){(function (){
+// 'path' module extracted from Node.js v8.11.1 (only the posix part)
+// transplited with Babel
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3535,286 +4239,513 @@ module.exports.Egua = class Egua {
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
+'use strict';
 
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
+function assertPath(path) {
+  if (typeof path !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
   }
-
-  return parts;
 }
 
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
+// Resolves . and .. elements in a path with directory names
+function normalizeStringPosix(path, allowAboveRoot) {
+  var res = '';
+  var lastSegmentLength = 0;
+  var lastSlash = -1;
+  var dots = 0;
+  var code;
+  for (var i = 0; i <= path.length; ++i) {
+    if (i < path.length)
+      code = path.charCodeAt(i);
+    else if (code === 47 /*/*/)
       break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  if (path.length === 0) return '.';
-  var code = path.charCodeAt(0);
-  var hasRoot = code === 47 /*/*/;
-  var end = -1;
-  var matchedSlash = true;
-  for (var i = path.length - 1; i >= 1; --i) {
-    code = path.charCodeAt(i);
+    else
+      code = 47 /*/*/;
     if (code === 47 /*/*/) {
-        if (!matchedSlash) {
-          end = i;
-          break;
+      if (lastSlash === i - 1 || dots === 1) {
+        // NOOP
+      } else if (lastSlash !== i - 1 && dots === 2) {
+        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 /*.*/ || res.charCodeAt(res.length - 2) !== 46 /*.*/) {
+          if (res.length > 2) {
+            var lastSlashIndex = res.lastIndexOf('/');
+            if (lastSlashIndex !== res.length - 1) {
+              if (lastSlashIndex === -1) {
+                res = '';
+                lastSegmentLength = 0;
+              } else {
+                res = res.slice(0, lastSlashIndex);
+                lastSegmentLength = res.length - 1 - res.lastIndexOf('/');
+              }
+              lastSlash = i;
+              dots = 0;
+              continue;
+            }
+          } else if (res.length === 2 || res.length === 1) {
+            res = '';
+            lastSegmentLength = 0;
+            lastSlash = i;
+            dots = 0;
+            continue;
+          }
+        }
+        if (allowAboveRoot) {
+          if (res.length > 0)
+            res += '/..';
+          else
+            res = '..';
+          lastSegmentLength = 2;
         }
       } else {
-      // We saw the first non-path separator
-      matchedSlash = false;
+        if (res.length > 0)
+          res += '/' + path.slice(lastSlash + 1, i);
+        else
+          res = path.slice(lastSlash + 1, i);
+        lastSegmentLength = i - lastSlash - 1;
+      }
+      lastSlash = i;
+      dots = 0;
+    } else if (code === 46 /*.*/ && dots !== -1) {
+      ++dots;
+    } else {
+      dots = -1;
     }
   }
-
-  if (end === -1) return hasRoot ? '/' : '.';
-  if (hasRoot && end === 1) {
-    // return '//';
-    // Backwards-compat fix:
-    return '/';
-  }
-  return path.slice(0, end);
-};
-
-function basename(path) {
-  if (typeof path !== 'string') path = path + '';
-
-  var start = 0;
-  var end = -1;
-  var matchedSlash = true;
-  var i;
-
-  for (i = path.length - 1; i >= 0; --i) {
-    if (path.charCodeAt(i) === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          start = i + 1;
-          break;
-        }
-      } else if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // path component
-      matchedSlash = false;
-      end = i + 1;
-    }
-  }
-
-  if (end === -1) return '';
-  return path.slice(start, end);
+  return res;
 }
 
-// Uses a mixed approach for backwards-compatibility, as ext behavior changed
-// in new Node.js versions, so only basename() above is backported here
-exports.basename = function (path, ext) {
-  var f = basename(path);
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
+function _format(sep, pathObject) {
+  var dir = pathObject.dir || pathObject.root;
+  var base = pathObject.base || (pathObject.name || '') + (pathObject.ext || '');
+  if (!dir) {
+    return base;
   }
-  return f;
-};
+  if (dir === pathObject.root) {
+    return dir + base;
+  }
+  return dir + sep + base;
+}
 
-exports.extname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  var startDot = -1;
-  var startPart = 0;
-  var end = -1;
-  var matchedSlash = true;
-  // Track the state of characters (if any) we see before our first dot and
-  // after any path separator we find
-  var preDotState = 0;
-  for (var i = path.length - 1; i >= 0; --i) {
-    var code = path.charCodeAt(i);
-    if (code === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
+var posix = {
+  // path.resolve([from ...], to)
+  resolve: function resolve() {
+    var resolvedPath = '';
+    var resolvedAbsolute = false;
+    var cwd;
+
+    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+      var path;
+      if (i >= 0)
+        path = arguments[i];
+      else {
+        if (cwd === undefined)
+          cwd = process.cwd();
+        path = cwd;
+      }
+
+      assertPath(path);
+
+      // Skip empty entries
+      if (path.length === 0) {
         continue;
       }
-    if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // extension
-      matchedSlash = false;
-      end = i + 1;
-    }
-    if (code === 46 /*.*/) {
-        // If this is our first dot, mark it as the start of our extension
-        if (startDot === -1)
-          startDot = i;
-        else if (preDotState !== 1)
-          preDotState = 1;
-    } else if (startDot !== -1) {
-      // We saw a non-dot and non-path separator before our dot, so we should
-      // have a good chance at having a non-empty extension
-      preDotState = -1;
-    }
-  }
 
-  if (startDot === -1 || end === -1 ||
-      // We saw a non-dot character immediately before the dot
-      preDotState === 0 ||
-      // The (right-most) trimmed path component is exactly '..'
-      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-    return '';
-  }
-  return path.slice(startDot, end);
+      resolvedPath = path + '/' + resolvedPath;
+      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    }
+
+    // At this point the path should be resolved to a full absolute path, but
+    // handle relative paths to be safe (might happen when process.cwd() fails)
+
+    // Normalize the path
+    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
+
+    if (resolvedAbsolute) {
+      if (resolvedPath.length > 0)
+        return '/' + resolvedPath;
+      else
+        return '/';
+    } else if (resolvedPath.length > 0) {
+      return resolvedPath;
+    } else {
+      return '.';
+    }
+  },
+
+  normalize: function normalize(path) {
+    assertPath(path);
+
+    if (path.length === 0) return '.';
+
+    var isAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    var trailingSeparator = path.charCodeAt(path.length - 1) === 47 /*/*/;
+
+    // Normalize the path
+    path = normalizeStringPosix(path, !isAbsolute);
+
+    if (path.length === 0 && !isAbsolute) path = '.';
+    if (path.length > 0 && trailingSeparator) path += '/';
+
+    if (isAbsolute) return '/' + path;
+    return path;
+  },
+
+  isAbsolute: function isAbsolute(path) {
+    assertPath(path);
+    return path.length > 0 && path.charCodeAt(0) === 47 /*/*/;
+  },
+
+  join: function join() {
+    if (arguments.length === 0)
+      return '.';
+    var joined;
+    for (var i = 0; i < arguments.length; ++i) {
+      var arg = arguments[i];
+      assertPath(arg);
+      if (arg.length > 0) {
+        if (joined === undefined)
+          joined = arg;
+        else
+          joined += '/' + arg;
+      }
+    }
+    if (joined === undefined)
+      return '.';
+    return posix.normalize(joined);
+  },
+
+  relative: function relative(from, to) {
+    assertPath(from);
+    assertPath(to);
+
+    if (from === to) return '';
+
+    from = posix.resolve(from);
+    to = posix.resolve(to);
+
+    if (from === to) return '';
+
+    // Trim any leading backslashes
+    var fromStart = 1;
+    for (; fromStart < from.length; ++fromStart) {
+      if (from.charCodeAt(fromStart) !== 47 /*/*/)
+        break;
+    }
+    var fromEnd = from.length;
+    var fromLen = fromEnd - fromStart;
+
+    // Trim any leading backslashes
+    var toStart = 1;
+    for (; toStart < to.length; ++toStart) {
+      if (to.charCodeAt(toStart) !== 47 /*/*/)
+        break;
+    }
+    var toEnd = to.length;
+    var toLen = toEnd - toStart;
+
+    // Compare paths to find the longest common path from root
+    var length = fromLen < toLen ? fromLen : toLen;
+    var lastCommonSep = -1;
+    var i = 0;
+    for (; i <= length; ++i) {
+      if (i === length) {
+        if (toLen > length) {
+          if (to.charCodeAt(toStart + i) === 47 /*/*/) {
+            // We get here if `from` is the exact base path for `to`.
+            // For example: from='/foo/bar'; to='/foo/bar/baz'
+            return to.slice(toStart + i + 1);
+          } else if (i === 0) {
+            // We get here if `from` is the root
+            // For example: from='/'; to='/foo'
+            return to.slice(toStart + i);
+          }
+        } else if (fromLen > length) {
+          if (from.charCodeAt(fromStart + i) === 47 /*/*/) {
+            // We get here if `to` is the exact base path for `from`.
+            // For example: from='/foo/bar/baz'; to='/foo/bar'
+            lastCommonSep = i;
+          } else if (i === 0) {
+            // We get here if `to` is the root.
+            // For example: from='/foo'; to='/'
+            lastCommonSep = 0;
+          }
+        }
+        break;
+      }
+      var fromCode = from.charCodeAt(fromStart + i);
+      var toCode = to.charCodeAt(toStart + i);
+      if (fromCode !== toCode)
+        break;
+      else if (fromCode === 47 /*/*/)
+        lastCommonSep = i;
+    }
+
+    var out = '';
+    // Generate the relative path based on the path difference between `to`
+    // and `from`
+    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
+      if (i === fromEnd || from.charCodeAt(i) === 47 /*/*/) {
+        if (out.length === 0)
+          out += '..';
+        else
+          out += '/..';
+      }
+    }
+
+    // Lastly, append the rest of the destination (`to`) path that comes after
+    // the common path parts
+    if (out.length > 0)
+      return out + to.slice(toStart + lastCommonSep);
+    else {
+      toStart += lastCommonSep;
+      if (to.charCodeAt(toStart) === 47 /*/*/)
+        ++toStart;
+      return to.slice(toStart);
+    }
+  },
+
+  _makeLong: function _makeLong(path) {
+    return path;
+  },
+
+  dirname: function dirname(path) {
+    assertPath(path);
+    if (path.length === 0) return '.';
+    var code = path.charCodeAt(0);
+    var hasRoot = code === 47 /*/*/;
+    var end = -1;
+    var matchedSlash = true;
+    for (var i = path.length - 1; i >= 1; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          if (!matchedSlash) {
+            end = i;
+            break;
+          }
+        } else {
+        // We saw the first non-path separator
+        matchedSlash = false;
+      }
+    }
+
+    if (end === -1) return hasRoot ? '/' : '.';
+    if (hasRoot && end === 1) return '//';
+    return path.slice(0, end);
+  },
+
+  basename: function basename(path, ext) {
+    if (ext !== undefined && typeof ext !== 'string') throw new TypeError('"ext" argument must be a string');
+    assertPath(path);
+
+    var start = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i;
+
+    if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
+      if (ext.length === path.length && ext === path) return '';
+      var extIdx = ext.length - 1;
+      var firstNonSlashEnd = -1;
+      for (i = path.length - 1; i >= 0; --i) {
+        var code = path.charCodeAt(i);
+        if (code === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else {
+          if (firstNonSlashEnd === -1) {
+            // We saw the first non-path separator, remember this index in case
+            // we need it if the extension ends up not matching
+            matchedSlash = false;
+            firstNonSlashEnd = i + 1;
+          }
+          if (extIdx >= 0) {
+            // Try to match the explicit extension
+            if (code === ext.charCodeAt(extIdx)) {
+              if (--extIdx === -1) {
+                // We matched the extension, so mark this as the end of our path
+                // component
+                end = i;
+              }
+            } else {
+              // Extension does not match, so our result is the entire path
+              // component
+              extIdx = -1;
+              end = firstNonSlashEnd;
+            }
+          }
+        }
+      }
+
+      if (start === end) end = firstNonSlashEnd;else if (end === -1) end = path.length;
+      return path.slice(start, end);
+    } else {
+      for (i = path.length - 1; i >= 0; --i) {
+        if (path.charCodeAt(i) === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else if (end === -1) {
+          // We saw the first non-path separator, mark this as the end of our
+          // path component
+          matchedSlash = false;
+          end = i + 1;
+        }
+      }
+
+      if (end === -1) return '';
+      return path.slice(start, end);
+    }
+  },
+
+  extname: function extname(path) {
+    assertPath(path);
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+    for (var i = path.length - 1; i >= 0; --i) {
+      var code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1)
+            startDot = i;
+          else if (preDotState !== 1)
+            preDotState = 1;
+      } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+        // We saw a non-dot character immediately before the dot
+        preDotState === 0 ||
+        // The (right-most) trimmed path component is exactly '..'
+        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      return '';
+    }
+    return path.slice(startDot, end);
+  },
+
+  format: function format(pathObject) {
+    if (pathObject === null || typeof pathObject !== 'object') {
+      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
+    }
+    return _format('/', pathObject);
+  },
+
+  parse: function parse(path) {
+    assertPath(path);
+
+    var ret = { root: '', dir: '', base: '', ext: '', name: '' };
+    if (path.length === 0) return ret;
+    var code = path.charCodeAt(0);
+    var isAbsolute = code === 47 /*/*/;
+    var start;
+    if (isAbsolute) {
+      ret.root = '/';
+      start = 1;
+    } else {
+      start = 0;
+    }
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i = path.length - 1;
+
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+
+    // Get non-dir info
+    for (; i >= start; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1) startDot = i;else if (preDotState !== 1) preDotState = 1;
+        } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+    // We saw a non-dot character immediately before the dot
+    preDotState === 0 ||
+    // The (right-most) trimmed path component is exactly '..'
+    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      if (end !== -1) {
+        if (startPart === 0 && isAbsolute) ret.base = ret.name = path.slice(1, end);else ret.base = ret.name = path.slice(startPart, end);
+      }
+    } else {
+      if (startPart === 0 && isAbsolute) {
+        ret.name = path.slice(1, startDot);
+        ret.base = path.slice(1, end);
+      } else {
+        ret.name = path.slice(startPart, startDot);
+        ret.base = path.slice(startPart, end);
+      }
+      ret.ext = path.slice(startDot, end);
+    }
+
+    if (startPart > 0) ret.dir = path.slice(0, startPart - 1);else if (isAbsolute) ret.dir = '/';
+
+    return ret;
+  },
+
+  sep: '/',
+  delimiter: ':',
+  win32: null,
+  posix: null
 };
 
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
+posix.posix = posix;
 
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
+module.exports = posix;
 
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"_process":24}],24:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};

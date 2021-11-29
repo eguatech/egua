@@ -1,14 +1,16 @@
 {
   "name": "egua",
-  "version": "1.0.95",
-  "description": "Linguagem de programação simples e moderna",
+  "version": "1.1.15",
+  "description": "Linguagem de programação simples e moderna usando português",
   "main": "index.js",
   "scripts": {
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
     "npm-publish": "npm publish",
     "testes": "./bin/egua tests/tests.egua",
     "test": "jest",
-    "production": "npm run build-web && npm run npm-publish"
+    "production": "npm run build-web && npm run npm-publish",
+    "testes": "./bin/egua tests/tests.egua",
+    "build:azure": "ls /github/workspace"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,13 @@
     "egua"
   ],
   "author": "lucaspompeun",
+  "contributors": [
+    {
+      "name": "Leonel Sanches da Silva",
+      "email": "leonel@designliquido.com.br",
+      "url": "https://www.linkedin.com/in/leonelsanchesdasilva/"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/eguatech/egua/issues"
@@ -30,4 +39,5 @@
     "@babel/preset-env": "^7.12.1",
     "jest": "^26.6.1"
   }
+  "homepage": "https://github.com/eguatech/egua#readme"
 }

@@ -675,7 +675,7 @@ module.exports = class Parser {
 
             this.consume(
                 tokenTypes.ENQUANTO,
-                "Esperado delcaração do 'enquanto' após o escopo do 'faca'."
+                "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
             );
             this.consume(
                 tokenTypes.LEFT_PAREN,
@@ -689,14 +689,14 @@ module.exports = class Parser {
                 "Esperado ')' após declaração do 'enquanto'."
             );
 
-            return new Stmt.Faca(doBranch, whileCondition);
+            return new Stmt.Fazer(doBranch, whileCondition);
         } finally {
             this.loopDepth -= 1;
         }
     }
 
     statement() {
-        if (this.match(tokenTypes.FACA)) return this.doStatement();
+        if (this.match(tokenTypes.FAZER)) return this.doStatement();
         if (this.match(tokenTypes.TENTE)) return this.tryStatement();
         if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
         if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
@@ -765,7 +765,7 @@ module.exports = class Parser {
         }
 
         this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
-        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo ${kind}.`);
+        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo do ${kind}.`);
 
         let body = this.block();
 
@@ -785,7 +785,7 @@ module.exports = class Parser {
 
         let methods = [];
         while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
-            methods.push(this.function("method"));
+            methods.push(this.function("método"));
         }
 
         this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");

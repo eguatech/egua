@@ -1,0 +1,21 @@
+name: Commit e PR - Desenvolvimento
+
+on:
+  push:
+    branches: [ desenvolvimento ]
+  pull_request:
+    branches: [ desenvolvimento ]
+
+jobs:
+  test_desenvolvimento:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '12'
+
+    - name: Teste
+      run: | 
+        npm run testes
