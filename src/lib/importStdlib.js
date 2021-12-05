@@ -28,7 +28,7 @@ module.exports = function (name) {
             return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
+        default:
+            return loadModule(name, name);
     }
-
-    return null;
 };
