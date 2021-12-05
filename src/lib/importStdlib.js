@@ -1,8 +1,15 @@
-const StandardFn = require("../structures/standardFn.js");
-const EguaModule = require("../structures/module.js");
+const RuntimeError = require("../errors.js").RuntimeError,
+    StandardFn = require("../structures/standardFn.js"),
+    EguaModule = require("../structures/module.js");
 
 const loadModule = function (moduleName, modulePath) {
-    let moduleData = require(modulePath);
+    let moduleData;
+    try {
+        moduleData = require(modulePath);
+    } catch (erro) {
+        throw new RuntimeError(moduleName, `Biblioteca ${moduleName} não encontrada para importação.`);
+    }
+     
     let newModule = new EguaModule(moduleName);
 
     let keys = Object.keys(moduleData);
