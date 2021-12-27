@@ -1,4 +1,4 @@
-const {RuntimeError} = require("../../web/dist");
+const RuntimeError = require("../errors.js").RuntimeError;
 
 module.exports = class EguaInstance {
     constructor(creatorClass) {

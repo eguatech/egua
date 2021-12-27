@@ -1177,11 +1177,11 @@ module.exports = class Interpreter {
     }
 
     isTruthy(object) {
-        if (object === null) 
+        if (object === null)
             return false;
-        if (typeof object === "boolean") 
+        if (typeof object === "boolean")
             return Boolean(object);
-        
+
         return true;
     }
 
@@ -1207,9 +1207,9 @@ module.exports = class Interpreter {
     }
 
     isEqual(left, right) {
-        if (left === null && right === null) 
+        if (left === null && right === null)
             return true;
-        if (left === null) 
+        if (left === null)
             return false;
 
         return left === right;
@@ -1395,7 +1395,7 @@ module.exports = class Interpreter {
 
             if (Array.isArray(right) || typeof right === "string") {
                 return right.includes(left);
-            } else if (right.constructor == Object) {
+            } else if (right.constructor === Object) {
                 return left in right;
             } else {
                 throw new RuntimeError("Tipo de chamada inválida com 'em'.");
@@ -1683,7 +1683,7 @@ module.exports = class Interpreter {
 
             obj[index] = value;
         } else if (
-            obj.constructor == Object ||
+            obj.constructor === Object ||
             obj instanceof EguaInstance ||
             obj instanceof EguaFunction ||
             obj instanceof EguaClass ||
@@ -1725,7 +1725,7 @@ module.exports = class Interpreter {
         }
 
         else if (
-            obj.constructor == Object ||
+            obj.constructor === Object ||
             obj instanceof EguaInstance ||
             obj instanceof EguaFunction ||
             obj instanceof EguaClass ||
@@ -1776,7 +1776,7 @@ module.exports = class Interpreter {
         if (obj instanceof EguaInstance) {
             obj.set(expr.name, value);
             return value;
-        } else if (obj.constructor == Object) {
+        } else if (obj.constructor === Object) {
             obj[expr.name.lexeme] = value;
         }
     }
@@ -1838,7 +1838,7 @@ module.exports = class Interpreter {
         let object = this.evaluate(expr.object);
         if (object instanceof EguaInstance) {
             return object.get(expr.name) || null;
-        } else if (object.constructor == Object) {
+        } else if (object.constructor === Object) {
             return object[expr.name.lexeme] || null;
         } else if (object instanceof EguaModule) {
             return object[expr.name.lexeme] || null;
@@ -1898,7 +1898,7 @@ module.exports = class Interpreter {
             const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
             return formato.format(object);
         }
-        
+
         if (Array.isArray(object)) return object;
 
         return object.toString();
@@ -1918,6 +1918,7 @@ module.exports = class Interpreter {
         }
     }
 };
+
 },{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":11,"./lib/importStdlib.js":12,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 
@@ -2248,15 +2249,27 @@ module.exports.mediana = function (a) {
   return mid % 1 ? a[mid - 0.5] : (a[mid - 1] + a[mid]) / 2;
 };
 
-//Moda de uma matriz
-module.exports.moda = function (a) {
-  if (isNaN(a) || a === null)
+/**
+ * Calcula a moda de um vetor. A moda é o valor, ou valores, que mais são 
+ * presentes em um conjunto.
+ * @param {inteiro[]} vetor O conjunto a ser avaliado.
+ * @returns O novo conjunto com os valores da moda.
+ * @see https://pt.wikipedia.org/wiki/Moda_(estat%C3%ADstica)
+ */
+module.exports.moda = function (vetor) {
+  if (!Array.isArray(vetor))
     throw new RuntimeError(
       this.token,
-      "Você deve prover valores para mediana(a)."
+      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
     );
 
-  const objectArr = a.reduce(
+  if (vetor.some(isNaN))
+    throw new RuntimeError(
+      this.token,
+      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
+    );
+
+  const objectArr = vetor.reduce(
     function (acc, curr) { 
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc 
     },
@@ -3216,7 +3229,7 @@ module.exports = class Parser {
         this.advance();
 
         while (!this.isAtEnd()) {
-            if (this.previous().type == tokenTypes.SEMICOLON) return;
+            if (this.previous().type === tokenTypes.SEMICOLON) return;
 
             switch (this.peek().type) {
                 case tokenTypes.CLASSE:
@@ -3263,7 +3276,7 @@ module.exports = class Parser {
     }
 
     isAtEnd() {
-        return this.peek().type == tokenTypes.EOF;
+        return this.peek().type === tokenTypes.EOF;
     }
 
     advance() {
@@ -4019,6 +4032,7 @@ module.exports = class Parser {
         return statements
     }
 };
+
 },{"./expr.js":7,"./stmt.js":16,"./tokenTypes.js":23}],15:[function(require,module,exports){
 class ResolverError extends Error {
     constructor(msg) {
@@ -4769,6 +4783,8 @@ module.exports = class EguaFunction extends Callable {
     }
 };
 },{"../environment.js":5,"../errors.js":6,"./callable.js":17}],20:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError;
+
 module.exports = class EguaInstance {
     constructor(creatorClass) {
         this.creatorClass = creatorClass;
@@ -4794,7 +4810,8 @@ module.exports = class EguaInstance {
         return "<Objeto " + this.creatorClass.name + ">";
     }
 };
-},{}],21:[function(require,module,exports){
+
+},{"../errors.js":6}],21:[function(require,module,exports){
 module.exports = class EguaModule {
     constructor(name) {
         if (name !== undefined) this.name = name;
