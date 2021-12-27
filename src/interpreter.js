@@ -760,20 +760,22 @@ module.exports = class Interpreter {
         return method.bind(object);
     }
 
-    stringify(object) {
-        if (object === null) return "nulo";
-        if (typeof object === "boolean") {
-            return object ? "verdadeiro" : "falso";
+    stringify(objeto) {
+        if (objeto === null) return "nulo";
+        if (typeof objeto === "boolean") {
+            return objeto ? "verdadeiro" : "falso";
         }
 
-        if (object instanceof Date) {
+        if (objeto instanceof Date) {
             const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
-            return formato.format(object);
+            return formato.format(objeto);
         }
 
-        if (Array.isArray(object)) return object;
+        if (Array.isArray(objeto)) return objeto;
 
-        return object.toString();
+        if (typeof objeto === 'object') return JSON.stringify(objeto);
+
+        return objeto.toString();
     }
 
     execute(stmt) {
