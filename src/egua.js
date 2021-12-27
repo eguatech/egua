@@ -95,7 +95,7 @@ module.exports.Egua = class Egua {
                 );
             else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
         } else {
-            console.error(error);
+            console.error(`Erro: ${error.message}`);
         }
         this.hadRuntimeError = true;
     }
