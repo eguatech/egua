@@ -45,6 +45,12 @@ class Token {
     }
 }
 
+/**
+ * O Lexador é responsável por transformar o código em uma coleção de tokens de linguagem.
+ * Cada token de linguagem é representado por um tipo, um lexema e informações da linha de código em que foi expresso.
+ * Também é responsável por mapear as palavras reservadas da linguagem, que não podem ser usadas por outras
+ * estruturas, tais como nomes de variáveis, funções, literais, classes e assim por diante.
+ */
 module.exports = class Lexer {
     constructor(code, Egua) {
         this.Egua = Egua;
