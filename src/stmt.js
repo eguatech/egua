@@ -1,5 +1,5 @@
 class Stmt {
-    accept(visitor) { }
+    aceitar(visitor) { }
 }
 
 class Expression extends Stmt {
@@ -8,7 +8,7 @@ class Expression extends Stmt {
         this.expression = expression;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitExpressionStmt(this)
     }
 }
@@ -20,7 +20,7 @@ class Funcao extends Stmt {
         this.func = func;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitFunctionStmt(this);
     }
 }
@@ -32,20 +32,20 @@ class Retorna extends Stmt {
         this.value = value;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitReturnStmt(this);
     }
 }
 
 class Classe extends Stmt {
-    constructor(name, superclass, methods) {
+    constructor(nome, superClasse, metodos) {
         super();
-        this.name = name;
-        this.superclass = superclass;
-        this.methods = methods;
+        this.name = nome;
+        this.superclass = superClasse;
+        this.methods = metodos;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitClassStmt(this);
     }
 }
@@ -56,7 +56,7 @@ class Block extends Stmt {
         this.statements = statements;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitBlockStmt(this);
     }
 }
@@ -67,7 +67,7 @@ class Escreva extends Stmt {
         this.expression = expression;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitPrintStmt(this);
     }
 }
@@ -79,7 +79,7 @@ class Importar extends Stmt {
         this.closeBracket = closeBracket;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitImportStmt(this);
     }
 }
@@ -91,7 +91,7 @@ class Fazer extends Stmt {
       this.whileCondition = whileCondition;
     }
   
-    accept(visitor) {
+    aceitar(visitor) {
       return visitor.visitDoStmt(this);
     }
   }
@@ -103,7 +103,7 @@ class Enquanto extends Stmt {
         this.body = body;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitWhileStmt(this);
     }
 }
@@ -117,7 +117,7 @@ class Para extends Stmt {
         this.body = body;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitForStmt(this);
     }
 }
@@ -131,7 +131,7 @@ class Tente extends Stmt {
         this.finallyBranch = finallyBranch;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitTryStmt(this);
     }
 }
@@ -145,7 +145,7 @@ class Se extends Stmt {
         this.elseBranch = elseBranch;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitIfStmt(this);
     }
 }
@@ -158,7 +158,7 @@ class Escolha extends Stmt {
         this.defaultBranch = defaultBranch;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitSwitchStmt(this);
     }
 }
@@ -168,7 +168,7 @@ class Pausa extends Stmt {
         super();
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitBreakStmt(this);
     }
 }
@@ -178,7 +178,7 @@ class Continua extends Stmt {
         super();
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitContinueStmt(this);
     }
 }
@@ -190,7 +190,7 @@ class Var extends Stmt {
         this.initializer = initializer;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitVarStmt(this);
     }
 }

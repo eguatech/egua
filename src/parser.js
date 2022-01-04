@@ -13,17 +13,17 @@ module.exports = class Parser {
         this.tokens = tokens;
         this.Egua = Egua;
 
-        this.current = 0;
-        this.loopDepth = 0;
+        this.atual = 0;
+        this.ciclos = 0;
     }
 
-    synchronize() {
-        this.advance();
+    sincronizar() {
+        this.avancar();
 
         while (!this.isAtEnd()) {
-            if (this.previous().type === tokenTypes.SEMICOLON) return;
+            if (this.voltar().type === tokenTypes.SEMICOLON) return;
 
-            switch (this.peek().type) {
+            switch (this.peek().tipo) {
                 case tokenTypes.CLASSE:
                 case tokenTypes.FUNCAO:
                 case tokenTypes.VAR:
@@ -35,7 +35,7 @@ module.exports = class Parser {
                     return;
             }
 
-            this.advance();
+            this.avancar();
         }
     }
 
@@ -44,47 +44,47 @@ module.exports = class Parser {
         return new ParserError();
     }
 
-    consume(type, errorMessage) {
-        if (this.check(type)) return this.advance();
+    consumir(tipo, errorMessage) {
+        if (this.verificar(tipo)) return this.avancar();
         else throw this.error(this.peek(), errorMessage);
     }
 
-    check(type) {
+    verificar(tipo) {
         if (this.isAtEnd()) return false;
-        return this.peek().type === type;
+        return this.peek().tipo === tipo;
     }
 
-    checkNext(type) {
+    verificarProximo(tipo) {
         if (this.isAtEnd()) return false;
-        return this.tokens[this.current + 1].type === type;
+        return this.tokens[this.atual + 1].tipo === tipo;
     }
 
     peek() {
-        return this.tokens[this.current];
+        return this.tokens[this.atual];
     }
 
-    previous() {
-        return this.tokens[this.current - 1];
+    voltar() {
+        return this.tokens[this.atual - 1];
     }
 
-    seek(positions) {
-        return this.tokens[this.current + positions];
+    seek(posicao) {
+        return this.tokens[this.atual + posicao];
     }
 
     isAtEnd() {
-        return this.peek().type === tokenTypes.EOF;
+        return this.peek().tipo === tokenTypes.EOF;
     }
 
-    advance() {
-        if (!this.isAtEnd()) this.current += 1;
-        return this.previous();
+    avancar() {
+        if (!this.isAtEnd()) this.atual += 1;
+        return this.voltar();
     }
 
     match(...args) {
         for (let i = 0; i < args.length; i++) {
             let currentType = args[i];
-            if (this.check(currentType)) {
-                this.advance();
+            if (this.verificar(currentType)) {
+                this.avancar();
                 return true;
             }
         }
@@ -92,11 +92,11 @@ module.exports = class Parser {
         return false;
     }
 
-    primary() {
+    primario() {
         if (this.match(tokenTypes.SUPER)) {
-            let keyword = this.previous();
-            this.consume(tokenTypes.DOT, "Esperado '.' após 'super'.");
-            let method = this.consume(
+            let keyword = this.voltar();
+            this.consumir(tokenTypes.DOT, "Esperado '.' após 'super'.");
+            let method = this.consumir(
                 tokenTypes.IDENTIFIER,
                 "Esperado nome do método da superclasse."
             );
@@ -108,10 +108,10 @@ module.exports = class Parser {
                 return new Expr.Array([]);
             }
             while (!this.match(tokenTypes.RIGHT_SQUARE_BRACKET)) {
-                let value = this.assignment();
+                let value = this.atribuir();
                 values.push(value);
-                if (this.peek().type !== tokenTypes.RIGHT_SQUARE_BRACKET) {
-                    this.consume(
+                if (this.peek().tipo !== tokenTypes.RIGHT_SQUARE_BRACKET) {
+                    this.consumir(
                         tokenTypes.COMMA,
                         "Esperado vírgula antes da próxima expressão."
                     );
@@ -126,18 +126,18 @@ module.exports = class Parser {
                 return new Expr.Dictionary([], []);
             }
             while (!this.match(tokenTypes.RIGHT_BRACE)) {
-                let key = this.assignment();
-                this.consume(
+                let key = this.atribuir();
+                this.consumir(
                     tokenTypes.COLON,
                     "Esperado ':' entre chave e valor."
                 );
-                let value = this.assignment();
+                let value = this.atribuir();
 
                 keys.push(key);
                 values.push(value);
 
-                if (this.peek().type !== tokenTypes.RIGHT_BRACE) {
-                    this.consume(
+                if (this.peek().tipo !== tokenTypes.RIGHT_BRACE) {
+                    this.consumir(
                         tokenTypes.COMMA,
                         "Esperado vígula antes da próxima expressão."
                     );
@@ -145,65 +145,65 @@ module.exports = class Parser {
             }
             return new Expr.Dictionary(keys, values);
         }
-        if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
+        if (this.match(tokenTypes.FUNCAO)) return this.corpoDaFuncao("funcao");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NULO)) return new Expr.Literal(null);
-        if (this.match(tokenTypes.ISTO)) return new Expr.Isto(this.previous());
+        if (this.match(tokenTypes.ISTO)) return new Expr.Isto(this.voltar());
 
         if (this.match(tokenTypes.IMPORTAR)) return this.importStatement();
 
         if (this.match(tokenTypes.NUMBER, tokenTypes.STRING)) {
-            return new Expr.Literal(this.previous().literal);
+            return new Expr.Literal(this.voltar().literal);
         }
 
         if (this.match(tokenTypes.IDENTIFIER)) {
-            return new Expr.Variable(this.previous());
+            return new Expr.Variable(this.voltar());
         }
 
         if (this.match(tokenTypes.LEFT_PAREN)) {
             let expr = this.expression();
-            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após a expressão.");
+            this.consumir(tokenTypes.RIGHT_PAREN, "Esperado ')' após a expressão.");
             return new Expr.Grouping(expr);
         }
 
         throw this.error(this.peek(), "Esperado expressão.");
     }
 
-    finishCall(callee) {
-        let args = [];
-        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+    finalizarChamada(callee) {
+        let argumentos = [];
+        if (!this.verificar(tokenTypes.RIGHT_PAREN)) {
             do {
-                if (args.length >= 255) {
+                if (argumentos.length >= 255) {
                     error(this.peek(), "Não pode haver mais de 255 argumentos.");
                 }
-                args.push(this.expression());
+                argumentos.push(this.expression());
             } while (this.match(tokenTypes.COMMA));
         }
 
-        let paren = this.consume(
+        let parenteseDireito = this.consumir(
             tokenTypes.RIGHT_PAREN,
             "Esperado ')' após os argumentos."
         );
 
-        return new Expr.Call(callee, paren, args);
+        return new Expr.Call(callee, parenteseDireito, argumentos);
     }
 
-    call() {
-        let expr = this.primary();
+    chamar() {
+        let expr = this.primario();
 
         while (true) {
             if (this.match(tokenTypes.LEFT_PAREN)) {
-                expr = this.finishCall(expr);
+                expr = this.finalizarChamada(expr);
             } else if (this.match(tokenTypes.DOT)) {
-                let name = this.consume(
+                let name = this.consumir(
                     tokenTypes.IDENTIFIER,
                     "Esperado nome do método após '.'."
                 );
                 expr = new Expr.Get(expr, name);
             } else if (this.match(tokenTypes.LEFT_SQUARE_BRACKET)) {
                 let index = this.expression();
-                let closeBracket = this.consume(
+                let closeBracket = this.consumir(
                     tokenTypes.RIGHT_SQUARE_BRACKET,
                     "Esperado ']' após escrita de index."
                 );
@@ -216,90 +216,90 @@ module.exports = class Parser {
         return expr;
     }
 
-    unary() {
+    unario() {
         if (this.match(tokenTypes.BANG, tokenTypes.MINUS, tokenTypes.BIT_NOT)) {
-            let operator = this.previous();
-            let right = this.unary();
-            return new Expr.Unary(operator, right);
+            const operador = this.voltar();
+            const direito = this.unario();
+            return new Expr.Unary(operador, direito);
         }
 
-        return this.call();
+        return this.chamar();
     }
 
     exponent() {
-        let expr = this.unary();
+        let expr = this.unario();
 
         while (this.match(tokenTypes.STAR_STAR)) {
-            let operator = this.previous();
-            let right = this.unary();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.unario();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
-    multiplication() {
+    multiplicar() {
         let expr = this.exponent();
 
         while (this.match(tokenTypes.SLASH, tokenTypes.STAR, tokenTypes.MODULUS)) {
-            let operator = this.previous();
-            let right = this.exponent();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.exponent();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
-    addition() {
-        let expr = this.multiplication();
+    adicionar() {
+        let expr = this.multiplicar();
 
         while (this.match(tokenTypes.MINUS, tokenTypes.PLUS)) {
-            let operator = this.previous();
-            let right = this.multiplication();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.multiplicar();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
     bitFill() {
-        let expr = this.addition();
+        let expr = this.adicionar();
 
         while (this.match(tokenTypes.LESSER_LESSER, tokenTypes.GREATER_GREATER)) {
-            let operator = this.previous();
-            let right = this.addition();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.adicionar();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
-    bitAnd() {
+    bitE() {
         let expr = this.bitFill();
 
         while (this.match(tokenTypes.BIT_AND)) {
-            let operator = this.previous();
-            let right = this.bitFill();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.bitFill();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
-    bitOr() {
-        let expr = this.bitAnd();
+    bitOu() {
+        let expr = this.bitE();
 
         while (this.match(tokenTypes.BIT_OR, tokenTypes.BIT_XOR)) {
-            let operator = this.previous();
-            let right = this.bitAnd();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.bitE();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
-    comparison() {
-        let expr = this.bitOr();
+    comparar() {
+        let expr = this.bitOu();
 
         while (
             this.match(
@@ -309,21 +309,21 @@ module.exports = class Parser {
                 tokenTypes.LESS_EQUAL
             )
         ) {
-            let operator = this.previous();
-            let right = this.bitOr();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.bitOu();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
     }
 
     equality() {
-        let expr = this.comparison();
+        let expr = this.comparar();
 
         while (this.match(tokenTypes.BANG_EQUAL, tokenTypes.EQUAL_EQUAL)) {
-            let operator = this.previous();
-            let right = this.comparison();
-            expr = new Expr.Binary(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.comparar();
+            expr = new Expr.Binary(expr, operador, direito);
         }
 
         return expr;
@@ -333,9 +333,9 @@ module.exports = class Parser {
         let expr = this.equality();
 
         while (this.match(tokenTypes.EM)) {
-            let operator = this.previous();
-            let right = this.equality();
-            expr = new Expr.Logical(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.equality();
+            expr = new Expr.Logical(expr, operador, direito);
         }
 
         return expr;
@@ -345,9 +345,9 @@ module.exports = class Parser {
         let expr = this.em();
 
         while (this.match(tokenTypes.E)) {
-            let operator = this.previous();
-            let right = this.em();
-            expr = new Expr.Logical(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.em();
+            expr = new Expr.Logical(expr, operador, direito);
         }
 
         return expr;
@@ -357,86 +357,86 @@ module.exports = class Parser {
         let expr = this.e();
 
         while (this.match(tokenTypes.OU)) {
-            let operator = this.previous();
-            let right = this.e();
-            expr = new Expr.Logical(expr, operator, right);
+            const operador = this.voltar();
+            const direito = this.e();
+            expr = new Expr.Logical(expr, operador, direito);
         }
 
         return expr;
     }
 
-    assignment() {
-        let expr = this.ou();
+    atribuir() {
+        const expr = this.ou();
 
-        if (this.match(tokenTypes.EQUAL)) {
-            let equals = this.previous();
-            let value = this.assignment();
+        if (this.match(tokenTypes.EQUAL) || this.match(tokenTypes.MAIS_IGUAL)) {
+            const igual = this.voltar();
+            const valor = this.atribuir();
 
             if (expr instanceof Expr.Variable) {
-                let name = expr.name;
-                return new Expr.Assign(name, value);
+                const nome = expr.name;
+                return new Expr.Assign(nome, valor);
             } else if (expr instanceof Expr.Get) {
-                let get = expr;
-                return new Expr.Set(get.object, get.name, value);
+                const get = expr;
+                return new Expr.Set(get.object, get.name, valor);
             } else if (expr instanceof Expr.Subscript) {
-                return new Expr.Assignsubscript(expr.callee, expr.index, value);
+                return new Expr.Assignsubscript(expr.callee, expr.index, valor);
             }
-            this.error(equals, "Tarefa de atribuição inválida");
+            this.error(igual, "Tarefa de atribuição inválida");
         }
 
         return expr;
     }
 
     expression() {
-        return this.assignment();
+        return this.atribuir();
     }
 
-    printStatement() {
-        this.consume(
+    declaracaoMostrar() {
+        this.consumir(
             tokenTypes.LEFT_PAREN,
             "Esperado '(' antes dos valores em escreva."
         );
 
-        let value = this.expression();
+        const valor = this.expression();
 
-        this.consume(
+        this.consumir(
             tokenTypes.RIGHT_PAREN,
             "Esperado ')' após os valores em escreva."
         );
-        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o valor.");
+        this.consumir(tokenTypes.SEMICOLON, "Esperado ';' após o valor.");
 
-        return new Stmt.Escreva(value);
+        return new Stmt.Escreva(valor);
     }
 
     expressionStatement() {
-        let expr = this.expression();
-        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após expressão.");
+        const expr = this.expression();
+        this.consumir(tokenTypes.SEMICOLON, "Esperado ';' após expressão.");
         return new Stmt.Expression(expr);
     }
 
     block() {
-        let statements = [];
+        const declaracoes = [];
 
-        while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
-            statements.push(this.declaration());
+        while (!this.verificar(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+            declaracoes.push(this.declaracao());
         }
 
-        this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o bloco.");
-        return statements;
+        this.consumir(tokenTypes.RIGHT_BRACE, "Esperado '}' após o bloco.");
+        return declaracoes;
     }
 
-    ifStatement() {
-        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'se'.");
+    declaracaoSe() {
+        this.consumir(tokenTypes.LEFT_PAREN, "Esperado '(' após 'se'.");
         let condition = this.expression();
-        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condição do se.");
+        this.consumir(tokenTypes.RIGHT_PAREN, "Esperado ')' após condição do se.");
 
         let thenBranch = this.statement();
 
         let elifBranches = [];
         while (this.match(tokenTypes.SENAOSE)) {
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+            this.consumir(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
             let elifCondition = this.expression();
-            this.consume(
+            this.consumir(
                 tokenTypes.RIGHT_PAREN,
                 "Esperado ')' apóes codição do 'senaose."
             );
@@ -459,121 +459,121 @@ module.exports = class Parser {
 
     whileStatement() {
         try {
-            this.loopDepth += 1;
+            this.ciclos += 1;
 
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'enquanto'.");
-            let condition = this.expression();
-            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após condicional.");
-            let body = this.statement();
+            this.consumir(tokenTypes.LEFT_PAREN, "Esperado '(' após 'enquanto'.");
+            const condicao = this.expression();
+            this.consumir(tokenTypes.RIGHT_PAREN, "Esperado ')' após condicional.");
+            const corpo = this.statement();
 
-            return new Stmt.Enquanto(condition, body);
+            return new Stmt.Enquanto(condicao, corpo);
         } finally {
-            this.loopDepth -= 1;
+            this.ciclos -= 1;
         }
     }
 
     forStatement() {
         try {
-            this.loopDepth += 1;
+            this.ciclos += 1;
 
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'para'.");
+            this.consumir(tokenTypes.LEFT_PAREN, "Esperado '(' após 'para'.");
 
             let initializer;
             if (this.match(tokenTypes.SEMICOLON)) {
                 initializer = null;
             } else if (this.match(tokenTypes.VAR)) {
-                initializer = this.varDeclaration();
+                initializer = this.declaracaoDeVariavel();
             } else {
                 initializer = this.expressionStatement();
             }
 
             let condition = null;
-            if (!this.check(tokenTypes.SEMICOLON)) {
+            if (!this.verificar(tokenTypes.SEMICOLON)) {
                 condition = this.expression();
             }
 
-            this.consume(
+            this.consumir(
                 tokenTypes.SEMICOLON,
                 "Esperado ';' após valores da condicional"
             );
 
-            let increment = null;
-            if (!this.check(tokenTypes.RIGHT_PAREN)) {
-                increment = this.expression();
+            let incrementar = null;
+            if (!this.verificar(tokenTypes.RIGHT_PAREN)) {
+                incrementar = this.expression();
             }
 
-            this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após cláusulas");
+            this.consumir(tokenTypes.RIGHT_PAREN, "Esperado ')' após cláusulas");
 
-            let body = this.statement();
+            const corpo = this.statement();
 
-            return new Stmt.Para(initializer, condition, increment, body);
+            return new Stmt.Para(initializer, condition, incrementar, corpo);
         } finally {
-            this.loopDepth -= 1;
+            this.ciclos -= 1;
         }
     }
 
     breakStatement() {
-        if (this.loopDepth < 1) {
-            this.error(this.previous(), "'pausa' deve estar dentro de um loop.");
+        if (this.ciclos < 1) {
+            this.error(this.voltar(), "'pausa' deve estar dentro de um loop.");
         }
 
-        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'pausa'.");
+        this.consumir(tokenTypes.SEMICOLON, "Esperado ';' após 'pausa'.");
         return new Stmt.Pausa();
     }
 
-    continueStatement() {
-        if (this.loopDepth < 1) {
-            this.error(this.previous(), "'continua' precisa estar em um laço de repetição.");
+    declaracaoContinue() {
+        if (this.ciclos < 1) {
+            this.error(this.voltar(), "'continua' precisa estar em um laço de repetição.");
         }
 
-        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após 'continua'.");
+        this.consumir(tokenTypes.SEMICOLON, "Esperado ';' após 'continua'.");
         return new Stmt.Continua();
     }
 
-    returnStatement() {
-        let keyword = this.previous();
-        let value = null;
+    declaracaoRetorna() {
+        const palavraChave = this.voltar();
+        let valor = null;
 
-        if (!this.check(tokenTypes.SEMICOLON)) {
-            value = this.expression();
+        if (!this.verificar(tokenTypes.SEMICOLON)) {
+            valor = this.expression();
         }
 
-        this.consume(tokenTypes.SEMICOLON, "Esperado ';' após o retorno.");
-        return new Stmt.Retorna(keyword, value);
+        this.consumir(tokenTypes.SEMICOLON, "Esperado ';' após o retorno.");
+        return new Stmt.Retorna(palavraChave, valor);
     }
 
-    switchStatement() {
+    declaracaoEscolha() {
         try {
-            this.loopDepth += 1;
+            this.ciclos += 1;
 
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_PAREN,
                 "Esperado '{' após 'escolha'."
             );
             let condition = this.expression();
-            this.consume(
+            this.consumir(
                 tokenTypes.RIGHT_PAREN,
                 "Esperado '}' após a condição de 'escolha'."
             );
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' antes do escopo do 'escolha'."
             );
 
-            let branches = [];
+            const branches = [];
             let defaultBranch = null;
             while (!this.match(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
                 if (this.match(tokenTypes.CASO)) {
                     let branchConditions = [this.expression()];
-                    this.consume(
+                    this.consumir(
                         tokenTypes.COLON,
                         "Esperado ':' após o 'caso'."
                     );
 
-                    while (this.check(tokenTypes.CASO)) {
-                        this.consume(tokenTypes.CASO, null);
+                    while (this.verificar(tokenTypes.CASO)) {
+                        this.consumir(tokenTypes.CASO, null);
                         branchConditions.push(this.expression());
-                        this.consume(
+                        this.consumir(
                             tokenTypes.COLON,
                             "Esperado ':' após declaração do 'caso'."
                         );
@@ -583,9 +583,9 @@ module.exports = class Parser {
                     do {
                         stmts.push(this.statement());
                     } while (
-                        !this.check(tokenTypes.CASO) &&
-                        !this.check(tokenTypes.PADRAO) &&
-                        !this.check(tokenTypes.RIGHT_BRACE)
+                        !this.verificar(tokenTypes.CASO) &&
+                        !this.verificar(tokenTypes.PADRAO) &&
+                        !this.verificar(tokenTypes.RIGHT_BRACE)
                     );
 
                     branches.push({
@@ -598,7 +598,7 @@ module.exports = class Parser {
                             "Você só pode ter um 'padrao' em cada declaração de 'escolha'."
                         );
 
-                    this.consume(
+                    this.consumir(
                         tokenTypes.COLON,
                         "Esperado ':' após declaração do 'padrao'."
                     );
@@ -607,9 +607,9 @@ module.exports = class Parser {
                     do {
                         stmts.push(this.statement());
                     } while (
-                        !this.check(tokenTypes.CASO) &&
-                        !this.check(tokenTypes.PADRAO) &&
-                        !this.check(tokenTypes.RIGHT_BRACE)
+                        !this.verificar(tokenTypes.CASO) &&
+                        !this.verificar(tokenTypes.PADRAO) &&
+                        !this.verificar(tokenTypes.RIGHT_BRACE)
                     );
 
                     defaultBranch = {
@@ -620,31 +620,31 @@ module.exports = class Parser {
 
             return new Stmt.Escolha(condition, branches, defaultBranch);
         } finally {
-            this.loopDepth -= 1;
+            this.ciclos -= 1;
         }
     }
 
     importStatement() {
-        this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após declaração.");
+        this.consumir(tokenTypes.LEFT_PAREN, "Esperado '(' após declaração.");
 
-        let path = this.expression();
+        const caminho = this.expression();
 
-        let closeBracket = this.consume(
+        let closeBracket = this.consumir(
             tokenTypes.RIGHT_PAREN,
             "Esperado ')' após declaração."
         );
 
-        return new Stmt.Importar(path, closeBracket);
+        return new Stmt.Importar(caminho, closeBracket);
     }
 
     tryStatement() {
-        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' após a declaração 'tente'.");
+        this.consumir(tokenTypes.LEFT_BRACE, "Esperado '{' após a declaração 'tente'.");
 
         let tryBlock = this.block();
 
         let catchBlock = null;
         if (this.match(tokenTypes.PEGUE)) {
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."
             );
@@ -654,7 +654,7 @@ module.exports = class Parser {
 
         let elseBlock = null;
         if (this.match(tokenTypes.SENAO)) {
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."
             );
@@ -664,7 +664,7 @@ module.exports = class Parser {
 
         let finallyBlock = null;
         if (this.match(tokenTypes.FINALMENTE)) {
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."
             );
@@ -677,154 +677,154 @@ module.exports = class Parser {
 
     doStatement() {
         try {
-            this.loopDepth += 1;
+            this.ciclos += 1;
 
-            let doBranch = this.statement();
+            const doBranch = this.statement();
 
-            this.consume(
+            this.consumir(
                 tokenTypes.ENQUANTO,
                 "Esperado declaração do 'enquanto' após o escopo do 'fazer'."
             );
-            this.consume(
+            this.consumir(
                 tokenTypes.LEFT_PAREN,
                 "Esperado '(' após declaração 'enquanto'."
             );
 
-            let whileCondition = this.expression();
+            const whileCondition = this.expression();
 
-            this.consume(
+            this.consumir(
                 tokenTypes.RIGHT_PAREN,
                 "Esperado ')' após declaração do 'enquanto'."
             );
 
             return new Stmt.Fazer(doBranch, whileCondition);
         } finally {
-            this.loopDepth -= 1;
+            this.ciclos -= 1;
         }
     }
 
     statement() {
         if (this.match(tokenTypes.FAZER)) return this.doStatement();
         if (this.match(tokenTypes.TENTE)) return this.tryStatement();
-        if (this.match(tokenTypes.ESCOLHA)) return this.switchStatement();
-        if (this.match(tokenTypes.RETORNA)) return this.returnStatement();
-        if (this.match(tokenTypes.CONTINUA)) return this.continueStatement();
+        if (this.match(tokenTypes.ESCOLHA)) return this.declaracaoEscolha();
+        if (this.match(tokenTypes.RETORNA)) return this.declaracaoRetorna();
+        if (this.match(tokenTypes.CONTINUA)) return this.declaracaoContinue();
         if (this.match(tokenTypes.PAUSA)) return this.breakStatement();
         if (this.match(tokenTypes.PARA)) return this.forStatement();
         if (this.match(tokenTypes.ENQUANTO)) return this.whileStatement();
-        if (this.match(tokenTypes.SE)) return this.ifStatement();
-        if (this.match(tokenTypes.ESCREVA)) return this.printStatement();
+        if (this.match(tokenTypes.SE)) return this.declaracaoSe();
+        if (this.match(tokenTypes.ESCREVA)) return this.declaracaoMostrar();
         if (this.match(tokenTypes.LEFT_BRACE)) return new Stmt.Block(this.block());
 
         return this.expressionStatement();
     }
 
-    varDeclaration() {
-        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome de variável.");
+    declaracaoDeVariavel() {
+        let name = this.consumir(tokenTypes.IDENTIFIER, "Esperado nome de variável.");
         let initializer = null;
-        if (this.match(tokenTypes.EQUAL)) {
+        if (this.match(tokenTypes.EQUAL) || this.match(tokenTypes.MAIS_IGUAL)) {
             initializer = this.expression();
         }
 
-        this.consume(
+        this.consumir(
             tokenTypes.SEMICOLON,
             "Esperado ';' após a declaração da variável."
         );
         return new Stmt.Var(name, initializer);
     }
 
-    function(kind) {
-        let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
-        return new Stmt.Funcao(name, this.functionBody(kind));
+    funcao(kind) {
+        const nome = this.consumir(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
+        return new Stmt.Funcao(nome, this.corpoDaFuncao(kind));
     }
 
-    functionBody(kind) {
-        this.consume(tokenTypes.LEFT_PAREN, `Esperado '(' após o nome ${kind}.`);
+    corpoDaFuncao(kind) {
+        this.consumir(tokenTypes.LEFT_PAREN, `Esperado '(' após o nome ${kind}.`);
 
-        let parameters = [];
-        if (!this.check(tokenTypes.RIGHT_PAREN)) {
+        let parametros = [];
+        if (!this.verificar(tokenTypes.RIGHT_PAREN)) {
             do {
-                if (parameters.length >= 255) {
+                if (parametros.length >= 255) {
                     this.error(this.peek(), "Não pode haver mais de 255 parâmetros");
                 }
 
                 let paramObj = {};
 
-                if (this.peek().type === tokenTypes.STAR) {
-                    this.consume(tokenTypes.STAR, null);
+                if (this.peek().tipo === tokenTypes.STAR) {
+                    this.consumir(tokenTypes.STAR, null);
                     paramObj["type"] = "wildcard";
                 } else {
                     paramObj["type"] = "standard";
                 }
 
-                paramObj['name'] = this.consume(
+                paramObj['name'] = this.consumir(
                     tokenTypes.IDENTIFIER,
                     "Esperado nome do parâmetro."
                 );
 
                 if (this.match(tokenTypes.EQUAL)) {
-                    paramObj["default"] = this.primary();
+                    paramObj["default"] = this.primario();
                 }
 
-                parameters.push(paramObj);
+                parametros.push(paramObj);
 
                 if (paramObj["type"] === "wildcard") break;
             } while (this.match(tokenTypes.COMMA));
         }
 
-        this.consume(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
-        this.consume(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo do ${kind}.`);
+        this.consumir(tokenTypes.RIGHT_PAREN, "Esperado ')' após parâmetros.");
+        this.consumir(tokenTypes.LEFT_BRACE, `Esperado '{' antes do escopo do ${kind}.`);
 
-        let body = this.block();
+        const corpo = this.block();
 
-        return new Expr.Funcao(parameters, body);
+        return new Expr.Funcao(parametros, corpo);
     }
 
-    classDeclaration() {
-        let name = this.consume(tokenTypes.IDENTIFIER, "Esperado nome da classe.");
+    declaracaoDeClasse() {
+        const nome = this.consumir(tokenTypes.IDENTIFIER, "Esperado nome da classe.");
 
-        let superclass = null;
+        let superClasse = null;
         if (this.match(tokenTypes.HERDA)) {
-            this.consume(tokenTypes.IDENTIFIER, "Esperado nome da superclasse.");
-            superclass = new Expr.Variable(this.previous());
+            this.consumir(tokenTypes.IDENTIFIER, "Esperado nome da superclasse.");
+            superClasse = new Expr.Variable(this.voltar());
         }
 
-        this.consume(tokenTypes.LEFT_BRACE, "Esperado '{' antes do escopo da classe.");
+        this.consumir(tokenTypes.LEFT_BRACE, "Esperado '{' antes do escopo da classe.");
 
-        let methods = [];
-        while (!this.check(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
-            methods.push(this.function("método"));
+        const metodos = [];
+        while (!this.verificar(tokenTypes.RIGHT_BRACE) && !this.isAtEnd()) {
+            metodos.push(this.funcao("método"));
         }
 
-        this.consume(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
-        return new Stmt.Classe(name, superclass, methods);
+        this.consumir(tokenTypes.RIGHT_BRACE, "Esperado '}' após o escopo da classe.");
+        return new Stmt.Classe(nome, superClasse, metodos);
     }
 
-    declaration() {
+    declaracao() {
         try {
             if (
-                this.check(tokenTypes.FUNCAO) &&
-                this.checkNext(tokenTypes.IDENTIFIER)
+                this.verificar(tokenTypes.FUNCAO) &&
+                this.verificarProximo(tokenTypes.IDENTIFIER)
             ) {
-                this.consume(tokenTypes.FUNCAO, null);
-                return this.function("funcao");
+                this.consumir(tokenTypes.FUNCAO, null);
+                return this.funcao("funcao");
             }
-            if (this.match(tokenTypes.VAR)) return this.varDeclaration();
-            if (this.match(tokenTypes.CLASSE)) return this.classDeclaration();
+            if (this.match(tokenTypes.VAR)) return this.declaracaoDeVariavel();
+            if (this.match(tokenTypes.CLASSE)) return this.declaracaoDeClasse();
 
             return this.statement();
         } catch (error) {
-            this.synchronize();
+            this.sincronizar();
             return null;
         }
     }
 
-    parse() {
-        let statements = [];
+    analisar() {
+        const declaracoes = [];
         while (!this.isAtEnd()) {
-            statements.push(this.declaration());
+            declaracoes.push(this.declaracao());
         }
 
-        return statements
+        return declaracoes
     }
 };

@@ -1,5 +1,5 @@
 class Expr {
-    accept(visitor) {}
+    aceitar(visitor) {}
 }
 
 class Assign extends Expr {
@@ -9,7 +9,7 @@ class Assign extends Expr {
         this.value = value;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitAssignExpr(this);
     }
 }
@@ -22,7 +22,7 @@ class Binary extends Expr {
         this.right = right;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitBinaryExpr(this);
     }
 }
@@ -34,7 +34,7 @@ class Funcao extends Expr {
         this.body = body;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitFunctionExpr(this);
     }
 }
@@ -47,7 +47,7 @@ class Call extends Expr {
         this.args = args;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitCallExpr(this);
     }
 }
@@ -59,7 +59,7 @@ class Get extends Expr {
         this.name = name;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitGetExpr(this);
     }
 }
@@ -70,7 +70,7 @@ class Grouping extends Expr {
         this.expression = expression;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitGroupingExpr(this);
     }
 }
@@ -81,7 +81,7 @@ class Literal extends Expr {
         this.value = value;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitLiteralExpr(this);
     }
 }
@@ -92,7 +92,7 @@ class Array extends Expr {
         this.values = values;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitArrayExpr(this);
     }
 }
@@ -104,7 +104,7 @@ class Dictionary extends Expr {
         this.values = values;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitDictionaryExpr(this);
     }
 }
@@ -117,7 +117,7 @@ class Subscript extends Expr {
         this.closeBracket = closeBracket;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitSubscriptExpr(this);
     }
 }
@@ -130,7 +130,7 @@ class Assignsubscript extends Expr {
         this.value = value;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitAssignsubscriptExpr(this);
     }
 }
@@ -143,7 +143,7 @@ class Logical extends Expr {
         this.right = right;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitLogicalExpr(this);
     }
 }
@@ -156,7 +156,7 @@ class Set extends Expr {
         this.value = value;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitSetExpr(this);
     }
 }
@@ -168,7 +168,7 @@ class Super extends Expr {
         this.method = method;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitSuperExpr(this);
     }
 }
@@ -179,7 +179,7 @@ class Isto extends Expr {
         this.keyword = keyword;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitThisExpr(this);
     }
 }
@@ -191,7 +191,7 @@ class Unary extends Expr {
         this.right = right;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitUnaryExpr(this);
     }
 }
@@ -202,7 +202,7 @@ class Variable extends Expr {
         this.name = name;
     }
 
-    accept(visitor) {
+    aceitar(visitor) {
         return visitor.visitVariableExpr(this);
     }
 }

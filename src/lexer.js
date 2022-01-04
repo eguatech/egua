@@ -1,6 +1,6 @@
 const tokenTypes = require("./tokenTypes.js");
 
-const reservedWords = {
+const palavrasReservadas = {
     e: tokenTypes.E,
     em: tokenTypes.EM,
     classe: tokenTypes.CLASSE,
@@ -33,15 +33,15 @@ const reservedWords = {
 };
 
 class Token {
-    constructor(type, lexeme, literal, line) {
-        this.type = type;
+    constructor(tipo, lexeme, literal, linha) {
+        this.tipo = tipo;
         this.lexeme = lexeme;
         this.literal = literal;
-        this.line = line;
+        this.linha = linha;
     }
 
     toString() {
-        return this.type + " " + this.lexeme + " " + this.literal;
+        return this.tipo + " " + this.lexeme + " " + this.literal;
     }
 }
 
@@ -52,222 +52,228 @@ class Token {
  * estruturas, tais como nomes de variáveis, funções, literais, classes e assim por diante.
  */
 module.exports = class Lexer {
-    constructor(code, Egua) {
+    constructor(codigo, Egua) {
         this.Egua = Egua;
-        this.code = code;
+        this.codigo = codigo;
 
-        this.tokens = [];
+        this.simbolos = [];
 
-        this.start = 0;
-        this.current = 0;
-        this.line = 1;
+        this.inicio = 0;
+        this.atual = 0;
+        this.linha = 1;
     }
 
-    isDigit(c) {
+    eDigito(c) {
         return c >= "0" && c <= "9";
     }
 
-    isAlpha(c) {
+    eAlfabeto(c) {
         return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
     }
 
-    isAlphaNumeric(c) {
-        return this.isDigit(c) || this.isAlpha(c);
+    eAlfabetoOuDigito(c) {
+        return this.eDigito(c) || this.eAlfabeto(c);
     }
 
     endOfCode() {
-        return this.current >= this.code.length;
+        return this.atual >= this.codigo.length;
     }
 
-    advance() {
-        this.current += 1;
-        return this.code[this.current - 1];
+    avancar() {
+        this.atual += 1;
+        return this.codigo[this.atual - 1];
     }
 
-    addToken(type, literal = null) {
-        const text = this.code.substring(this.start, this.current);
-        this.tokens.push(new Token(type, text, literal, this.line));
+    adicionarSimbolo(tipo, literal = null) {
+        const texto = this.codigo.substring(this.inicio, this.atual);
+        this.simbolos.push(new Token(tipo, texto, literal, this.linha));
     }
 
-    match(expected) {
+    match(esperado) {
         if (this.endOfCode()) {
             return false;
         }
 
-        if (this.code[this.current] !== expected) {
+        if (this.codigo[this.atual] !== esperado) {
             return false;
         }
 
-        this.current += 1;
+        this.atual += 1;
         return true;
     }
 
     peek() {
         if (this.endOfCode()) return "\0";
-        return this.code.charAt(this.current);
+        return this.codigo.charAt(this.atual);
     }
 
     peekNext() {
-        if (this.current + 1 >= this.code.length) return "\0";
-        return this.code.charAt(this.current + 1);
+        if (this.atual + 1 >= this.codigo.length) return "\0";
+        return this.codigo.charAt(this.atual + 1);
     }
 
-    previous() {
-        return this.code.charAt(this.current - 1);
+    voltar() {
+        return this.codigo.charAt(this.atual - 1);
     }
 
-    parseString(stringChar = '"') {
+    analisarTexto(stringChar = '"') {
         while (this.peek() !== stringChar && !this.endOfCode()) {
-            if (this.peek() === "\n") this.line = +1;
-            this.advance();
+            if (this.peek() === "\n") this.linha = +1;
+            this.avancar();
         }
 
         if (this.endOfCode()) {
             this.Egua.lexerError(
-                this.line,
-                this.previous(),
+                this.linha,
+                this.voltar(),
                 "Texto não finalizado."
             );
             return;
         }
 
-        this.advance();
+        this.avancar();
 
-        let value = this.code.substring(this.start + 1, this.current - 1);
-        this.addToken(tokenTypes.STRING, value);
+        let value = this.codigo.substring(this.inicio + 1, this.atual - 1);
+        this.adicionarSimbolo(tokenTypes.STRING, value);
     }
 
-    parseNumber() {
-        while (this.isDigit(this.peek())) {
-            this.advance();
+    analisarNumero() {
+        while (this.eDigito(this.peek())) {
+            this.avancar();
         }
 
-        if (this.peek() == "." && this.isDigit(this.peekNext())) {
-            this.advance();
+        if (this.peek() == "." && this.eDigito(this.peekNext())) {
+            this.avancar();
 
-            while (this.isDigit(this.peek())) {
-                this.advance();
+            while (this.eDigito(this.peek())) {
+                this.avancar();
             }
         }
 
-        const fullNumber = this.code.substring(this.start, this.current);
-        this.addToken(tokenTypes.NUMBER, parseFloat(fullNumber));
+        const fullNumber = this.codigo.substring(this.inicio, this.atual);
+        this.adicionarSimbolo(tokenTypes.NUMBER, parseFloat(fullNumber));
     }
 
-    identifyKeyword() {
-        while (this.isAlphaNumeric(this.peek())) {
-            this.advance();
+    identificarPalavraChave() {
+        while (this.eAlfabetoOuDigito(this.peek())) {
+            this.avancar();
         }
 
-        const c = this.code.substring(this.start, this.current);
-        const type = c in reservedWords ? reservedWords[c] : tokenTypes.IDENTIFIER;
+        const c = this.codigo.substring(this.inicio, this.atual);
+        const tipo = c in palavrasReservadas ? palavrasReservadas[c] : tokenTypes.IDENTIFIER;
 
-        this.addToken(type);
+        this.adicionarSimbolo(tipo);
     }
 
     scanToken() {
-        const char = this.advance();
+        const char = this.avancar();
 
         switch (char) {
             case "[":
-                this.addToken(tokenTypes.LEFT_SQUARE_BRACKET);
+                this.adicionarSimbolo(tokenTypes.LEFT_SQUARE_BRACKET);
                 break;
             case "]":
-                this.addToken(tokenTypes.RIGHT_SQUARE_BRACKET);
+                this.adicionarSimbolo(tokenTypes.RIGHT_SQUARE_BRACKET);
                 break;
             case "(":
-                this.addToken(tokenTypes.LEFT_PAREN);
+                this.adicionarSimbolo(tokenTypes.LEFT_PAREN);
                 break;
             case ")":
-                this.addToken(tokenTypes.RIGHT_PAREN);
+                this.adicionarSimbolo(tokenTypes.RIGHT_PAREN);
                 break;
             case "{":
-                this.addToken(tokenTypes.LEFT_BRACE);
+                this.adicionarSimbolo(tokenTypes.LEFT_BRACE);
                 break;
             case "}":
-                this.addToken(tokenTypes.RIGHT_BRACE);
+                this.adicionarSimbolo(tokenTypes.RIGHT_BRACE);
                 break;
             case ",":
-                this.addToken(tokenTypes.COMMA);
+                this.adicionarSimbolo(tokenTypes.COMMA);
                 break;
             case ".":
-                this.addToken(tokenTypes.DOT);
+                this.adicionarSimbolo(tokenTypes.DOT);
                 break;
             case "-":
-                this.addToken(tokenTypes.MINUS);
+                if (this.match("=")) {
+                    this.adicionarSimbolo(tokenTypes.MENOR_IGUAL);
+                }
+                this.adicionarSimbolo(tokenTypes.MINUS);
                 break;
             case "+":
-                this.addToken(tokenTypes.PLUS);
+                if (this.match("=")) {
+                    this.adicionarSimbolo(tokenTypes.MAIS_IGUAL);
+                }
+                this.adicionarSimbolo(tokenTypes.PLUS);
                 break;
             case ":":
-                this.addToken(tokenTypes.COLON);
+                this.adicionarSimbolo(tokenTypes.COLON);
                 break;
             case ";":
-                this.addToken(tokenTypes.SEMICOLON);
+                this.adicionarSimbolo(tokenTypes.SEMICOLON);
                 break;
             case "%":
-                this.addToken(tokenTypes.MODULUS);
+                this.adicionarSimbolo(tokenTypes.MODULUS);
                 break;
             case "*":
                 if (this.peek() === "*") {
-                    this.advance();
-                    this.addToken(tokenTypes.STAR_STAR);
+                    this.avancar();
+                    this.adicionarSimbolo(tokenTypes.STAR_STAR);
                     break;
                 }
-                this.addToken(tokenTypes.STAR);
+                this.adicionarSimbolo(tokenTypes.STAR);
                 break;
             case "!":
-                this.addToken(
+                this.adicionarSimbolo(
                     this.match("=") ? tokenTypes.BANG_EQUAL : tokenTypes.BANG
                 );
                 break;
             case "=":
-                this.addToken(
+                this.adicionarSimbolo(
                     this.match("=") ? tokenTypes.EQUAL_EQUAL : tokenTypes.EQUAL
                 );
                 break;
 
             case "&":
-                this.addToken(tokenTypes.BIT_AND);
+                this.adicionarSimbolo(tokenTypes.BIT_AND);
                 break;
 
             case "~":
-                this.addToken(tokenTypes.BIT_NOT);
+                this.adicionarSimbolo(tokenTypes.BIT_NOT);
                 break;
 
             case "|":
-                this.addToken(tokenTypes.BIT_OR);
+                this.adicionarSimbolo(tokenTypes.BIT_OR);
                 break;
 
             case "^":
-                this.addToken(tokenTypes.BIT_XOR);
+                this.adicionarSimbolo(tokenTypes.BIT_XOR);
                 break;
 
             case "<":
                 if (this.match("=")) {
-                    this.addToken(tokenTypes.LESS_EQUAL);
+                    this.adicionarSimbolo(tokenTypes.LESS_EQUAL);
                 } else if (this.match("<")) {
-                    this.addToken(tokenTypes.LESSER_LESSER);
+                    this.adicionarSimbolo(tokenTypes.LESSER_LESSER);
                 } else {
-                    this.addToken(tokenTypes.LESS);
+                    this.adicionarSimbolo(tokenTypes.LESS);
                 }
                 break;
 
             case ">":
                 if (this.match("=")) {
-                    this.addToken(tokenTypes.GREATER_EQUAL);
+                    this.adicionarSimbolo(tokenTypes.GREATER_EQUAL);
                 } else if (this.match(">")) {
-                    this.addToken(tokenTypes.GREATER_GREATER);
+                    this.adicionarSimbolo(tokenTypes.GREATER_GREATER);
                 } else {
-                    this.addToken(tokenTypes.GREATER);
+                    this.adicionarSimbolo(tokenTypes.GREATER);
                 }
                 break;
 
             case "/":
                 if (this.match("/")) {
-                    while (this.peek() != "\n" && !this.endOfCode()) this.advance();
+                    while (this.peek() != "\n" && !this.endOfCode()) this.avancar();
                 } else {
-                    this.addToken(tokenTypes.SLASH);
+                    this.adicionarSimbolo(tokenTypes.SLASH);
                 }
                 break;
 
@@ -279,31 +285,31 @@ module.exports = class Lexer {
 
             // tentativa de pulhar linha com \n que ainda não funciona
             case "\n":
-                this.line += 1;
+                this.linha += 1;
                 break;
 
             case '"':
-                this.parseString('"');
+                this.analisarTexto('"');
                 break;
 
             case "'":
-                this.parseString("'");
+                this.analisarTexto("'");
                 break;
 
             default:
-                if (this.isDigit(char)) this.parseNumber();
-                else if (this.isAlpha(char)) this.identifyKeyword();
-                else this.Egua.lexerError(this.line, char, "Caractere inesperado.");
+                if (this.eDigito(char)) this.analisarNumero();
+                else if (this.eAlfabeto(char)) this.identificarPalavraChave();
+                else this.Egua.lexerError(this.linha, char, "Caractere inesperado.");
         }
     }
 
     scan() {
         while (!this.endOfCode()) {
-            this.start = this.current;
+            this.inicio = this.atual;
             this.scanToken();
         }
 
-        this.tokens.push(new Token(tokenTypes.EOF, "", null, this.line));
-        return this.tokens;
+        this.simbolos.push(new Token(tokenTypes.EOF, "", null, this.linha));
+        return this.simbolos;
     }
 };

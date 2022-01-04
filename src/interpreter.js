@@ -45,7 +45,7 @@ module.exports = class Interpreter {
     }
 
     evaluate(expr) {
-        return expr.accept(this);
+        return expr.aceitar(this);
     }
 
     visitGroupingExpr(expr) {
@@ -293,7 +293,7 @@ module.exports = class Interpreter {
 
     visitIfStmt(stmt) {
         if (this.isTruthy(this.evaluate(stmt.condition))) {
-            this.execute(stmt.thenBranch);
+            this.executar(stmt.thenBranch);
             return null;
         }
 
@@ -301,13 +301,13 @@ module.exports = class Interpreter {
             let current = stmt.elifBranches[i];
 
             if (this.isTruthy(this.evaluate(current.condition))) {
-                this.execute(current.branch);
+                this.executar(current.branch);
                 return null;
             }
         }
 
         if (stmt.elseBranch !== null) {
-            this.execute(stmt.elseBranch);
+            this.executar(stmt.elseBranch);
         }
 
         return null;
@@ -325,7 +325,7 @@ module.exports = class Interpreter {
             }
 
             try {
-                this.execute(stmt.body);
+                this.executar(stmt.body);
             } catch (error) {
                 if (error instanceof BreakException) {
                     break;
@@ -345,7 +345,7 @@ module.exports = class Interpreter {
     visitDoStmt(stmt) {
         do {
             try {
-                this.execute(stmt.doBranch);
+                this.executar(stmt.doBranch);
             } catch (error) {
                 if (error instanceof BreakException) {
                     break;
@@ -373,7 +373,7 @@ module.exports = class Interpreter {
 
                         try {
                             for (let k = 0; k < branch.stmts.length; k++) {
-                                this.execute(branch.stmts[k]);
+                                this.executar(branch.stmts[k]);
                             }
                         } catch (error) {
                             if (error instanceof ContinueException) {
@@ -387,7 +387,7 @@ module.exports = class Interpreter {
 
             if (defaultBranch !== null && matched === false) {
                 for (let i = 0; i < defaultBranch.stmts.length; i++) {
-                    this.execute(defaultBranch["stmts"][i]);
+                    this.executar(defaultBranch["stmts"][i]);
                 }
             }
         } catch (error) {
@@ -429,7 +429,7 @@ module.exports = class Interpreter {
     visitWhileStmt(stmt) {
         while (this.isTruthy(this.evaluate(stmt.condition))) {
             try {
-                this.execute(stmt.body);
+                this.executar(stmt.body);
             } catch (error) {
                 if (error instanceof BreakException) {
                     break;
@@ -500,7 +500,7 @@ module.exports = class Interpreter {
             this.environment = environment;
 
             for (let i = 0; i < statements.length; i++) {
-                this.execute(statements[i]);
+                this.executar(statements[i]);
             }
         } finally {
             this.environment = previous;
@@ -576,63 +576,63 @@ module.exports = class Interpreter {
         }
     }
 
-    visitSubscriptExpr(expr) {
-        let obj = this.evaluate(expr.callee);
+    visitSubscriptExpr(expressao) {
+        const objeto = this.evaluate(expressao.callee);
 
-        let index = this.evaluate(expr.index);
-        if (Array.isArray(obj)) {
-            if (!Number.isInteger(index)) {
+        let indice = this.evaluate(expressao.index);
+        if (Array.isArray(objeto)) {
+            if (!Number.isInteger(indice)) {
                 throw new RuntimeError(
-                    expr.closeBracket,
+                    expressao.closeBracket,
                     "Somente inteiros podem ser usados para indexar um vetor."
                 );
             }
 
-            if (index < 0 && obj.length !== 0) {
-                while (index < 0) {
-                    index += obj.length;
+            if (indice < 0 && objeto.length !== 0) {
+                while (indice < 0) {
+                    indice += objeto.length;
                 }
             }
 
-            if (index >= obj.length) {
-                throw new RuntimeError(expr.closeBracket, "Index do vetor fora do intervalo.");
+            if (indice >= objeto.length) {
+                throw new RuntimeError(expressao.closeBracket, "Índice do vetor fora do intervalo.");
             }
-            return obj[index];
+            return objeto[indice];
         }
 
         else if (
-            obj.constructor === Object ||
-            obj instanceof EguaInstance ||
-            obj instanceof EguaFunction ||
-            obj instanceof EguaClass ||
-            obj instanceof EguaModule
+            objeto.constructor === Object ||
+            objeto instanceof EguaInstance ||
+            objeto instanceof EguaFunction ||
+            objeto instanceof EguaClass ||
+            objeto instanceof EguaModule
         ) {
-            return obj[index] || null;
+            return objeto[indice] || null;
         }
 
-        else if (typeof obj === "string") {
-            if (!Number.isInteger(index)) {
+        else if (typeof objeto === "string") {
+            if (!Number.isInteger(indice)) {
                 throw new RuntimeError(
-                    expr.closeBracket,
+                    expressao.closeBracket,
                     "Somente inteiros podem ser usados para indexar um vetor."
                 );
             }
 
-            if (index < 0 && obj.length !== 0) {
-                while (index < 0) {
-                    index += obj.length;
+            if (indice < 0 && objeto.length !== 0) {
+                while (indice < 0) {
+                    indice += obj.length;
                 }
             }
 
-            if (index >= obj.length) {
-                throw new RuntimeError(expr.closeBracket, "Index fora do tamanho.");
+            if (indice >= objeto.length) {
+                throw new RuntimeError(expressao.closeBracket, "Índice fora do tamanho.");
             }
-            return obj.charAt(index);
+            return objeto.charAt(indice);
         }
 
         else {
             throw new RuntimeError(
-                expr.callee.name,
+                expressao.callee.name,
                 "Somente listas, dicionários, classes e objetos podem ser mudados por sobrescrita."
             );
         }
@@ -782,14 +782,14 @@ module.exports = class Interpreter {
         return objeto.toString();
     }
 
-    execute(stmt) {
-        stmt.accept(this);
+    executar(stmt) {
+        stmt.aceitar(this);
     }
 
-    interpret(statements) {
+    interpretar(statements) {
         try {
             for (let i = 0; i < statements.length; i++) {
-                this.execute(statements[i]);
+                this.executar(statements[i]);
             }
         } catch (error) {
             this.Egua.runtimeError(error);

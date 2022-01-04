@@ -60,133 +60,133 @@ module.exports = class Resolver {
     constructor(interpreter, egua) {
         this.interpreter = interpreter;
         this.egua = egua;
-        this.scopes = new Stack();
+        this.escopos = new Stack();
 
-        this.currentFunction = FunctionType.NONE;
-        this.currentClass = ClassType.NONE;
-        this.currentLoop = ClassType.NONE;
+        this.FuncaoAtual = FunctionType.NONE;
+        this.ClasseAtual = ClassType.NONE;
+        this.cicloAtual = ClassType.NONE;
     }
 
-    define(name) {
-        if (this.scopes.isEmpty()) return;
-        this.scopes.peek()[name.lexeme] = true;
+    definir(name) {
+        if (this.escopos.isEmpty()) return;
+        this.escopos.peek()[name.lexeme] = true;
     }
 
-    declare(name) {
-        if (this.scopes.isEmpty()) return;
-        let scope = this.scopes.peek();
-        if (scope.hasOwnProperty(name.lexeme))
+    declarar(name) {
+        if (this.escopos.isEmpty()) return;
+        let escopo = this.escopos.peek();
+        if (escopo.hasOwnProperty(name.lexeme))
             this.egua.error(
                 name,
                 "Variável com esse nome já declarada neste escopo."
             );
-        scope[name.lexeme] = false;
+            escopo[name.lexeme] = false;
     }
 
-    beginScope() {
-        this.scopes.push({});
+    inicioDoEscopo() {
+        this.escopos.push({});
     }
 
-    endScope() {
-        this.scopes.pop();
+    finalDoEscopo() {
+        this.escopos.pop();
     }
 
-    resolve(statements) {
+    resolver(statements) {
         if (Array.isArray(statements)) {
             for (let i = 0; i < statements.length; i++) {
-                statements[i].accept(this);
+                statements[i].aceitar(this);
             }
         } else {
-            statements.accept(this);
+            statements.aceitar(this);
         }
     }
 
-    resolveLocal(expr, name) {
-        for (let i = this.scopes.stack.length - 1; i >= 0; i--) {
-            if (this.scopes.stack[i].hasOwnProperty(name.lexeme)) {
-                this.interpreter.resolve(expr, this.scopes.stack.length - 1 - i);
+    resolverLocal(expr, name) {
+        for (let i = this.escopos.stack.length - 1; i >= 0; i--) {
+            if (this.escopos.stack[i].hasOwnProperty(name.lexeme)) {
+                this.interpreter.resolver(expr, this.escopos.stack.length - 1 - i);
             }
         }
     }
 
     visitBlockStmt(stmt) {
-        this.beginScope();
-        this.resolve(stmt.statements);
-        this.endScope();
+        this.inicioDoEscopo();
+        this.resolver(stmt.statements);
+        this.finalDoEscopo();
         return null;
     }
 
     visitVariableExpr(expr) {
         if (
-            !this.scopes.isEmpty() &&
-            this.scopes.peek()[expr.name.lexeme] === false
+            !this.escopos.isEmpty() &&
+            this.escopos.peek()[expr.name.lexeme] === false
         ) {
             throw new ResolverError(
                 "Não é possível ler a variável local em seu próprio inicializador."
             );
         }
-        this.resolveLocal(expr, expr.name);
+        this.resolverLocal(expr, expr.name);
         return null;
     }
 
     visitVarStmt(stmt) {
-        this.declare(stmt.name);
+        this.declarar(stmt.name);
         if (stmt.initializer !== null) {
-            this.resolve(stmt.initializer);
+            this.resolver(stmt.initializer);
         }
-        this.define(stmt.name);
+        this.definir(stmt.name);
         return null;
     }
 
     visitAssignExpr(expr) {
-        this.resolve(expr.value);
-        this.resolveLocal(expr, expr.name);
+        this.resolver(expr.value);
+        this.resolverLocal(expr, expr.name);
         return null;
     }
 
-    resolveFunction(func, funcType) {
-        let enclosingFunc = this.currentFunction;
-        this.currentFunction = funcType;
+    resolverFuncao(funcao, funcType) {
+        let enclosingFunc = this.FuncaoAtual;
+        this.FuncaoAtual = funcType;
 
-        this.beginScope();
-        let params = func.params;
-        for (let i = 0; i < params.length; i++) {
-            this.declare(params[i]["name"]);
-            this.define(params[i]["name"]);
+        this.inicioDoEscopo();
+        let parametros = funcao.params;
+        for (let i = 0; i < parametros.length; i++) {
+            this.declarar(parametros[i]["name"]);
+            this.definir(parametros[i]["name"]);
         }
-        this.resolve(func.body);
-        this.endScope();
+        this.resolver(funcao.body);
+        this.finalDoEscopo();
 
-        this.currentFunction = enclosingFunc;
+        this.FuncaoAtual = enclosingFunc;
     }
 
     visitFunctionStmt(stmt) {
-        this.declare(stmt.name);
-        this.define(stmt.name);
+        this.declarar(stmt.name);
+        this.definir(stmt.name);
 
-        this.resolveFunction(stmt.func, FunctionType.FUNCAO);
+        this.resolverFuncao(stmt.func, FunctionType.FUNCAO);
         return null;
     }
 
     visitFunctionExpr(stmt) {
-        this.resolveFunction(stmt, FunctionType.FUNCAO);
+        this.resolverFuncao(stmt, FunctionType.FUNCAO);
         return null;
     }
 
     visitTryStmt(stmt) {
-        this.resolve(stmt.tryBranch);
+        this.resolver(stmt.tryBranch);
 
-        if (stmt.catchBranch !== null) this.resolve(stmt.catchBranch);
-        if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
-        if (stmt.finallyBranch !== null) this.resolve(stmt.finallyBranch);
+        if (stmt.catchBranch !== null) this.resolver(stmt.catchBranch);
+        if (stmt.elseBranch !== null) this.resolver(stmt.elseBranch);
+        if (stmt.finallyBranch !== null) this.resolver(stmt.finallyBranch);
     }
 
     visitClassStmt(stmt) {
-        let enclosingClass = this.currentClass;
-        this.currentClass = ClassType.CLASSE;
+        let enclosingClass = this.ClasseAtual;
+        this.ClasseAtual = ClassType.CLASSE;
 
-        this.declare(stmt.name);
-        this.define(stmt.name);
+        this.declarar(stmt.name);
+        this.definir(stmt.name);
 
         if (
             stmt.superclass !== null &&
@@ -196,189 +196,189 @@ module.exports = class Resolver {
         }
 
         if (stmt.superclass !== null) {
-            this.currentClass = ClassType.SUBCLASS;
-            this.resolve(stmt.superclass);
+            this.ClasseAtual = ClassType.SUBCLASS;
+            this.resolver(stmt.superclass);
         }
 
         if (stmt.superclass !== null) {
-            this.beginScope();
-            this.scopes.peek()["super"] = true;
+            this.inicioDoEscopo();
+            this.escopos.peek()["super"] = true;
         }
 
-        this.beginScope();
-        this.scopes.peek()["isto"] = true;
+        this.inicioDoEscopo();
+        this.escopos.peek()["isto"] = true;
 
-        let methods = stmt.methods;
-        for (let i = 0; i < methods.length; i++) {
-            let declaration = FunctionType.METHOD;
+        let metodos = stmt.methods;
+        for (let i = 0; i < metodos.length; i++) {
+            let declaracao = FunctionType.METHOD;
 
-            if (methods[i].name.lexeme === "isto") {
-                declaration = FunctionType.CONSTRUTOR;
+            if (metodos[i].name.lexeme === "isto") {
+                declaracao = FunctionType.CONSTRUTOR;
             }
 
-            this.resolveFunction(methods[i].func, declaration);
+            this.resolverFuncao(metodos[i].func, declaracao);
         }
 
-        this.endScope();
+        this.finalDoEscopo();
 
-        if (stmt.superclass !== null) this.endScope();
+        if (stmt.superclass !== null) this.finalDoEscopo();
 
-        this.currentClass = enclosingClass;
+        this.ClasseAtual = enclosingClass;
         return null;
     }
 
     visitSuperExpr(expr) {
-        if (this.currentClass === ClassType.NONE) {
+        if (this.ClasseAtual === ClassType.NONE) {
             this.egua.error(expr.keyword, "Não pode usar 'super' fora de uma classe.");
-        } else if (this.currentClass !== ClassType.SUBCLASS) {
+        } else if (this.ClasseAtual !== ClassType.SUBCLASS) {
             this.egua.error(
                 expr.keyword,
                 "Não se usa 'super' numa classe sem superclasse."
             );
         }
 
-        this.resolveLocal(expr, expr.keyword);
+        this.resolverLocal(expr, expr.keyword);
         return null;
     }
 
     visitGetExpr(expr) {
-        this.resolve(expr.object);
+        this.resolver(expr.object);
         return null;
     }
 
     visitExpressionStmt(stmt) {
-        this.resolve(stmt.expression);
+        this.resolver(stmt.expression);
         return null;
     }
 
     visitIfStmt(stmt) {
-        this.resolve(stmt.condition);
-        this.resolve(stmt.thenBranch);
+        this.resolver(stmt.condition);
+        this.resolver(stmt.thenBranch);
 
         for (let i = 0; i < stmt.elifBranches.length; i++) {
-            this.resolve(stmt.elifBranches[i].condition);
-            this.resolve(stmt.elifBranches[i].branch);
+            this.resolver(stmt.elifBranches[i].condition);
+            this.resolver(stmt.elifBranches[i].branch);
         }
 
-        if (stmt.elseBranch !== null) this.resolve(stmt.elseBranch);
+        if (stmt.elseBranch !== null) this.resolver(stmt.elseBranch);
         return null;
     }
 
     visitImportStmt(stmt) {
-        this.resolve(stmt.path);
+        this.resolver(stmt.path);
     }
 
     visitPrintStmt(stmt) {
-        this.resolve(stmt.expression);
+        this.resolver(stmt.expression);
     }
 
     visitReturnStmt(stmt) {
-        if (this.currentFunction === FunctionType.NONE) {
+        if (this.FuncaoAtual === FunctionType.NONE) {
             this.egua.error(stmt.keyword, "Não é possível retornar do código do escopo superior.");
         }
         if (stmt.value !== null) {
-            if (this.currentFunction === FunctionType.CONSTRUTOR) {
+            if (this.FuncaoAtual === FunctionType.CONSTRUTOR) {
                 this.egua.error(
                     stmt.keyword,
                     "Não pode retornar o valor do construtor."
                 );
             }
-            this.resolve(stmt.value);
+            this.resolver(stmt.value);
         }
         return null;
     }
 
     visitSwitchStmt(stmt) {
-        let enclosingType = this.currentLoop;
-        this.currentLoop = LoopType.ESCOLHA;
+        let enclosingType = this.cicloAtual;
+        this.cicloAtual = LoopType.ESCOLHA;
 
         let branches = stmt.branches;
         let defaultBranch = stmt.defaultBranch;
 
         for (let i = 0; i < branches.length; i++) {
-            this.resolve(branches[i]["stmts"]);
+            this.resolver(branches[i]["stmts"]);
         }
 
-        if (defaultBranch !== null) this.resolve(defaultBranch["stmts"]);
+        if (defaultBranch !== null) this.resolver(defaultBranch["stmts"]);
 
-        this.currentLoop = enclosingType;
+        this.cicloAtual = enclosingType;
     }
 
     visitWhileStmt(stmt) {
-        this.resolve(stmt.condition);
-        this.resolve(stmt.body);
+        this.resolver(stmt.condition);
+        this.resolver(stmt.body);
         return null;
     }
 
     visitForStmt(stmt) {
         if (stmt.initializer !== null) {
-            this.resolve(stmt.initializer);
+            this.resolver(stmt.initializer);
         }
         if (stmt.condition !== null) {
-            this.resolve(stmt.condition);
+            this.resolver(stmt.condition);
         }
         if (stmt.increment !== null) {
-            this.resolve(stmt.increment);
+            this.resolver(stmt.increment);
         }
 
-        let enclosingType = this.currentLoop;
-        this.currentLoop = LoopType.ENQUANTO;
-        this.resolve(stmt.body);
-        this.currentLoop = enclosingType;
+        let enclosingType = this.cicloAtual;
+        this.cicloAtual = LoopType.ENQUANTO;
+        this.resolver(stmt.body);
+        this.cicloAtual = enclosingType;
 
         return null;
     }
 
     visitDoStmt(stmt) {
-        this.resolve(stmt.whileCondition);
+        this.resolver(stmt.whileCondition);
 
-        let enclosingType = this.currentLoop;
-        this.currentLoop = LoopType.FAZER;
-        this.resolve(stmt.doBranch);
-        this.currentLoop = enclosingType;
+        let enclosingType = this.cicloAtual;
+        this.cicloAtual = LoopType.FAZER;
+        this.resolver(stmt.doBranch);
+        this.cicloAtual = enclosingType;
         return null;
     }
 
     visitBinaryExpr(expr) {
-        this.resolve(expr.left);
-        this.resolve(expr.right);
+        this.resolver(expr.left);
+        this.resolver(expr.right);
         return null;
     }
 
     visitCallExpr(expr) {
-        this.resolve(expr.callee);
+        this.resolver(expr.callee);
 
         let args = expr.args;
         for (let i = 0; i < args.length; i++) {
-            this.resolve(args[i]);
+            this.resolver(args[i]);
         }
 
         return null;
     }
 
     visitGroupingExpr(expr) {
-        this.resolve(expr.expression);
+        this.resolver(expr.expression);
         return null;
     }
 
     visitDictionaryExpr(expr) {
         for (let i = 0; i < expr.keys.length; i++) {
-            this.resolve(expr.keys[i]);
-            this.resolve(expr.values[i]);
+            this.resolver(expr.keys[i]);
+            this.resolver(expr.values[i]);
         }
         return null;
     }
 
     visitArrayExpr(expr) {
         for (let i = 0; i < expr.values.length; i++) {
-            this.resolve(expr.values[i]);
+            this.resolver(expr.values[i]);
         }
         return null;
     }
 
     visitSubscriptExpr(expr) {
-        this.resolve(expr.callee);
-        this.resolve(expr.index);
+        this.resolver(expr.callee);
+        this.resolver(expr.index);
         return null;
     }
 
@@ -399,27 +399,27 @@ module.exports = class Resolver {
     }
 
     visitLogicalExpr(expr) {
-        this.resolve(expr.left);
-        this.resolve(expr.right);
+        this.resolver(expr.left);
+        this.resolver(expr.right);
         return null;
     }
 
     visitUnaryExpr(expr) {
-        this.resolve(expr.right);
+        this.resolver(expr.right);
         return null;
     }
 
     visitSetExpr(expr) {
-        this.resolve(expr.value);
-        this.resolve(expr.object);
+        this.resolver(expr.value);
+        this.resolver(expr.object);
         return null;
     }
 
     visitThisExpr(expr) {
-        if (this.currentClass == ClassType.NONE) {
+        if (this.ClasseAtual == ClassType.NONE) {
             this.egua.error(expr.keyword, "Não pode usar 'isto' fora da classe.");
         }
-        this.resolveLocal(expr, expr.keyword);
+        this.resolverLocal(expr, expr.keyword);
         return null;
     }
 };
