@@ -45,7 +45,7 @@ module.exports = class Interpreter {
     }
 
     evaluate(expr) {
-        return expr.aceitar(this);
+        return expr.adicionar(this);
     }
 
     visitGroupingExpr(expr) {
@@ -783,7 +783,7 @@ module.exports = class Interpreter {
     }
 
     executar(stmt) {
-        stmt.aceitar(this);
+        stmt.adicionar(this);
     }
 
     interpretar(statements) {

@@ -1,5 +1,5 @@
 class Stmt {
-    aceitar(visitor) { }
+    adicionar(visitor) { }
 }
 
 class Expression extends Stmt {
@@ -8,7 +8,7 @@ class Expression extends Stmt {
         this.expression = expression;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitExpressionStmt(this)
     }
 }
@@ -20,7 +20,7 @@ class Funcao extends Stmt {
         this.func = func;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitFunctionStmt(this);
     }
 }
@@ -32,7 +32,7 @@ class Retorna extends Stmt {
         this.value = value;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitReturnStmt(this);
     }
 }
@@ -45,7 +45,7 @@ class Classe extends Stmt {
         this.methods = metodos;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitClassStmt(this);
     }
 }
@@ -56,7 +56,7 @@ class Block extends Stmt {
         this.statements = statements;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitBlockStmt(this);
     }
 }
@@ -67,7 +67,7 @@ class Escreva extends Stmt {
         this.expression = expression;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitPrintStmt(this);
     }
 }
@@ -79,7 +79,7 @@ class Importar extends Stmt {
         this.closeBracket = closeBracket;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitImportStmt(this);
     }
 }
@@ -91,7 +91,7 @@ class Fazer extends Stmt {
       this.whileCondition = whileCondition;
     }
   
-    aceitar(visitor) {
+    adicionar(visitor) {
       return visitor.visitDoStmt(this);
     }
   }
@@ -103,7 +103,7 @@ class Enquanto extends Stmt {
         this.body = body;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitWhileStmt(this);
     }
 }
@@ -117,7 +117,7 @@ class Para extends Stmt {
         this.body = body;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitForStmt(this);
     }
 }
@@ -131,7 +131,7 @@ class Tente extends Stmt {
         this.finallyBranch = finallyBranch;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitTryStmt(this);
     }
 }
@@ -145,7 +145,7 @@ class Se extends Stmt {
         this.elseBranch = elseBranch;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitIfStmt(this);
     }
 }
@@ -158,7 +158,7 @@ class Escolha extends Stmt {
         this.defaultBranch = defaultBranch;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitSwitchStmt(this);
     }
 }
@@ -168,7 +168,7 @@ class Pausa extends Stmt {
         super();
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitBreakStmt(this);
     }
 }
@@ -178,7 +178,7 @@ class Continua extends Stmt {
         super();
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitContinueStmt(this);
     }
 }
@@ -190,7 +190,7 @@ class Var extends Stmt {
         this.initializer = initializer;
     }
 
-    aceitar(visitor) {
+    adicionar(visitor) {
         return visitor.visitVarStmt(this);
     }
 }
