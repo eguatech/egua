@@ -818,7 +818,7 @@ module.exports.Egua = class Egua {
                 );
             else console.error(`Erro: [Linha: ${error.token.line}] ${error.message}`);
         } else {
-            console.error(error);
+            console.error(`Erro: ${error.message}`);
         }
         this.hadRuntimeError = true;
     }
@@ -1888,20 +1888,22 @@ module.exports = class Interpreter {
         return method.bind(object);
     }
 
-    stringify(object) {
-        if (object === null) return "nulo";
-        if (typeof object === "boolean") {
-            return object ? "verdadeiro" : "falso";
+    stringify(objeto) {
+        if (objeto === null) return "nulo";
+        if (typeof objeto === "boolean") {
+            return objeto ? "verdadeiro" : "falso";
         }
 
-        if (object instanceof Date) {
+        if (objeto instanceof Date) {
             const formato = Intl.DateTimeFormat('pt', { dateStyle: 'full', timeStyle: 'full' });
-            return formato.format(object);
+            return formato.format(objeto);
         }
 
-        if (Array.isArray(object)) return object;
+        if (Array.isArray(objeto)) return objeto;
 
-        return object.toString();
+        if (typeof objeto === 'object') return JSON.stringify(objeto);
+
+        return objeto.toString();
     }
 
     execute(stmt) {
@@ -2972,6 +2974,31 @@ module.exports = function (interpreter, globals) {
     globals.defineVar(
         "aleatorioEntre",
         new StandardFn(1, function (min, max) {
+            if (!arguments[0]) {
+                throw new RuntimeError(
+                    this.token,
+                    "A função recebe ao menos um parâmetro"
+                );
+            }
+
+            if (arguments.length === 1) {
+                if (typeof min !== 'number') {
+                    throw new RuntimeError(
+                        this.token,
+                        "O parâmetro deve ser do tipo número"
+                    );
+                };
+
+                return Math.floor(Math.random() * (0 - min)) + min;
+            }
+
+            if (arguments.length > 2) {
+                throw new RuntimeError(
+                    this.token,
+                    "A quantidade de argumentos máxima é 2"
+                );
+            }
+
             if (typeof min !== 'number' || typeof max !== 'number') {
                 throw new RuntimeError(
                     this.token,
@@ -3124,11 +3151,18 @@ module.exports = function (interpreter, globals) {
 };
 
 },{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],12:[function(require,module,exports){
-const StandardFn = require("../structures/standardFn.js");
-const EguaModule = require("../structures/module.js");
+const RuntimeError = require("../errors.js").RuntimeError,
+    StandardFn = require("../structures/standardFn.js"),
+    EguaModule = require("../structures/module.js");
 
 const loadModule = function (moduleName, modulePath) {
-    let moduleData = require(modulePath);
+    let moduleData;
+    try {
+        moduleData = require(modulePath);
+    } catch (erro) {
+        throw new RuntimeError(moduleName, `Biblioteca ${moduleName} não encontrada para importação.`);
+    }
+     
     let newModule = new EguaModule(moduleName);
 
     let keys = Object.keys(moduleData);
@@ -3154,11 +3188,11 @@ module.exports = function (name) {
             return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
+        default:
+            return loadModule(name, name);
     }
-
-    return null;
 };
-},{"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
+},{"../errors.js":6,"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
 // Retorna uma data completa
