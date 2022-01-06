@@ -19,6 +19,31 @@ module.exports = function (interpreter, globals) {
     globals.defineVar(
         "aleatorioEntre",
         new StandardFn(1, function (min, max) {
+            if (!arguments[0]) {
+                throw new RuntimeError(
+                    this.token,
+                    "A função recebe ao menos um parâmetro"
+                );
+            }
+
+            if (arguments.length === 1) {
+                if (typeof min !== 'number') {
+                    throw new RuntimeError(
+                        this.token,
+                        "O parâmetro deve ser do tipo número"
+                    );
+                };
+
+                return Math.floor(Math.random() * (0 - min)) + min;
+            }
+
+            if (arguments.length > 2) {
+                throw new RuntimeError(
+                    this.token,
+                    "A quantidade de argumentos máxima é 2"
+                );
+            }
+
             if (typeof min !== 'number' || typeof max !== 'number') {
                 throw new RuntimeError(
                     this.token,
