@@ -19,9 +19,9 @@ O desenvolvimento da linguagem egua, assim como a utilização da linguagem, pos
 - NPM >= 6
     > Vale lembrar que ainda não efetuamos testes para garantir o funcionamento do Egua no NPM 7.
 
-- Browserify >= 16.0.0
+- Execute o comando abaixo para instalar as dependências do projeto
     ```sh
-    npm install -g browserify
+    npm install
     ```
 
 ## Como contribuir
