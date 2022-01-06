@@ -1,10 +1,6 @@
-html, body {
-  font-family: "Roboto Mono", serif;
+html {
+  font-family: "Roboto Mono";
   color: black;
-}
-
-* {
-  font-family: "Roboto Mono", serif;
 }
 
 #runBtn {
