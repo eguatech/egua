@@ -585,13 +585,24 @@ funcao taleatorio(){
 }
 
 funcao taleatorioEntre(){
-  var ran = aleatorioEntre(0,3);
-  se (ran == 0)
+  var ran = aleatorioEntre(3);
+
+  se (ran < 3) {
     escreva(ran);
-  senao se (ran == 1) {
-    escreva(ran);
-  } senao se (ran == 2){
-    escreva(ran);
+  } senao {
+    errosM = errosM+1;
+    escreva(errosM);
+  }
+
+  var ran2 = aleatorioEntre(1,3);
+
+  se (ran2 >= 1) {
+    se (ran2 < 3) {
+      escreva(ran2);
+    } senao {
+      errosM = errosM+1;
+      escreva(errosM);
+    }
   } senao {
     errosM = errosM+1;
     escreva(errosM);
