@@ -1,15 +1,11 @@
-const RuntimeError = require("../errors.js").RuntimeError,
-    StandardFn = require("../structures/standardFn.js"),
-    EguaModule = require("../structures/module.js");
+const StandardFn = require("../structures/standardFn.js");
+const EguaModule = require("../structures/module.js");
+
+require("./tempo.js");
+require("./eguamat.js");
 
 const loadModule = function (moduleName, modulePath) {
-    let moduleData;
-    try {
-        moduleData = require(modulePath);
-    } catch (erro) {
-        throw new RuntimeError(moduleName, `Biblioteca ${moduleName} não encontrada para importação.`);
-    }
-     
+    let moduleData = require(modulePath);
     let newModule = new EguaModule(moduleName);
 
     let keys = Object.keys(moduleData);
@@ -26,16 +22,13 @@ const loadModule = function (moduleName, modulePath) {
     return newModule;
 };
 
-require("./tempo.js");
-require("./eguamat.js");
-
 module.exports = function (name) {
     switch (name) {
         case "tempo":
             return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
-        default:
-            return loadModule(name, name);
     }
+
+    return null;
 };
