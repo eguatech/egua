@@ -3151,18 +3151,14 @@ module.exports = function (interpreter, globals) {
 };
 
 },{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],12:[function(require,module,exports){
-const RuntimeError = require("../errors.js").RuntimeError,
-    StandardFn = require("../structures/standardFn.js"),
-    EguaModule = require("../structures/module.js");
+const StandardFn = require("../structures/standardFn.js");
+const EguaModule = require("../structures/module.js");
+
+require("./tempo.js");
+require("./eguamat.js");
 
 const loadModule = function (moduleName, modulePath) {
-    let moduleData;
-    try {
-        moduleData = require(modulePath);
-    } catch (erro) {
-        throw new RuntimeError(moduleName, `Biblioteca ${moduleName} não encontrada para importação.`);
-    }
-     
+    let moduleData = require(modulePath);
     let newModule = new EguaModule(moduleName);
 
     let keys = Object.keys(moduleData);
@@ -3179,20 +3175,18 @@ const loadModule = function (moduleName, modulePath) {
     return newModule;
 };
 
-require("./tempo.js");
-require("./eguamat.js");
-
 module.exports = function (name) {
     switch (name) {
         case "tempo":
             return loadModule("tempo", "./tempo.js");
         case "eguamat":
             return loadModule("eguamat", "./eguamat.js");
-        default:
-            return loadModule(name, name);
     }
+
+    return null;
 };
-},{"../errors.js":6,"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
+
+},{"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
 // Retorna uma data completa
