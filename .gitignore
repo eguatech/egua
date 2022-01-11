@@ -1,5 +1,6 @@
+# node modules
+node_modules
+
+# Editors
 .idea
-
-*.swp
-
-node_modules/
+.vscode
