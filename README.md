@@ -23,12 +23,10 @@
     <img src="https://img.shields.io/npm/v/egua">
     <img src="https://img.shields.io/github/license/eguatech/egua" />
     <br>
-    <a href="https://github.com/eguatech" target="_blank"><img src="https://img.shields.io/badge/-Github-000?style=flat&logo=Github&logoColor=white">
     <a href="https://twitter.com/eguatech" target="_blank"> <img src="https://img.shields.io/badge/-Twitter-1ca0f1?style=flat&labelColor=1ca0f1&logo=twitter&logoColor=white&link=Twitter" href="https://twitter.com/eguatech">
     <a href="https://www.instagram.com/eguatech/" target="_blank"><img src="https://img.shields.io/badge/-Instagram-c13584?style=flat&labelColor=c13584&logo=instagram&logoColor=white">
     <a href="https://www.youtube.com/channel/UCDgGUdR_6hZ6lfVaQbkQPLw" target="_blank"><img src="https://img.shields.io/badge/-YouTube-ff0000?style=flat-square&labelColor=ff0000&logo=youtube&logoColor=white">
     <a href="https://www.linkedin.com/company/eguatech/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=Linkedin&logoColor=white"> </a>
-    <a href="https://dev.to/eguatech" target="_blank"><img src="https://img.shields.io/badge/DEV.TO-%230A0A0A.svg?&style=for-the-badge&logo=dev-dot-to&logoColor=white" height=22> </a>
   </p>
 </p>
 
