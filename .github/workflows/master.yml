@@ -17,4 +17,4 @@ jobs:
         node-version: '12'
 
     - name: Teste binário
-      run: npm run testes
+      run: npm run test

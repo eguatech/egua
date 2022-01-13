@@ -18,7 +18,7 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
 
     - name: Testando binário
-      run: npm run testes
+      run: npm run test
 
     - name: Publicando NPM
       run: npm publish  
