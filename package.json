@@ -7,7 +7,8 @@
     "egua": "egua",
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
     "npm-publish": "npm publish",
-    "testes": "./bin/egua tests/tests.egua",
+    "test": "./bin/egua tests/tests.egua",
+    "test-windows": "node index.js tests/tests.egua",
     "production": "npm run build-web && npm run npm-publish"
   },
   "repository": {
