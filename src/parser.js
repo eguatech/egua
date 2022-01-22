@@ -425,12 +425,12 @@ module.exports = class Parser {
         let thenBranch = this.statement();
 
         let elifBranches = [];
-        while (this.match(tokenTypes.SENAOSE)) {
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+        while (this.match(tokenTypes.SENÃOSE)) {
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senãose'.");
             let elifCondition = this.expression();
             this.consume(
                 tokenTypes.RIGHT_PAREN,
-                "Esperado ')' apóes codição do 'senaose."
+                "Esperado ')' apóes codição do 'senãose."
             );
 
             let branch = this.statement();
@@ -442,7 +442,7 @@ module.exports = class Parser {
         }
 
         let elseBranch = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             elseBranch = this.statement();
         }
 
@@ -645,7 +645,7 @@ module.exports = class Parser {
         }
 
         let elseBlock = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             this.consume(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."

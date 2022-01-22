@@ -56,7 +56,7 @@ se (vetor2[0]<vetor3[0] e vetor2[1]<vetor3[1]){
   vetor4[1]=vetor3[0];
   vetor4[2]=vetor2[1];
   vetor4[3]=vetor3[1];
-  }senao{
+  }senão{
   vetor4[1]=vetor2[1];
   vetor4[2]=vetor3[0];
   vetor4[3]=vetor3[1];
@@ -112,10 +112,10 @@ const Fibonacci = `// Recursão para o cálculo da sequência de fibonacci
 função fibonacci(n){
   se(n==0){
     retorna(0);
- }senao{
+ }senão{
     se(n==1){
       retorna(1);
-   }senao{
+   }senão{
     var n1 = n-1;
     var n2 = n-2;
     var f1 = fibonacci(n1);
@@ -152,7 +152,7 @@ enquanto(erro!=0){
     se(entrada2 == 1){
       resultadoEsperado = 1;
     }
-  } senao {
+  } senão {
     resultadoEsperado = 0;
   }
   
@@ -163,7 +163,7 @@ enquanto(erro!=0){
   
   se(somatoria < 1){
     resultado = 0;
-  } senao{
+  } senão{
     se(somatoria>=1){
       resultado = 1;
     }
@@ -185,7 +185,7 @@ enquanto(erro!=0){
 const FilaEstatica = `função enfileirar (valorEntrada) {
   se (indexFinal == maximoDeElementos){
     escreva("Fila Cheia");
-  } senao {
+  } senão {
     filaEstatica[indexFinal] = valorEntrada;
     escreva("Valor inserido com sucesso: " + texto(filaEstatica[indexFinal]));
     retorna indexFinal = indexFinal + 1;
@@ -195,14 +195,14 @@ const FilaEstatica = `função enfileirar (valorEntrada) {
 função desenfileirar(){
   se (indexInicial == indexFinal){
     escreva("Fila Vazia") ;
-  } senao {
+  } senão {
     para (i = 0; i <= indexFinal; i=i+1){
       
       se(i+1 == indexFinal){
         indexFinal = indexFinal - 1;
         escreva("Valor retirado com sucesso.");
         
-      } senao {
+      } senão {
         filaEstatica[i] = filaEstatica[i+1];
       }
     }    
@@ -212,7 +212,7 @@ função desenfileirar(){
 função mostrar_fila () {
   se(indexInicial == indexFinal){
     escreva("Fila Vazia");
-  } senao {  
+  } senão {  
     para (var i = 0; i < indexFinal; i = i + 1){
       escreva("index "+texto(i)); 
       escreva(texto(filaEstatica[i]));

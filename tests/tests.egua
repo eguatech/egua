@@ -6,7 +6,7 @@ escreva("|");
 var erros = 0;
 
 função startTest(){
-  escreva(tSeSenao());
+  escreva(tSesenão());
   escreva("|");
   escreva(tEnquanto());
   escreva("|");
@@ -21,7 +21,7 @@ função startTest(){
   escreva(tClasse());
 }
 
-função tSeSenao(){
+função tSesenão(){
   escreva("----------------------------");
   escreva("Iniciando Teste: Se - Se Não");
   escreva("----------------------------");
@@ -29,7 +29,7 @@ função tSeSenao(){
   var b = 1;
   se (a == b)
     retorna("Se - Se não: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Se - Se não: ERRO!");
   }
@@ -45,7 +45,7 @@ função tEnquanto(){
   }
   se (a == 5)
     retorna("Enquanto: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Enquanto: ERRO!");
   }
@@ -62,7 +62,7 @@ função tPara(){
   }
   se (a == 5)
     retorna("Para: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Para: ERRO!");
   }
@@ -79,7 +79,7 @@ função tFacaEnquanto(){
   }
   se (a == 5)
     retorna("Faça - Enquanto: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Faça - Enquanto: ERRO!");
   }
@@ -163,7 +163,7 @@ função teste_gerarPontosAbscissa() {
 
   se (gerarPontosAbscissa != nula)
     escreva (gerarPontosAbscissa);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -174,7 +174,7 @@ função tfun1R(){
   
   se (fun1R != nula)
         escreva (fun1R);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
@@ -185,7 +185,7 @@ função tfun2R(){
   
   se (fun2R != nula)
     escreva (fun2R);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -196,7 +196,7 @@ função taprox(){
   
   se (aprox != nula)
         escreva (aprox);
-  senao {
+  senão {
         errosM = errosM+1;
         escreva(errosM);
 
@@ -209,7 +209,7 @@ função tsen(){
   
   se (sen != nula)
         escreva (sen);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
@@ -220,7 +220,7 @@ função tcos(){
   
   se (cos != nula)
         escreva (cos);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
@@ -231,7 +231,7 @@ função ttan(){
 
   se (tan != nula)
     escreva (tan);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -242,7 +242,7 @@ função tarsen(){
 
   se (arsen != nula)
     escreva (arsen);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -253,7 +253,7 @@ função tarcos(){
 
   se (arcos != nula)
     escreva (arcos);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -264,7 +264,7 @@ função tartan(){
 
   se (artan != nula)
     escreva (artan);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -275,7 +275,7 @@ função texp(){
 
   se (exp != nula)
     escreva (exp);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -286,7 +286,7 @@ função tlog(){
   
   se (log != nula)
     escreva(log);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -297,7 +297,7 @@ função tpotencia(){
   
   se (pot != nula)
     escreva(pot);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -308,7 +308,7 @@ função traizq(){
 
   se (raizq != nula)
     escreva(raizq);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -319,7 +319,7 @@ função tvmed(){
 
   se (vmed != nula)
     escreva(vmed);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -330,7 +330,7 @@ função tdeltas(){
 
   se (deltas != nula)
     escreva(deltas);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -341,7 +341,7 @@ função tdeltat(){
 
   se (deltat != nula)
     escreva(deltat);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -352,7 +352,7 @@ função tacel(){
   
   se (acel != nula)
     escreva(acel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -363,7 +363,7 @@ função tmrufh(){
 
   se (mrufh != nula)
     escreva(mrufh);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -374,7 +374,7 @@ função tmruvvel(){
 
   se (mruvvel != nula)
     escreva(mruvvel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -390,20 +390,20 @@ função tmoda(){
   
   se (modaUm[0] == 2)
     escreva(modaUm);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
   se (modaDois[0] == 2 e modaDois[1] == 3)
     escreva(modaDois);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 
   se (modaTres)
     escreva(modaTres);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -520,7 +520,7 @@ função ttamanho(){
 
   se (tam != nula)
     escreva(tam);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -532,7 +532,7 @@ função ttexto(){
 
   se (text != nula)
     escreva(text);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -544,7 +544,7 @@ função treal(){
 
   se (rel != nula)
     escreva(rel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -556,7 +556,7 @@ função tinteiro(){
 
   se (int != nula)
     escreva(int);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -568,7 +568,7 @@ função tordenar(){
 
   se (ord != nula)
     escreva(ord);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -578,7 +578,7 @@ função taleatorio(){
   var ran = aleatorio();
   se (ran != nula)
     escreva(ran);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -589,7 +589,7 @@ função taleatorioEntre(){
 
   se (ran < 3) {
     escreva(ran);
-  } senao {
+  } senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -599,11 +599,11 @@ função taleatorioEntre(){
   se (ran2 >= 1) {
     se (ran2 < 3) {
       escreva(ran2);
-    } senao {
+    } senão {
       errosM = errosM+1;
       escreva(errosM);
     }
-  } senao {
+  } senão {
     errosM = errosM+1;
     escreva(errosM);
   }
