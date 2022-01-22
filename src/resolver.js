@@ -31,7 +31,7 @@ class Stack {
 
 const FunctionType = {
     NONE: "NONE",
-    FUNCAO: "FUNCAO",
+    FUNÇÃO: "FUNÇÃO",
     CONSTRUTOR: "CONSTRUTOR",
     METHOD: "METHOD"
 };
@@ -158,12 +158,12 @@ module.exports = class Resolver {
         this.declare(stmt.name);
         this.define(stmt.name);
 
-        this.resolveFunction(stmt.func, FunctionType.FUNCAO);
+        this.resolveFunction(stmt.func, FunctionType.FUNÇÃO);
         return null;
     }
 
     visitFunctionExpr(stmt) {
-        this.resolveFunction(stmt, FunctionType.FUNCAO);
+        this.resolveFunction(stmt, FunctionType.FUNÇÃO);
         return null;
     }
 

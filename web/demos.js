@@ -67,7 +67,7 @@ para (a=0; a<4; a=a+1){
   escreva ("vetor4("+texto(vetor4[a])+")");
 }`
 
-const Bhaskara = `funcao bhaskara(a,b,c){
+const Bhaskara = `função bhaskara(a,b,c){
   //A variável "d" vai simbolizar o Delta.
   //"a", "b", e "c" irão representar os coeficientes da equação.
   var d = b**2;
@@ -109,7 +109,7 @@ bhaskara(a,b,c);`
 
 const Fibonacci = `// Recursão para o cálculo da sequência de fibonacci
 
-funcao fibonacci(n){
+função fibonacci(n){
   se(n==0){
     retorna(0);
  }senao{
@@ -182,7 +182,7 @@ enquanto(erro!=0){
   escreva("erro: " + texto(erro));
 }`
 
-const FilaEstatica = `funcao enfileirar (valorEntrada) {
+const FilaEstatica = `função enfileirar (valorEntrada) {
   se (indexFinal == maximoDeElementos){
     escreva("Fila Cheia");
   } senao {
@@ -192,7 +192,7 @@ const FilaEstatica = `funcao enfileirar (valorEntrada) {
   }
 }
 
-funcao desenfileirar(){
+função desenfileirar(){
   se (indexInicial == indexFinal){
     escreva("Fila Vazia") ;
   } senao {
@@ -209,7 +209,7 @@ funcao desenfileirar(){
   }
 }
 
-funcao mostrar_fila () {
+função mostrar_fila () {
   se(indexInicial == indexFinal){
     escreva("Fila Vazia");
   } senao {  

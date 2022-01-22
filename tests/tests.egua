@@ -5,7 +5,7 @@ escreva("|");
 
 var erros = 0;
 
-funcao startTest(){
+função startTest(){
   escreva(tSeSenao());
   escreva("|");
   escreva(tEnquanto());
@@ -21,7 +21,7 @@ funcao startTest(){
   escreva(tClasse());
 }
 
-funcao tSeSenao(){
+função tSeSenao(){
   escreva("----------------------------");
   escreva("Iniciando Teste: Se - Se Não");
   escreva("----------------------------");
@@ -35,7 +35,7 @@ funcao tSeSenao(){
   }
 }
 
-funcao tEnquanto(){
+função tEnquanto(){
   escreva("------------------------");
   escreva("Iniciando Teste: Enquanto");
   escreva("------------------------");
@@ -52,7 +52,7 @@ funcao tEnquanto(){
   escreva(a);
 }
 
-funcao tPara(){
+função tPara(){
   escreva("--------------------");
   escreva("Iniciando Teste: Para");
   escreva("--------------------");
@@ -68,7 +68,7 @@ funcao tPara(){
   }
 }
 
-funcao tFacaEnquanto(){
+função tFacaEnquanto(){
   escreva("-----------------------------");
   escreva("Iniciando Teste: Faça - Enquanto");
   escreva("-----------------------------");
@@ -85,7 +85,7 @@ funcao tFacaEnquanto(){
   }
 }
 
-funcao tCasoEscolha(){
+função tCasoEscolha(){
   escreva("--------------------");
   escreva("Iniciando Teste: Caso - Escolha");
   escreva("--------------------");
@@ -97,7 +97,7 @@ funcao tCasoEscolha(){
   }
 }
 
-funcao tTentePegue(){
+função tTentePegue(){
   escreva("--------------------");
   escreva("Iniciando Teste: Tente - Pegue");
   escreva("--------------------");
@@ -111,7 +111,7 @@ funcao tTentePegue(){
   }
 }
 
-funcao tClasse(){
+função tClasse(){
   escreva("--------------------");
   escreva("Iniciando Teste: Classe");
   escreva("--------------------");
@@ -158,7 +158,7 @@ var o = [1,1,2,3,15];
 var p = [2,6,7,10,20];
 
 
-funcao teste_gerarPontosAbscissa() {
+função teste_gerarPontosAbscissa() {
   var gerarPontosAbscissa = m.gerarPontosAbscissa(2,3);
 
   se (gerarPontosAbscissa != nula)
@@ -169,7 +169,7 @@ funcao teste_gerarPontosAbscissa() {
   }
 }
 
-funcao tfun1R(){
+função tfun1R(){
   var fun1R = m.fun1R(2,3);
   
   se (fun1R != nula)
@@ -180,7 +180,7 @@ funcao tfun1R(){
       }
 }
 
-funcao tfun2R(){
+função tfun2R(){
   var fun2R = m.fun2R(2,-4,3);
   
   se (fun2R != nula)
@@ -191,7 +191,7 @@ funcao tfun2R(){
   }
 }
 
-funcao taprox(){
+função taprox(){
   var aprox = m.aprox(1,10);
   
   se (aprox != nula)
@@ -204,7 +204,7 @@ funcao taprox(){
 }
 
 
-funcao tsen(){
+função tsen(){
   var sen = m.sen(60);
   
   se (sen != nula)
@@ -215,7 +215,7 @@ funcao tsen(){
       }
 }
 
-funcao tcos(){
+função tcos(){
   var cos = m.cos(60);
   
   se (cos != nula)
@@ -226,7 +226,7 @@ funcao tcos(){
       }
 }
 
-funcao ttan(){
+função ttan(){
   var tan = m.tan(60);
 
   se (tan != nula)
@@ -237,7 +237,7 @@ funcao ttan(){
   }
 }
 
-funcao tarsen(){
+função tarsen(){
   var arsen = m.arsen(60);
 
   se (arsen != nula)
@@ -248,7 +248,7 @@ funcao tarsen(){
   }
 }
 
-funcao tarcos(){
+função tarcos(){
   var arcos = m.arcos(60);
 
   se (arcos != nula)
@@ -259,7 +259,7 @@ funcao tarcos(){
   }
 }
 
-funcao tartan(){
+função tartan(){
   var artan = m.artan(60);
 
   se (artan != nula)
@@ -270,7 +270,7 @@ funcao tartan(){
   }
 }
 
-funcao texp(){
+função texp(){
   var exp = m.exp(10);
 
   se (exp != nula)
@@ -281,7 +281,7 @@ funcao texp(){
   }
 }
 
-funcao tlog(){
+função tlog(){
   var log = m.log(10);
   
   se (log != nula)
@@ -292,7 +292,7 @@ funcao tlog(){
   }
 }
 
-funcao tpotencia(){
+função tpotencia(){
   var pot = m.potencia(2,3);
   
   se (pot != nula)
@@ -303,7 +303,7 @@ funcao tpotencia(){
   }
 }
 
-funcao traizq(){
+função traizq(){
   var raizq = m.raizq(49);
 
   se (raizq != nula)
@@ -314,7 +314,7 @@ funcao traizq(){
   }
 }
 
-funcao tvmed(){
+função tvmed(){
   var vmed = m.velocidadeMedia(30,10);
 
   se (vmed != nula)
@@ -325,7 +325,7 @@ funcao tvmed(){
   }
 }
 
-funcao tdeltas(){
+função tdeltas(){
   var deltas = m.deltaS(10,30);
 
   se (deltas != nula)
@@ -336,7 +336,7 @@ funcao tdeltas(){
   }
 }
 
-funcao tdeltat(){
+função tdeltat(){
   var deltat = m.deltaT(10,30);
 
   se (deltat != nula)
@@ -347,7 +347,7 @@ funcao tdeltat(){
   }
 }
 
-funcao tacel(){
+função tacel(){
   var acel= m.aceleracao(30,0,60,0);
   
   se (acel != nula)
@@ -358,7 +358,7 @@ funcao tacel(){
   }
 }
 
-funcao tmrufh(){
+função tmrufh(){
   var mrufh = m.mrufh(0,30,15);
 
   se (mrufh != nula)
@@ -369,7 +369,7 @@ funcao tmrufh(){
   }
 }
 
-funcao tmruvvel(){
+função tmruvvel(){
   var mruvvel = m.mruv(0,30,15,2);
 
   se (mruvvel != nula)
@@ -380,7 +380,7 @@ funcao tmruvvel(){
   }
 }
 
-funcao tmoda(){
+função tmoda(){
   var i = [1,2,2,3,4];
   var modaUm = m.moda(i);
   var j = [1,2,2,3,3];
@@ -514,7 +514,7 @@ escreva("Testes Funções Internas - Linguagem Egua");
 escreva("--------------------------------");
 escreva("|");
 
-funcao ttamanho(){
+função ttamanho(){
   var array = [1,2,3];
   var tam = tamanho(array);
 
@@ -526,7 +526,7 @@ funcao ttamanho(){
   }
 }
 
-funcao ttexto(){
+função ttexto(){
   var t = 123;
   var text = texto(t);
 
@@ -538,7 +538,7 @@ funcao ttexto(){
   }
 }
 
-funcao treal(){
+função treal(){
   var n = '123.05';
   var rel = real(n);
 
@@ -550,7 +550,7 @@ funcao treal(){
   }
 }
 
-funcao tinteiro(){
+função tinteiro(){
   var i = '50.56';
   var int = inteiro(i);
 
@@ -562,7 +562,7 @@ funcao tinteiro(){
   }
 }
 
-funcao tordenar(){
+função tordenar(){
   var i = [4,2,1,5,3];
   var ord = ordenar(i);
 
@@ -574,7 +574,7 @@ funcao tordenar(){
   }
 }
 
-funcao taleatorio(){
+função taleatorio(){
   var ran = aleatorio();
   se (ran != nula)
     escreva(ran);
@@ -584,7 +584,7 @@ funcao taleatorio(){
   }
 }
 
-funcao taleatorioEntre(){
+função taleatorioEntre(){
   var ran = aleatorioEntre(3);
 
   se (ran < 3) {

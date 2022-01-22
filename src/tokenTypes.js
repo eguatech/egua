@@ -36,7 +36,7 @@ module.exports = {
     EM: "EM",
     CLASSE: "CLASSE",
     FALSO: "FALSO",
-    FUNCAO: "FUNCAO",
+    FUNÇÃO: "FUNÇÃO",
     PARA: "PARA",
     SE: "SE",
     SENAOSE: "SENAOSE",

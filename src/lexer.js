@@ -7,7 +7,7 @@ const reservedWords = {
     senao: tokenTypes.SENAO,
     falso: tokenTypes.FALSO,
     para: tokenTypes.PARA,
-    funcao: tokenTypes.FUNCAO,
+    função: tokenTypes.FUNÇÃO,
     se: tokenTypes.SE,
     senaose: tokenTypes.SENAOSE,
     nulo: tokenTypes.NULO,
@@ -62,7 +62,8 @@ module.exports = class Lexer {
     }
 
     isAlpha(c) {
-        return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
+        let specialAlphabet = ["_", "á", "Á", "ã", "Ã", "â", "Â", "à", "À", "é", "É", "ê", "Ê", "í", "Í", "ó", "Ó", "õ", "Õ", "ô", "Ô", "ú", "Ú", "ç", "Ç"];
+        return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || specialAlphabet.includes(c);
     }
 
     isAlphaNumeric(c) {
