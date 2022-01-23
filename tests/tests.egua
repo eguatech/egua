@@ -5,8 +5,8 @@ escreva("|");
 
 var erros = 0;
 
-funcao startTest(){
-  escreva(tSeSenao());
+função startTest(){
+  escreva(tSesenão());
   escreva("|");
   escreva(tEnquanto());
   escreva("|");
@@ -21,7 +21,7 @@ funcao startTest(){
   escreva(tClasse());
 }
 
-funcao tSeSenao(){
+função tSesenão(){
   escreva("----------------------------");
   escreva("Iniciando Teste: Se - Se Não");
   escreva("----------------------------");
@@ -29,13 +29,13 @@ funcao tSeSenao(){
   var b = 1;
   se (a == b)
     retorna("Se - Se não: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Se - Se não: ERRO!");
   }
 }
 
-funcao tEnquanto(){
+função tEnquanto(){
   escreva("------------------------");
   escreva("Iniciando Teste: Enquanto");
   escreva("------------------------");
@@ -45,14 +45,14 @@ funcao tEnquanto(){
   }
   se (a == 5)
     retorna("Enquanto: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Enquanto: ERRO!");
   }
   escreva(a);
 }
 
-funcao tPara(){
+função tPara(){
   escreva("--------------------");
   escreva("Iniciando Teste: Para");
   escreva("--------------------");
@@ -62,13 +62,13 @@ funcao tPara(){
   }
   se (a == 5)
     retorna("Para: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Para: ERRO!");
   }
 }
 
-funcao tFacaEnquanto(){
+função tFacaEnquanto(){
   escreva("-----------------------------");
   escreva("Iniciando Teste: Faça - Enquanto");
   escreva("-----------------------------");
@@ -79,13 +79,13 @@ funcao tFacaEnquanto(){
   }
   se (a == 5)
     retorna("Faça - Enquanto: OK!");
-  senao {
+  senão {
     erros = erros + 1;
     retorna("Faça - Enquanto: ERRO!");
   }
 }
 
-funcao tCasoEscolha(){
+função tCasoEscolha(){
   escreva("--------------------");
   escreva("Iniciando Teste: Caso - Escolha");
   escreva("--------------------");
@@ -97,7 +97,7 @@ funcao tCasoEscolha(){
   }
 }
 
-funcao tTentePegue(){
+função tTentePegue(){
   escreva("--------------------");
   escreva("Iniciando Teste: Tente - Pegue");
   escreva("--------------------");
@@ -111,7 +111,7 @@ funcao tTentePegue(){
   }
 }
 
-funcao tClasse(){
+função tClasse(){
   escreva("--------------------");
   escreva("Iniciando Teste: Classe");
   escreva("--------------------");
@@ -158,45 +158,45 @@ var o = [1,1,2,3,15];
 var p = [2,6,7,10,20];
 
 
-funcao teste_gerarPontosAbscissa() {
+função teste_gerarPontosAbscissa() {
   var gerarPontosAbscissa = m.gerarPontosAbscissa(2,3);
 
   se (gerarPontosAbscissa != nula)
     escreva (gerarPontosAbscissa);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tfun1R(){
+função tfun1R(){
   var fun1R = m.fun1R(2,3);
   
   se (fun1R != nula)
         escreva (fun1R);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
 }
 
-funcao tfun2R(){
+função tfun2R(){
   var fun2R = m.fun2R(2,-4,3);
   
   se (fun2R != nula)
     escreva (fun2R);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao taprox(){
+função taprox(){
   var aprox = m.aprox(1,10);
   
   se (aprox != nula)
         escreva (aprox);
-  senao {
+  senão {
         errosM = errosM+1;
         escreva(errosM);
 
@@ -204,183 +204,183 @@ funcao taprox(){
 }
 
 
-funcao tsen(){
+função tsen(){
   var sen = m.sen(60);
   
   se (sen != nula)
         escreva (sen);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
 }
 
-funcao tcos(){
+função tcos(){
   var cos = m.cos(60);
   
   se (cos != nula)
         escreva (cos);
-      senao {
+      senão {
         errosM = errosM+1;
         escreva(errosM);
       }
 }
 
-funcao ttan(){
+função ttan(){
   var tan = m.tan(60);
 
   se (tan != nula)
     escreva (tan);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tarsen(){
+função tarsen(){
   var arsen = m.arsen(60);
 
   se (arsen != nula)
     escreva (arsen);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tarcos(){
+função tarcos(){
   var arcos = m.arcos(60);
 
   se (arcos != nula)
     escreva (arcos);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tartan(){
+função tartan(){
   var artan = m.artan(60);
 
   se (artan != nula)
     escreva (artan);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao texp(){
+função texp(){
   var exp = m.exp(10);
 
   se (exp != nula)
     escreva (exp);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tlog(){
+função tlog(){
   var log = m.log(10);
   
   se (log != nula)
     escreva(log);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tpotencia(){
+função tpotencia(){
   var pot = m.potencia(2,3);
   
   se (pot != nula)
     escreva(pot);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao traizq(){
+função traizq(){
   var raizq = m.raizq(49);
 
   se (raizq != nula)
     escreva(raizq);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tvmed(){
+função tvmed(){
   var vmed = m.velocidadeMedia(30,10);
 
   se (vmed != nula)
     escreva(vmed);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tdeltas(){
+função tdeltas(){
   var deltas = m.deltaS(10,30);
 
   se (deltas != nula)
     escreva(deltas);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tdeltat(){
+função tdeltat(){
   var deltat = m.deltaT(10,30);
 
   se (deltat != nula)
     escreva(deltat);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tacel(){
+função tacel(){
   var acel= m.aceleracao(30,0,60,0);
   
   se (acel != nula)
     escreva(acel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tmrufh(){
+função tmrufh(){
   var mrufh = m.mrufh(0,30,15);
 
   se (mrufh != nula)
     escreva(mrufh);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tmruvvel(){
+função tmruvvel(){
   var mruvvel = m.mruv(0,30,15,2);
 
   se (mruvvel != nula)
     escreva(mruvvel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tmoda(){
+função tmoda(){
   var i = [1,2,2,3,4];
   var modaUm = m.moda(i);
   var j = [1,2,2,3,3];
@@ -390,20 +390,20 @@ funcao tmoda(){
   
   se (modaUm[0] == 2)
     escreva(modaUm);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
   se (modaDois[0] == 2 e modaDois[1] == 3)
     escreva(modaDois);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 
   se (modaTres)
     escreva(modaTres);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -514,82 +514,82 @@ escreva("Testes Funções Internas - Linguagem Egua");
 escreva("--------------------------------");
 escreva("|");
 
-funcao ttamanho(){
+função ttamanho(){
   var array = [1,2,3];
   var tam = tamanho(array);
 
   se (tam != nula)
     escreva(tam);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao ttexto(){
+função ttexto(){
   var t = 123;
   var text = texto(t);
 
   se (text != nula)
     escreva(text);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao treal(){
+função treal(){
   var n = '123.05';
   var rel = real(n);
 
   se (rel != nula)
     escreva(rel);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tinteiro(){
+função tinteiro(){
   var i = '50.56';
   var int = inteiro(i);
 
   se (int != nula)
     escreva(int);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao tordenar(){
+função tordenar(){
   var i = [4,2,1,5,3];
   var ord = ordenar(i);
 
   se (ord != nula)
     escreva(ord);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao taleatorio(){
+função taleatorio(){
   var ran = aleatorio();
   se (ran != nula)
     escreva(ran);
-  senao {
+  senão {
     errosM = errosM+1;
     escreva(errosM);
   }
 }
 
-funcao taleatorioEntre(){
+função taleatorioEntre(){
   var ran = aleatorioEntre(3);
 
   se (ran < 3) {
     escreva(ran);
-  } senao {
+  } senão {
     errosM = errosM+1;
     escreva(errosM);
   }
@@ -599,11 +599,11 @@ funcao taleatorioEntre(){
   se (ran2 >= 1) {
     se (ran2 < 3) {
       escreva(ran2);
-    } senao {
+    } senão {
       errosM = errosM+1;
       escreva(errosM);
     }
-  } senao {
+  } senão {
     errosM = errosM+1;
     escreva(errosM);
   }

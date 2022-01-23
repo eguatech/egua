@@ -56,7 +56,7 @@ se (vetor2[0]<vetor3[0] e vetor2[1]<vetor3[1]){
   vetor4[1]=vetor3[0];
   vetor4[2]=vetor2[1];
   vetor4[3]=vetor3[1];
-  }senao{
+  }senão{
   vetor4[1]=vetor2[1];
   vetor4[2]=vetor3[0];
   vetor4[3]=vetor3[1];
@@ -67,7 +67,7 @@ para (a=0; a<4; a=a+1){
   escreva ("vetor4("+texto(vetor4[a])+")");
 }`
 
-const Bhaskara = `funcao bhaskara(a,b,c){
+const Bhaskara = `função bhaskara(a,b,c){
   //A variável "d" vai simbolizar o Delta.
   //"a", "b", e "c" irão representar os coeficientes da equação.
   var d = b**2;
@@ -109,13 +109,13 @@ bhaskara(a,b,c);`
 
 const Fibonacci = `// Recursão para o cálculo da sequência de fibonacci
 
-funcao fibonacci(n){
+função fibonacci(n){
   se(n==0){
     retorna(0);
- }senao{
+ }senão{
     se(n==1){
       retorna(1);
-   }senao{
+   }senão{
     var n1 = n-1;
     var n2 = n-2;
     var f1 = fibonacci(n1);
@@ -152,7 +152,7 @@ enquanto(erro!=0){
     se(entrada2 == 1){
       resultadoEsperado = 1;
     }
-  } senao {
+  } senão {
     resultadoEsperado = 0;
   }
   
@@ -163,7 +163,7 @@ enquanto(erro!=0){
   
   se(somatoria < 1){
     resultado = 0;
-  } senao{
+  } senão{
     se(somatoria>=1){
       resultado = 1;
     }
@@ -182,37 +182,37 @@ enquanto(erro!=0){
   escreva("erro: " + texto(erro));
 }`
 
-const FilaEstatica = `funcao enfileirar (valorEntrada) {
+const FilaEstatica = `função enfileirar (valorEntrada) {
   se (indexFinal == maximoDeElementos){
     escreva("Fila Cheia");
-  } senao {
+  } senão {
     filaEstatica[indexFinal] = valorEntrada;
     escreva("Valor inserido com sucesso: " + texto(filaEstatica[indexFinal]));
     retorna indexFinal = indexFinal + 1;
   }
 }
 
-funcao desenfileirar(){
+função desenfileirar(){
   se (indexInicial == indexFinal){
     escreva("Fila Vazia") ;
-  } senao {
+  } senão {
     para (i = 0; i <= indexFinal; i=i+1){
       
       se(i+1 == indexFinal){
         indexFinal = indexFinal - 1;
         escreva("Valor retirado com sucesso.");
         
-      } senao {
+      } senão {
         filaEstatica[i] = filaEstatica[i+1];
       }
     }    
   }
 }
 
-funcao mostrar_fila () {
+função mostrar_fila () {
   se(indexInicial == indexFinal){
     escreva("Fila Vazia");
-  } senao {  
+  } senão {  
     para (var i = 0; i < indexFinal; i = i + 1){
       escreva("index "+texto(i)); 
       escreva(texto(filaEstatica[i]));

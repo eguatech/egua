@@ -50,6 +50,11 @@ html {
     position: relative !important;
   }
 
+  .output {
+    font-size: 13px !important;
+  }
+  
+
   #runBtn {
     width: 100px;
     font-size: 11px;
@@ -74,7 +79,7 @@ html {
 .output {
   margin: 1px 10px;
   padding-top: 0;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 * {

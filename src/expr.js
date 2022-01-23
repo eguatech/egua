@@ -27,7 +27,7 @@ class Binary extends Expr {
     }
 }
 
-class Funcao extends Expr {
+class Função extends Expr {
     constructor(params, body) {
         super();
         this.params = params;
@@ -210,7 +210,7 @@ class Variable extends Expr {
 module.exports = {
     Assign,
     Binary,
-    Funcao,
+    Função,
     Call,
     Get,
     Grouping,

@@ -21,7 +21,7 @@ module.exports = class Parser {
 
             switch (this.peek().type) {
                 case tokenTypes.CLASSE:
-                case tokenTypes.FUNCAO:
+                case tokenTypes.FUNÇÃO:
                 case tokenTypes.VAR:
                 case tokenTypes.PARA:
                 case tokenTypes.SE:
@@ -137,7 +137,7 @@ module.exports = class Parser {
             }
             return new Expr.Dictionary(keys, values);
         }
-        if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
+        if (this.match(tokenTypes.FUNÇÃO)) return this.functionBody("função");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NULO)) return new Expr.Literal(null);
@@ -425,12 +425,12 @@ module.exports = class Parser {
         let thenBranch = this.statement();
 
         let elifBranches = [];
-        while (this.match(tokenTypes.SENAOSE)) {
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+        while (this.match(tokenTypes.SENÃOSE)) {
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senãose'.");
             let elifCondition = this.expression();
             this.consume(
                 tokenTypes.RIGHT_PAREN,
-                "Esperado ')' apóes codição do 'senaose."
+                "Esperado ')' apóes codição do 'senãose."
             );
 
             let branch = this.statement();
@@ -442,7 +442,7 @@ module.exports = class Parser {
         }
 
         let elseBranch = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             elseBranch = this.statement();
         }
 
@@ -645,7 +645,7 @@ module.exports = class Parser {
         }
 
         let elseBlock = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             this.consume(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."
@@ -727,7 +727,7 @@ module.exports = class Parser {
 
     function(kind) {
         let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
-        return new Stmt.Funcao(name, this.functionBody(kind));
+        return new Stmt.Função(name, this.functionBody(kind));
     }
 
     functionBody(kind) {
@@ -769,7 +769,7 @@ module.exports = class Parser {
 
         let body = this.block();
 
-        return new Expr.Funcao(parameters, body);
+        return new Expr.Função(parameters, body);
     }
 
     classDeclaration() {
@@ -795,11 +795,11 @@ module.exports = class Parser {
     declaration() {
         try {
             if (
-                this.check(tokenTypes.FUNCAO) &&
+                this.check(tokenTypes.FUNÇÃO) &&
                 this.checkNext(tokenTypes.IDENTIFIER)
             ) {
-                this.consume(tokenTypes.FUNCAO, null);
-                return this.function("funcao");
+                this.consume(tokenTypes.FUNÇÃO, null);
+                return this.function("função");
             }
             if (this.match(tokenTypes.VAR)) return this.varDeclaration();
             if (this.match(tokenTypes.CLASSE)) return this.classDeclaration();

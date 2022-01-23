@@ -13,7 +13,7 @@ class Expression extends Stmt {
     }
 }
 
-class Funcao extends Stmt {
+class Função extends Stmt {
     constructor(name, func) {
         super();
         this.name = name;
@@ -197,7 +197,7 @@ class Var extends Stmt {
 
 module.exports = {
     Expression,
-    Funcao,
+    Função,
     Retorna,
     Classe,
     Block,

@@ -740,7 +740,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.1.15");
+        console.log("Console da Linguagem Egua v1.2.2");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -926,7 +926,7 @@ class Binary extends Expr {
     }
 }
 
-class Funcao extends Expr {
+class Função extends Expr {
     constructor(params, body) {
         super();
         this.params = params;
@@ -1109,7 +1109,7 @@ class Variable extends Expr {
 module.exports = {
     Assign,
     Binary,
-    Funcao,
+    Função,
     Call,
     Get,
     Grouping,
@@ -1928,12 +1928,12 @@ const reservedWords = {
     e: tokenTypes.E,
     em: tokenTypes.EM,
     classe: tokenTypes.CLASSE,
-    senao: tokenTypes.SENAO,
+    senão: tokenTypes.SENÃO,
     falso: tokenTypes.FALSO,
     para: tokenTypes.PARA,
-    funcao: tokenTypes.FUNCAO,
+    função: tokenTypes.FUNÇÃO,
     se: tokenTypes.SE,
-    senaose: tokenTypes.SENAOSE,
+    senãose: tokenTypes.SENÃOSE,
     nulo: tokenTypes.NULO,
     ou: tokenTypes.OU,
     escreva: tokenTypes.ESCREVA,
@@ -1986,7 +1986,8 @@ module.exports = class Lexer {
     }
 
     isAlpha(c) {
-        return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
+        let specialAlphabet = ["_", "á", "Á", "ã", "Ã", "â", "Â", "à", "À", "é", "É", "ê", "Ê", "í", "Í", "ó", "Ó", "õ", "Õ", "ô", "Ô", "ú", "Ú", "ç", "Ç"];
+        return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || specialAlphabet.includes(c);
     }
 
     isAlphaNumeric(c) {
@@ -3261,7 +3262,7 @@ module.exports = class Parser {
 
             switch (this.peek().type) {
                 case tokenTypes.CLASSE:
-                case tokenTypes.FUNCAO:
+                case tokenTypes.FUNÇÃO:
                 case tokenTypes.VAR:
                 case tokenTypes.PARA:
                 case tokenTypes.SE:
@@ -3377,7 +3378,7 @@ module.exports = class Parser {
             }
             return new Expr.Dictionary(keys, values);
         }
-        if (this.match(tokenTypes.FUNCAO)) return this.functionBody("funcao");
+        if (this.match(tokenTypes.FUNÇÃO)) return this.functionBody("função");
         if (this.match(tokenTypes.FALSO)) return new Expr.Literal(false);
         if (this.match(tokenTypes.VERDADEIRO)) return new Expr.Literal(true);
         if (this.match(tokenTypes.NULO)) return new Expr.Literal(null);
@@ -3665,12 +3666,12 @@ module.exports = class Parser {
         let thenBranch = this.statement();
 
         let elifBranches = [];
-        while (this.match(tokenTypes.SENAOSE)) {
-            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senaose'.");
+        while (this.match(tokenTypes.SENÃOSE)) {
+            this.consume(tokenTypes.LEFT_PAREN, "Esperado '(' após 'senãose'.");
             let elifCondition = this.expression();
             this.consume(
                 tokenTypes.RIGHT_PAREN,
-                "Esperado ')' apóes codição do 'senaose."
+                "Esperado ')' apóes codição do 'senãose."
             );
 
             let branch = this.statement();
@@ -3682,7 +3683,7 @@ module.exports = class Parser {
         }
 
         let elseBranch = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             elseBranch = this.statement();
         }
 
@@ -3885,7 +3886,7 @@ module.exports = class Parser {
         }
 
         let elseBlock = null;
-        if (this.match(tokenTypes.SENAO)) {
+        if (this.match(tokenTypes.SENÃO)) {
             this.consume(
                 tokenTypes.LEFT_BRACE,
                 "Esperado '{' após a declaração 'pegue'."
@@ -3967,7 +3968,7 @@ module.exports = class Parser {
 
     function(kind) {
         let name = this.consume(tokenTypes.IDENTIFIER, `Esperado nome ${kind}.`);
-        return new Stmt.Funcao(name, this.functionBody(kind));
+        return new Stmt.Função(name, this.functionBody(kind));
     }
 
     functionBody(kind) {
@@ -4009,7 +4010,7 @@ module.exports = class Parser {
 
         let body = this.block();
 
-        return new Expr.Funcao(parameters, body);
+        return new Expr.Função(parameters, body);
     }
 
     classDeclaration() {
@@ -4035,11 +4036,11 @@ module.exports = class Parser {
     declaration() {
         try {
             if (
-                this.check(tokenTypes.FUNCAO) &&
+                this.check(tokenTypes.FUNÇÃO) &&
                 this.checkNext(tokenTypes.IDENTIFIER)
             ) {
-                this.consume(tokenTypes.FUNCAO, null);
-                return this.function("funcao");
+                this.consume(tokenTypes.FUNÇÃO, null);
+                return this.function("função");
             }
             if (this.match(tokenTypes.VAR)) return this.varDeclaration();
             if (this.match(tokenTypes.CLASSE)) return this.classDeclaration();
@@ -4095,7 +4096,7 @@ class Stack {
 
 const FunctionType = {
     NONE: "NONE",
-    FUNCAO: "FUNCAO",
+    FUNÇÃO: "FUNÇÃO",
     CONSTRUTOR: "CONSTRUTOR",
     METHOD: "METHOD"
 };
@@ -4222,12 +4223,12 @@ module.exports = class Resolver {
         this.declare(stmt.name);
         this.define(stmt.name);
 
-        this.resolveFunction(stmt.func, FunctionType.FUNCAO);
+        this.resolveFunction(stmt.func, FunctionType.FUNÇÃO);
         return null;
     }
 
     visitFunctionExpr(stmt) {
-        this.resolveFunction(stmt, FunctionType.FUNCAO);
+        this.resolveFunction(stmt, FunctionType.FUNÇÃO);
         return null;
     }
 
@@ -4497,7 +4498,7 @@ class Expression extends Stmt {
     }
 }
 
-class Funcao extends Stmt {
+class Função extends Stmt {
     constructor(name, func) {
         super();
         this.name = name;
@@ -4681,7 +4682,7 @@ class Var extends Stmt {
 
 module.exports = {
     Expression,
-    Funcao,
+    Função,
     Retorna,
     Classe,
     Block,
@@ -4907,11 +4908,11 @@ module.exports = {
     EM: "EM",
     CLASSE: "CLASSE",
     FALSO: "FALSO",
-    FUNCAO: "FUNCAO",
+    FUNÇÃO: "FUNÇÃO",
     PARA: "PARA",
     SE: "SE",
-    SENAOSE: "SENAOSE",
-    SENAO: "SENAO",
+    SENÃOSE: "SENÃOSE",
+    SENÃO: "SENÃO",
     ESCOLHA: "ESCOLHA",
     CASO: "CASO",
     PADRAO: "PADRAO",
