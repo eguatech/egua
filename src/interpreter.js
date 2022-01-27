@@ -20,6 +20,10 @@ const {
     ReturnException
 } = require("./errors.js");
 
+/**
+ * O Interpretador (Interpreter) visita todos os elementos complexos gerados pelo analisador sintático (Parser)
+ * e de fato executa a lógica de programação descrita no código.
+ */
 module.exports = class Interpreter {
     constructor(Egua, baseDir) {
         this.Egua = Egua;

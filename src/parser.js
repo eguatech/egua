@@ -4,6 +4,10 @@ const Stmt = require("./stmt.js");
 
 class ParserError extends Error { }
 
+/**
+ * O avaliador sintático (Parser) é responsável por transformar tokens do Lexador em estruturas de alto nível.
+ * Essas estruturas de alto nível são as partes que executam lógica de programação de fato.
+ */
 module.exports = class Parser {
     constructor(tokens, Egua) {
         this.tokens = tokens;

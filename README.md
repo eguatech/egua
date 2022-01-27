@@ -33,7 +33,7 @@
 - **Simples e Completa.** Podendo ser usadas por pessoas com ou sem experiência em programação.
 - **Totalmente em Português.** Desenvolvida totalmente em português para quebrar a barreira do inglês.
 - **Grátis.** Sem planos, sem limitações e sem propaganda.
-- **Código aberto (open-source).** Todo código fonte disponível para estudar, modificar e contribuir.
+- **Código aberto (*open-source*).** Todo código fonte disponível para estudar, modificar e contribuir.
 - **Constantes Atualizações.** Junto à nossa comunidade, para trazermos melhorias e inovações.
 - **Linguagem Científica.** Apoiamos e encorajamos o desenvolvimento e aprimoramento da ciência e da educação.
 
