@@ -144,15 +144,15 @@ escreva("----------------------------");
 
 
 escreva("--------------------------------");
-escreva("Testes Internos - Biblioteca EguaMat");
+escreva("Testes Internos - Biblioteca Matemática");
 escreva("--------------------------------");
 escreva("|");
 
 var errosM = 0;
 
 
-var m = importar("eguamat");
-var nula = m.nula();
+var m = importar("matematica");
+var nula = nulo;
 
 var o = [1,1,2,3,15];
 var p = [2,6,7,10,20];

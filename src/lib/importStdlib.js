@@ -2,7 +2,7 @@ const StandardFn = require("../structures/standardFn.js");
 const EguaModule = require("../structures/module.js");
 
 require("./tempo.js");
-require("./eguamat.js");
+require("./matematica.js");
 
 const loadModule = function (moduleName, modulePath) {
     let moduleData = require(modulePath);
@@ -26,8 +26,8 @@ module.exports = function (name) {
     switch (name) {
         case "tempo":
             return loadModule("tempo", "./tempo.js");
-        case "eguamat":
-            return loadModule("eguamat", "./eguamat.js");
+        case "matematica":
+            return loadModule("matematica", "./matematica.js");
     }
 
     return null;

@@ -2,12 +2,14 @@ name: Commit e PR - Master
 
 on:
   push:
-    branches: [ master ]
+    branches:
+       - "*"
   pull_request:
-    branches: [ master ]
+    branches:
+      - "*"
 
 jobs:
-  test_master:
+  tests:
     runs-on: ubuntu-latest
 
     steps:

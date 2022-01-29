@@ -17,7 +17,7 @@ module.exports.Egua = class Egua {
 
     runPrompt() {
         const interpreter = new Interpreter(this, process.cwd(), undefined);
-        console.log("Console da Linguagem Egua v1.2.2");
+        console.log("Console da Linguagem Egua v1.3.1");
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,

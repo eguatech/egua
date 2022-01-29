@@ -1148,6 +1148,10 @@ const {
     ReturnException
 } = require("./errors.js");
 
+/**
+ * O Interpretador (Interpreter) visita todos os elementos complexos gerados pelo analisador sintático (Parser)
+ * e de fato executa a lógica de programação descrita no código.
+ */
 module.exports = class Interpreter {
     constructor(Egua, baseDir) {
         this.Egua = Egua;
@@ -1921,7 +1925,7 @@ module.exports = class Interpreter {
     }
 };
 
-},{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":11,"./lib/importStdlib.js":12,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
+},{"./egua.js":4,"./environment.js":5,"./errors.js":6,"./lib/globalLib.js":10,"./lib/importStdlib.js":11,"./structures/callable.js":17,"./structures/class.js":18,"./structures/function.js":19,"./structures/instance.js":20,"./structures/module.js":21,"./structures/standardFn.js":22,"./tokenTypes.js":23,"fs":1,"path":2}],9:[function(require,module,exports){
 const tokenTypes = require("./tokenTypes.js");
 
 const reservedWords = {
@@ -1969,6 +1973,12 @@ class Token {
     }
 }
 
+/**
+ * O Lexador é responsável por transformar o código em uma coleção de tokens de linguagem.
+ * Cada token de linguagem é representado por um tipo, um lexema e informações da linha de código em que foi expresso.
+ * Também é responsável por mapear as palavras reservadas da linguagem, que não podem ser usadas por outras
+ * estruturas, tais como nomes de variáveis, funções, literais, classes e assim por diante.
+ */
 module.exports = class Lexer {
     constructor(code, Egua) {
         this.Egua = Egua;
@@ -2227,6 +2237,240 @@ module.exports = class Lexer {
     }
 };
 },{"./tokenTypes.js":23}],10:[function(require,module,exports){
+const RuntimeError = require("../errors.js").RuntimeError,
+    EguaFunction = require("../structures/function.js"),
+    EguaInstance = require("../structures/instance.js"),
+    StandardFn = require("../structures/standardFn.js"),
+    EguaClass = require("../structures/class.js");
+
+
+module.exports = function (interpreter, globals) {
+    // Retorna um número aleatório entre 0 e 1.
+    globals.defineVar(
+        "aleatorio",
+        new StandardFn(1, function () {
+            return Math.random();
+        })
+    );
+
+    // Retorna um número aleatório de acordo com o parâmetro passado.
+    // MIN(inclusivo) - MAX(exclusivo)
+    globals.defineVar(
+        "aleatorioEntre",
+        new StandardFn(1, function (min, max) {
+            if (!arguments[0]) {
+                throw new RuntimeError(
+                    this.token,
+                    "A função recebe ao menos um parâmetro"
+                );
+            }
+
+            if (arguments.length === 1) {
+                if (typeof min !== 'number') {
+                    throw new RuntimeError(
+                        this.token,
+                        "O parâmetro deve ser do tipo número"
+                    );
+                };
+
+                return Math.floor(Math.random() * (0 - min)) + min;
+            }
+
+            if (arguments.length > 2) {
+                throw new RuntimeError(
+                    this.token,
+                    "A quantidade de argumentos máxima é 2"
+                );
+            }
+
+            if (typeof min !== 'number' || typeof max !== 'number') {
+                throw new RuntimeError(
+                    this.token,
+                    "Os dois parâmetros devem ser do tipo número."
+                );
+            }
+
+            return Math.floor(Math.random() * (max - min)) + min;
+        })
+    );    
+
+    globals.defineVar(
+        "inteiro",
+        new StandardFn(1, function (value) {
+            if (value === undefined || value === null) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
+
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para inteiro."
+                );
+            }
+
+            return parseInt(value);
+        })
+    );
+
+    globals.defineVar(
+        "mapear",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            let provisorio = [];
+            for (let index = 0; index < array.length; ++index) {
+                provisorio.push(
+                    callback.call(
+                        interpreter, [array[index]]
+                    )
+                );
+            }
+
+            return provisorio;
+        })
+    );
+
+    globals.defineVar(
+        "ordenar",
+        new StandardFn(1, function (obj) {
+            if (Array.isArray(obj) == false) {
+                throw new RuntimeError(
+                    this.token,
+                    "Valor Inválido. Objeto inserido não é um vetor."
+                );
+            }
+
+            let trocado;
+            let length = obj.length;
+            do {
+                trocado = false;
+                for (var i = 0; i < length - 1; i++) {
+                    if (obj[i] > obj[i + 1]) {
+                        [obj[i], obj[i + 1]] = [obj[i + 1], obj[i]];
+                        trocado = true;
+                    }
+                }
+            } while (trocado);
+            return obj;
+        })
+    );
+
+    globals.defineVar(
+        "real",
+        new StandardFn(1, function (value) {
+            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
+                throw new RuntimeError(
+                    this.token,
+                    "Somente números podem passar para real."
+                );
+            return parseFloat(value);
+        })
+    );
+
+    globals.defineVar(
+        "tamanho",
+        new StandardFn(1, function (obj) {
+            if (!isNaN(obj)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Não é possível encontrar o tamanho de um número."
+                );
+            }
+
+            if (obj instanceof EguaInstance) {
+                throw new RuntimeError(
+                    this.token,
+                    "Você não pode encontrar o tamanho de uma declaração."
+                );
+            }
+
+            if (obj instanceof EguaFunction) {
+                return obj.declaration.params.length;
+            }
+
+            if (obj instanceof StandardFn) {
+                return obj.arityValue;
+            }
+
+            if (obj instanceof EguaClass) {
+                let methods = obj.methods;
+                let length = 0;
+
+                if (methods.init && methods.init.isInitializer) {
+                    length = methods.init.declaration.params.length;
+                }
+
+                return length;
+            }
+
+            return obj.length;
+        })
+    );
+
+    globals.defineVar(
+        "texto",
+        new StandardFn(1, function (value) {
+            return `${value}`;
+        })
+    );
+
+    globals.defineVar("exports", {});
+
+    return globals;
+};
+
+},{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],11:[function(require,module,exports){
+const StandardFn = require("../structures/standardFn.js");
+const EguaModule = require("../structures/module.js");
+
+require("./tempo.js");
+require("./matematica.js");
+
+const loadModule = function (moduleName, modulePath) {
+    let moduleData = require(modulePath);
+    let newModule = new EguaModule(moduleName);
+
+    let keys = Object.keys(moduleData);
+    for (let i = 0; i < keys.length; i++) {
+        let currentItem = moduleData[keys[i]];
+
+        if (typeof currentItem === "function") {
+            newModule[keys[i]] = new StandardFn(currentItem.length, currentItem);
+        } else {
+            newModule[keys[i]] = currentItem;
+        }
+    }
+
+    return newModule;
+};
+
+module.exports = function (name) {
+    switch (name) {
+        case "tempo":
+            return loadModule("tempo", "./tempo.js");
+        case "matematica":
+            return loadModule("matematica", "./matematica.js");
+    }
+
+    return null;
+};
+
+},{"../structures/module.js":21,"../structures/standardFn.js":22,"./matematica.js":12,"./tempo.js":13}],12:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
 module.exports.graus = function (angle) {
@@ -2239,7 +2483,6 @@ module.exports.graus = function (angle) {
   return angle * (180 / Math.PI);
 };
 
-//Mediana de uma matriz
 module.exports.mediana = function (a) {
   if (isNaN(a) || a === null)
     throw new RuntimeError(
@@ -2253,69 +2496,45 @@ module.exports.mediana = function (a) {
 };
 
 /**
- * Calcula a moda de um vetor. A moda é o valor, ou valores, que mais são 
- * presentes em um conjunto.
- * @param {inteiro[]} vetor O conjunto a ser avaliado.
- * @returns O novo conjunto com os valores da moda.
- * @see https://pt.wikipedia.org/wiki/Moda_(estat%C3%ADstica)
+ * Calcula a moda de um vetor.
+ * @param {inteiro[]} vetor Vetor de inteiros.
+ * @returns Valor inteiro da moda.
  */
-module.exports.moda = function (vetor) {
-  if (!Array.isArray(vetor))
+module.exports.moda = function (numbers) {
+  if (!Array.isArray(numbers))
     throw new RuntimeError(
       this.token,
-      "Parâmetro `vetor` deve ser um vetor, em min(vetor)."
+      "Parâmetro `vetor` deve ser um vetor na função moda(vetor)."
     );
 
-  if (vetor.some(isNaN))
+  if (numbers.some(isNaN))
     throw new RuntimeError(
       this.token,
-      "Todos os elementos de `vetor` deve ser numéricos, em min(vetor)."
+      "Todos os elementos de `vetor` deve ser numéricos na função moda(vetor)."
     );
-
-  const objectArr = vetor.reduce(
-    function (acc, curr) { 
-      return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc 
-    },
-    {}
-  )
-  const counter = []
-  Object.keys(objectArr).filter(function (pos) {
-    counter.push(objectArr[pos])
-  })
-  const max = Math.max.apply(null, counter)
   
-  if (max === 1) {
-    return []
-  }
-
-  return Object.keys(objectArr).filter(function (pos) {
-    return objectArr[pos] === max 
-      ? objectArr[pos]
-      : null
-  }).map(item => Number(item))
+    var modes = [], count = [], i, number, maxIndex = 0;
+ 
+    for (i = 0; i < numbers.length; i += 1) {
+        number = numbers[i];
+        count[number] = (count[number] || 0) + 1;
+        if (count[number] > maxIndex) {
+            maxIndex = count[number];
+        }
+    }
+ 
+    for (i in count)
+        if (count.hasOwnProperty(i)) {
+            if (count[i] === maxIndex) {
+                modes.push(Number(i));
+            }
+        }
+ 
+    return modes;
 }
-/**
- * Função que sempre returna `nulo`. 
- * Útil para comparações entre outras funções que também retornam nulo.
- * @returns `null` do JavaScript.
- */
-module.exports.nula = function () {
-  return null;
-};
 
-/**
- * Constante pi.
- * @see https://pt.wikipedia.org/wiki/Pi
- */
 module.exports.pi = Math.PI;
 
-/**
- * Calcula o valor radiano de um ângulo. O radiano é o comprimento do arco formado 
- * por um ângulo em uma circunferência.
- * @param {inteiro} angulo O ângulo, em graus, do valor radiano desejado.
- * @returns O valor, em radianos, do arco formado pelo ângulo.
- * @see https://pt.wikipedia.org/wiki/Radiano
- */
 module.exports.radiano = function (angulo) {
   if (!Number.isInteger(angulo))
     throw new RuntimeError(
@@ -2953,241 +3172,7 @@ module.exports.minaprox = function (value) {
   return Math.floor(value);
 };
 
-},{"../errors.js":6}],11:[function(require,module,exports){
-const RuntimeError = require("../errors.js").RuntimeError,
-    EguaFunction = require("../structures/function.js"),
-    EguaInstance = require("../structures/instance.js"),
-    StandardFn = require("../structures/standardFn.js"),
-    EguaClass = require("../structures/class.js");
-
-
-module.exports = function (interpreter, globals) {
-    // Retorna um número aleatório entre 0 e 1.
-    globals.defineVar(
-        "aleatorio",
-        new StandardFn(1, function () {
-            return Math.random();
-        })
-    );
-
-    // Retorna um número aleatório de acordo com o parâmetro passado.
-    // MIN(inclusivo) - MAX(exclusivo)
-    globals.defineVar(
-        "aleatorioEntre",
-        new StandardFn(1, function (min, max) {
-            if (!arguments[0]) {
-                throw new RuntimeError(
-                    this.token,
-                    "A função recebe ao menos um parâmetro"
-                );
-            }
-
-            if (arguments.length === 1) {
-                if (typeof min !== 'number') {
-                    throw new RuntimeError(
-                        this.token,
-                        "O parâmetro deve ser do tipo número"
-                    );
-                };
-
-                return Math.floor(Math.random() * (0 - min)) + min;
-            }
-
-            if (arguments.length > 2) {
-                throw new RuntimeError(
-                    this.token,
-                    "A quantidade de argumentos máxima é 2"
-                );
-            }
-
-            if (typeof min !== 'number' || typeof max !== 'number') {
-                throw new RuntimeError(
-                    this.token,
-                    "Os dois parâmetros devem ser do tipo número."
-                );
-            }
-
-            return Math.floor(Math.random() * (max - min)) + min;
-        })
-    );    
-
-    globals.defineVar(
-        "inteiro",
-        new StandardFn(1, function (value) {
-            if (value === undefined || value === null) {
-                throw new RuntimeError(
-                    this.token,
-                    "Somente números podem passar para inteiro."
-                );
-            }
-
-            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value)) {
-                throw new RuntimeError(
-                    this.token,
-                    "Somente números podem passar para inteiro."
-                );
-            }
-
-            return parseInt(value);
-        })
-    );
-
-    globals.defineVar(
-        "mapear",
-        new StandardFn(1, function (array, callback) {
-            if (!Array.isArray(array)) {
-                throw new RuntimeError(
-                    this.token,
-                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
-                );
-            }
-
-            if (callback.constructor.name !== 'EguaFunction') {
-                throw new RuntimeError(
-                    this.token,
-                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
-                );
-            }
-
-            let provisorio = [];
-            for (let index = 0; index < array.length; ++index) {
-                provisorio.push(
-                    callback.call(
-                        interpreter, [array[index]]
-                    )
-                );
-            }
-
-            return provisorio;
-        })
-    );
-
-    globals.defineVar(
-        "ordenar",
-        new StandardFn(1, function (obj) {
-            if (Array.isArray(obj) == false) {
-                throw new RuntimeError(
-                    this.token,
-                    "Valor Inválido. Objeto inserido não é um vetor."
-                );
-            }
-
-            let trocado;
-            let length = obj.length;
-            do {
-                trocado = false;
-                for (var i = 0; i < length - 1; i++) {
-                    if (obj[i] > obj[i + 1]) {
-                        [obj[i], obj[i + 1]] = [obj[i + 1], obj[i]];
-                        trocado = true;
-                    }
-                }
-            } while (trocado);
-            return obj;
-        })
-    );
-
-    globals.defineVar(
-        "real",
-        new StandardFn(1, function (value) {
-            if (!/^-{0,1}\d+$/.test(value) && !/^\d+\.\d+$/.test(value))
-                throw new RuntimeError(
-                    this.token,
-                    "Somente números podem passar para real."
-                );
-            return parseFloat(value);
-        })
-    );
-
-    globals.defineVar(
-        "tamanho",
-        new StandardFn(1, function (obj) {
-            if (!isNaN(obj)) {
-                throw new RuntimeError(
-                    this.token,
-                    "Não é possível encontrar o tamanho de um número."
-                );
-            }
-
-            if (obj instanceof EguaInstance) {
-                throw new RuntimeError(
-                    this.token,
-                    "Você não pode encontrar o tamanho de uma declaração."
-                );
-            }
-
-            if (obj instanceof EguaFunction) {
-                return obj.declaration.params.length;
-            }
-
-            if (obj instanceof StandardFn) {
-                return obj.arityValue;
-            }
-
-            if (obj instanceof EguaClass) {
-                let methods = obj.methods;
-                let length = 0;
-
-                if (methods.init && methods.init.isInitializer) {
-                    length = methods.init.declaration.params.length;
-                }
-
-                return length;
-            }
-
-            return obj.length;
-        })
-    );
-
-    globals.defineVar(
-        "texto",
-        new StandardFn(1, function (value) {
-            return `${value}`;
-        })
-    );
-
-    globals.defineVar("exports", {});
-
-    return globals;
-};
-
-},{"../errors.js":6,"../structures/class.js":18,"../structures/function.js":19,"../structures/instance.js":20,"../structures/standardFn.js":22}],12:[function(require,module,exports){
-const StandardFn = require("../structures/standardFn.js");
-const EguaModule = require("../structures/module.js");
-
-require("./tempo.js");
-require("./eguamat.js");
-
-const loadModule = function (moduleName, modulePath) {
-    let moduleData = require(modulePath);
-    let newModule = new EguaModule(moduleName);
-
-    let keys = Object.keys(moduleData);
-    for (let i = 0; i < keys.length; i++) {
-        let currentItem = moduleData[keys[i]];
-
-        if (typeof currentItem === "function") {
-            newModule[keys[i]] = new StandardFn(currentItem.length, currentItem);
-        } else {
-            newModule[keys[i]] = currentItem;
-        }
-    }
-
-    return newModule;
-};
-
-module.exports = function (name) {
-    switch (name) {
-        case "tempo":
-            return loadModule("tempo", "./tempo.js");
-        case "eguamat":
-            return loadModule("eguamat", "./eguamat.js");
-    }
-
-    return null;
-};
-
-},{"../structures/module.js":21,"../structures/standardFn.js":22,"./eguamat.js":10,"./tempo.js":13}],13:[function(require,module,exports){
+},{"../errors.js":6}],13:[function(require,module,exports){
 const RuntimeError = require("../errors.js").RuntimeError;
 
 // Retorna uma data completa
@@ -3245,6 +3230,10 @@ const Stmt = require("./stmt.js");
 
 class ParserError extends Error { }
 
+/**
+ * O avaliador sintático (Parser) é responsável por transformar tokens do Lexador em estruturas de alto nível.
+ * Essas estruturas de alto nível são as partes que executam lógica de programação de fato.
+ */
 module.exports = class Parser {
     constructor(tokens, Egua) {
         this.tokens = tokens;
@@ -4115,6 +4104,12 @@ const LoopType = {
     FAZER: "FAZER"
 };
 
+/**
+ * O Resolvedor (Resolver) é responsável por catalogar todos os identificadores complexos, como por exemplo: funções, classes, variáveis, 
+ * e delimitar os escopos onde esses identificadores existem. 
+ * Exemplo: uma classe A declara dois métodos chamados M e N. Todas as variáveis declaradas dentro de M não podem ser vistas por N, e vice-versa.
+ * No entanto, todas as variáveis declaradas dentro da classe A podem ser vistas tanto por M quanto por N.
+ */
 module.exports = class Resolver {
     constructor(interpreter, egua) {
         this.interpreter = interpreter;

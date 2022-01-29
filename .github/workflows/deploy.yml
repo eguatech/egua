@@ -1,9 +1,9 @@
 name: Deploy Servidor e NPM
 
-on:
+on:  
   push:
-    branches: [ master ]
-    paths: [ 'web/dist.js', 'package.json']
+    tags:
+      - '*'
 
 jobs:
   test_publish:
@@ -54,5 +54,3 @@ jobs:
       run: |
           sudo npm i -g egua
           egua tests/tests.egua
-
-    
