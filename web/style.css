@@ -24,6 +24,7 @@ html {
   display: inline-block;
   border-radius: 5px;
   padding: 15px 20px;
+  border-right: 7px solid transparent;
   margin-left: 10px;
 }
 
@@ -53,7 +54,7 @@ html {
   .output {
     font-size: 13px !important;
   }
-  
+
 
   #runBtn {
     width: 100px;
