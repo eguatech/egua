@@ -1,7 +1,8 @@
 .codeflask {
 	background: #fff;
-	color: #4f559c;
+	color: #212121;
 	font-size: 80px !important;
+	font-family: "Roboto Mono", monospace;
 }
 
 .codeflask__flatten {
@@ -11,6 +12,15 @@
 .codeflask__lines {
 	font-size: 17px !important;
 	z-index: 100 !important;
+}
+
+.codeflask__textarea {
+	font-family: 'Roboto Mono', monospace !important;
+}
+
+.codeflask__textarea::selection {
+	background: rgb(59 130 246);
+	color: transparent;
 }
 
 .codeflask.codeflask--has-line-numbers:before {
@@ -30,7 +40,7 @@
 }
 
 .codeflask .token.string {
-	color: #41ad8f;
+	color: rgb(5 150 105);
 }
 
 .codeflask .token.comment {
@@ -38,27 +48,27 @@
 }
 
 .codeflask .token.function {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.boolean {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.number {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.selector {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.property {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.tag {
-	color: #8500ff;
+	color: rgb(124 58 237);
 }
 
 .codeflask .token.attr-value {
