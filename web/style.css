@@ -115,6 +115,11 @@ html, body, button, select {
     display: inline-block;
 }
 
+#middle img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 #right {
     width: 25%;
     text-align: center;
