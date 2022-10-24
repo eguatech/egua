@@ -14,10 +14,6 @@
 	z-index: 100 !important;
 }
 
-.codeflask__textarea {
-	font-family: 'Roboto Mono', monospace !important;
-}
-
 .codeflask__textarea::selection {
 	background: rgb(59 130 246);
 	color: transparent;
