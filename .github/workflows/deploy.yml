@@ -20,7 +20,8 @@ jobs:
     - name: Testando binário
       run: |
           npm run test
-          npm install 
+          npm install
+          mkdir dist
           npm run build-web-npm
 
     - name: Publicando NPM
