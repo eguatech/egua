@@ -6,6 +6,7 @@
   "scripts": {
     "egua": "egua",
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
+    "build-web-npm": "browserify src/web.js --s Egua > dist/dist.js",
     "test": "./bin/egua tests/tests.egua",
     "test-wsl": "node index.js tests/tests.egua"
   },
@@ -26,7 +27,6 @@
   },
   "homepage": "https://github.com/eguatech/egua#readme",
   "devDependencies": {
-    "browserify": "^17.0.0",
-    "egua": "^1.2.0"
+    "browserify": "^17.0.0"
   }
 }
