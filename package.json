@@ -1,12 +1,12 @@
 {
   "name": "egua",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Linguagem de programação simples e moderna em português",
   "main": "index.js",
   "scripts": {
     "egua": "egua",
     "build-web": "browserify src/web.js --s Egua > web/dist.js",
-    "build-web-npm": "browserify src/web.js --s Egua > dist/dist.js",
+    "build-web-npm": "browserify src/web.js --s Egua > dist/egua.min.js",
     "test": "./bin/egua tests/tests.egua",
     "test-wsl": "node index.js tests/tests.egua"
   },
