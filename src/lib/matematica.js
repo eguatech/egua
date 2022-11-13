@@ -561,7 +561,7 @@ module.exports.deltaT = function (t0, t) {
       this.token,
       "Você deve prover valores para deltat(t0,t1)."
     );
-  dt = t - t;
+  dt = t - t0;
   return dt;
 };
 
