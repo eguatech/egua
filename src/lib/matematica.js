@@ -39,25 +39,25 @@ module.exports.moda = function (numbers) {
       this.token,
       "Todos os elementos de `vetor` deve ser numéricos na função moda(vetor)."
     );
-  
-    var modes = [], count = [], i, number, maxIndex = 0;
- 
-    for (i = 0; i < numbers.length; i += 1) {
-        number = numbers[i];
-        count[number] = (count[number] || 0) + 1;
-        if (count[number] > maxIndex) {
-            maxIndex = count[number];
-        }
+
+  let modes = [], count = [], i, number, maxIndex = 0;
+
+  for (i = 0; i < numbers.length; i += 1) {
+    number = numbers[i];
+    count[number] = (count[number] || 0) + 1;
+    if (count[number] > maxIndex) {
+      maxIndex = count[number];
     }
- 
-    for (i in count)
-        if (count.hasOwnProperty(i)) {
-            if (count[i] === maxIndex) {
-                modes.push(Number(i));
-            }
-        }
- 
-    return modes;
+  }
+
+  for (i in count)
+    if (count.hasOwnProperty(i)) {
+      if (count[i] === maxIndex) {
+        modes.push(Number(i));
+      }
+    }
+
+  return modes;
 }
 
 module.exports.pi = Math.PI;
