@@ -1,6 +1,6 @@
 {
   "name": "egua",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "Linguagem de programação simples e moderna em português",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/eguatech/egua/issues"
   },
-  "homepage": "https://github.com/eguatech/egua#readme",
+  "homepage": "https://github.com/eguatech/egua",
   "devDependencies": {
     "browserify": "^17.0.0"
   }
