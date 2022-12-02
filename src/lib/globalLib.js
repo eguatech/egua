@@ -53,7 +53,7 @@ module.exports = function (interpreter, globals) {
 
             return Math.floor(Math.random() * (max - min)) + min;
         })
-    );    
+    );
 
     globals.defineVar(
         "inteiro",

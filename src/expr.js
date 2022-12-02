@@ -1,5 +1,5 @@
 class Expr {
-    accept(visitor) {}
+    accept(visitor) { }
 }
 
 class Assign extends Expr {

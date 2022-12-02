@@ -86,15 +86,15 @@ class Importar extends Stmt {
 
 class Fazer extends Stmt {
     constructor(doBranch, whileCondition) {
-      super();
-      this.doBranch = doBranch;
-      this.whileCondition = whileCondition;
+        super();
+        this.doBranch = doBranch;
+        this.whileCondition = whileCondition;
     }
-  
+
     accept(visitor) {
-      return visitor.visitDoStmt(this);
+        return visitor.visitDoStmt(this);
     }
-  }
+}
 
 class Enquanto extends Stmt {
     constructor(condition, body) {
