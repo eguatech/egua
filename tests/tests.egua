@@ -640,3 +640,19 @@ escreva("|");
 escreva("--------------------------------");
 escreva("Teste terminado com " + texto(errosM) + " erro(s)!");
 escreva("----------------------------");
+
+escreva("Testando estado de função e classe");
+função a(){
+    retorna 1;
+}
+
+escreva(a);
+
+classe Animal {
+  correr() {
+      escreva("Correndo Loucamente");
+  }
+} 
+
+escreva(Animal);
+escreva("----------------------------");

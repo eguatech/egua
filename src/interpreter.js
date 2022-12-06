@@ -777,8 +777,6 @@ module.exports = class Interpreter {
 
         if (Array.isArray(objeto)) return objeto;
 
-        if (typeof objeto === 'object') return JSON.stringify(objeto);
-
         return objeto.toString();
     }
 
