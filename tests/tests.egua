@@ -656,3 +656,118 @@ classe Animal {
 
 escreva(Animal);
 escreva("----------------------------");
+
+escreva("Testando paraCada");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  escreva(valor);
+};
+
+paraCada(array, fn);
+
+escreva("Testando mapear");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor * 2;
+};
+
+escreva(mapear(array, fn));
+
+escreva("Testando filtrar");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor % 2 == 0;
+};
+
+escreva(filtrar(array, fn));
+
+escreva("Testando reduzir");
+var array = [1, 2, 3];
+
+var fn = função(total, valor){
+  retorna texto(total) + texto(valor);
+};
+
+escreva(reduzir(array, fn, ''));
+
+escreva("Testando encontrar");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor == 4;
+};
+
+escreva(encontrar(array, fn));
+
+escreva("Testando encontrarIndice");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor == 3;
+};
+
+escreva(encontrarIndice(array, fn));
+
+escreva("Testando encontrar");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor == 4;
+};
+
+escreva(encontrar(array, fn));
+
+escreva("Testando encontrarIndice");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor == 3;
+};
+
+escreva(encontrarIndice(array, fn));
+
+escreva("Testando encontrarUltimo");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor > 1;
+};
+
+escreva(encontrarUltimo(array, fn));
+
+escreva("Testando encontrarUltimoIndice");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor > 1;
+};
+
+escreva(encontrarUltimoIndice(array, fn));
+
+escreva("Testando incluido");
+var array = [1, 2, 3];
+
+escreva(incluido(array, 3));
+
+escreva("Testando algum");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor > 3;
+};
+
+escreva(algum(array, fn));
+
+escreva("Testando todos");
+var array = [1, 2, 3];
+
+var fn = função(valor){
+  retorna valor >= 1;
+};
+
+escreva(todos(array, fn));
+
+escreva("----------------------------");
