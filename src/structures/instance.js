@@ -14,7 +14,7 @@ module.exports = class EguaInstance {
         let method = this.creatorClass.findMethod(name.lexeme);
         if (method) return method.bind(this);
 
-        throw new RuntimeError(name, "Método indefinido não recuperado.");
+        throw new RuntimeError(name, `Método ${name.lexeme} não foi definido.`);
     }
 
     set(name, value) {
