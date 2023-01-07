@@ -31,6 +31,7 @@ jobs:
 
   tests_package:
     runs-on: ubuntu-latest
+    needs: publish
 
     steps:
     - uses: actions/checkout@v2
