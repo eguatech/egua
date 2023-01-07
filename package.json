@@ -1,6 +1,6 @@
 {
   "name": "egua",
-  "version": "1.4.7",
+  "version": "1.4.0",
   "description": "Linguagem de programação simples e moderna em português",
   "main": "index.js",
   "scripts": {
