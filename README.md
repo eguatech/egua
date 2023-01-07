@@ -10,7 +10,7 @@
     <a href="https://egua.tech/docs/egua" target="_blank"><strong>Documentação »</strong></a>
     <br />
     <br />
-    <a href="https://egua.tech/egua/" target="_blank">IDEgua</a>
+    <a href="https://egua.tech/idegua" target="_blank">IDEgua</a>
     ·
     <a href="https://github.com/eguatech/egua/issues" target="_blank">Reportar Bug</a>
     <br />
@@ -39,7 +39,7 @@
 
 ## Instalação
 
-- Apenas visite o [IDEgua](https://egua.tech/egua/) e comece a programar.
+- Apenas visite o [IDEgua](https://egua.tech/idegua) e comece a programar.
 
 ## Documentação
 
