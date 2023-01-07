@@ -77,6 +77,31 @@ module.exports = function (interpreter, globals) {
     );
 
     globals.defineVar(
+        "paraCada",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                callback.call(
+                    interpreter, [array[index]]
+                );
+            }
+        })
+    );
+
+    globals.defineVar(
         "mapear",
         new StandardFn(1, function (array, callback) {
             if (!Array.isArray(array)) {
@@ -103,6 +128,245 @@ module.exports = function (interpreter, globals) {
             }
 
             return provisorio;
+        })
+    );
+
+    globals.defineVar(
+        "filtrar",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            let provisorio = [];
+            for (let index = 0; index < array.length; ++index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    provisorio.push(array[index]);
+                }
+            }
+
+            return provisorio;
+        })
+    );
+
+    globals.defineVar(
+        "reduzir",
+        new StandardFn(1, function (array, callback, padrao) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            let provisorio = padrao;
+            let inicio = 0;
+
+            if (!provisorio) {
+                provisorio = array[0];
+                inicio = 1;
+            }
+
+            for (let index = inicio; index < array.length; ++index) {
+                provisorio = callback.call(interpreter, [provisorio, array[index]]);
+            }
+
+            return provisorio;
+        })
+    );
+
+    globals.defineVar(
+        "encontrar",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    return array[index];
+                }
+            }
+
+            return null;
+        })
+    );
+
+    globals.defineVar(
+        "encontrarUltimo",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = array.length - 1; index >= 0; --index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    return array[index];
+                }
+            }
+        })
+    );
+
+    globals.defineVar(
+        "encontrarIndice",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    return index;
+                }
+            }
+
+            return -1;
+        })
+    );
+
+    globals.defineVar(
+        "encontrarUltimoIndice",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = array.length - 1; index >= 0; --index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    return index;
+                }
+            }
+        })
+    );
+
+    globals.defineVar(
+        "incluido",
+        new StandardFn(1, function (array, valor) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                if (array[index] == valor) {
+                    return true;
+                }
+            }
+
+            return false;
+        })
+    );
+
+    globals.defineVar(
+        "algum",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                if (callback.call(interpreter, [array[index]])) {
+                    return true;
+                }
+            }
+
+            return false;
+        })
+    );
+
+    globals.defineVar(
+        "todos",
+        new StandardFn(1, function (array, callback) {
+            if (!Array.isArray(array)) {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O primeiro parâmetro da função, deve ser um array."
+                );
+            }
+
+            if (callback.constructor.name !== 'EguaFunction') {
+                throw new RuntimeError(
+                    this.token,
+                    "Parâmetro inválido. O segundo parâmetro da função, deve ser uma função."
+                );
+            }
+
+            for (let index = 0; index < array.length; ++index) {
+                if (!callback.call(interpreter, [array[index]])) {
+                    return false;
+                }
+            }
+
+            return true;
         })
     );
 
