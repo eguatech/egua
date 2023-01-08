@@ -798,10 +798,7 @@ module.exports = class Parser {
 
     declaration() {
         try {
-            if (
-                this.check(tokenTypes.FUNÇÃO) &&
-                this.checkNext(tokenTypes.IDENTIFIER)
-            ) {
+            if (this.check(tokenTypes.FUNÇÃO)) {
                 this.consume(tokenTypes.FUNÇÃO, null);
                 return this.function("função");
             }
