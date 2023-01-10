@@ -25,7 +25,7 @@ module.exports.letras_maiusculas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 /**
  * Conjunto de todas as letraas
  */
-module.exports.letras = this.letras_minusculas + this.letras_maiusculas;
+module.exports.letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /**
  * Conjunto de todas os dígitos
