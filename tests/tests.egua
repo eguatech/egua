@@ -771,3 +771,258 @@ var fn = função(valor){
 escreva(todos(array, fn));
 
 escreva("----------------------------");
+
+escreva("--------------------------------");
+escreva("Testes Internos - Biblioteca Textos");
+escreva("--------------------------------");
+escreva("|");
+
+var t = importar("textos"); // Importa Biblioteca
+var erros_t = 0;
+var nula = nulo;
+var texto_teste = "Programação simples e moderna em português";
+
+função checa_minusculas()  {
+  var esperado = "abcdefghijklmnopqrstuvwxyz";
+  var obtido = t.letras_minusculas;
+
+  se (obtido != esperado) {
+    escreva("TESTE: letras_minusculas: falhou!");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: letras_minusculas: passou!");
+}
+
+função checa_maiusculas()  {
+  var esperado = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var obtido = t.letras_maiusculas;
+  se (obtido != esperado) {
+    escreva("TESTE: letras_maiusculas: falhou!");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: letras_maiusculas: passou!");
+}
+
+função checa_letras(){
+  var esperado = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var obtido = t.letras;
+  se (obtido != esperado) {
+    escreva("TESTE: letras: falhou!");
+    escreva("| esperado: '" + esperado + "'");
+    escreva("| obtido: '" + obtido + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: letras: passou!");
+}
+
+função checa_digitos(){
+  var esperado = "0123456789";
+  var obtido = t.digitos;
+
+  se (obtido != esperado) {
+    escreva("TESTE: digitos: falhou!");
+    escreva("| esperado: '" + esperado + "'");
+    escreva("| obtido: '" + obtido + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: digitos: passou!");
+}
+
+função checa_pontuacoes(){
+  var esperado = '!"'+"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
+  var obtido = t.pontuacoes;
+
+  se (obtido != esperado) {
+    escreva("TESTE: pontuacoes: falhou!");
+    escreva("| esperado: '" + esperado + "'");
+    escreva("| obtido: '" + obtido + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: pontuacoes: passou!");
+}
+
+função testa_maiusculo(){
+  var esperado = "PROGRAMAÇÃO SIMPLES E MODERNA EM PORTUGUÊS";
+  var  obtido = t.maiusculo(texto_teste);
+
+  se (obtido != esperado) {
+    escreva("TESTE: função maiusculo(): falhou!");
+    escreva("| esperado: '" + esperado + "'");
+    escreva("| obtido: '" + obtido + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+   escreva("TESTE: função maiusculo(): passou!");
+}
+
+função testa_minusculo(){
+  var esperado = "programação simples e moderna em português";
+  var  obtido = t.minusculo(texto_teste);
+
+  se (obtido != esperado) {
+    escreva("TESTE: função minusculo(): falhou!");
+    escreva("| esperado: '" + esperado + "'");
+    escreva("| obtido: '" + obtido + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: função minusculo(): passou!");
+}
+
+função testa_contem(){
+  var esperado = verdadeiro;
+  var  obtido = t.contem(texto_teste, "simples");
+    
+  se (obtido != esperado) {
+    escreva("TESTE: função contem(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função contem(): passou!");
+}
+
+função testa_formate(){
+  var texto_teste = "{} {} {} {} {} {}";
+  var esperado = "1 2.5 verdadeiro falso egua nulo";
+  var  obtido = t.formate(texto_teste, 1, 2.5, verdadeiro, falso, "egua", nula);
+
+  se (obtido != esperado) {
+    escreva("TESTE: função formate(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+  escreva("TESTE: função formate(): passou!");
+}
+
+função testa_dividir(){
+  var esperado = ['Programação','simples','e','moderna','em','português'];
+  var  obtido = t.dividir(texto_teste, ' ');
+  
+  se (tamanho(esperado) != tamanho(obtido)){
+    escreva("TESTE: função dividir(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  para (var i = 0; i < tamanho(esperado); i = i + 1){
+    se (obtido[i] != esperado[i]){
+      escreva("TESTE: função dividir(): falhou!");
+      escreva("| esperado: '" + texto(esperado) + "'");
+      escreva("| obtido: '" + texto(obtido) + "'");
+      erros_t = erros_t + 1;
+      retorna;
+    }
+  }
+  escreva("TESTE: função dividir(): passou!");
+}
+
+função testa_tamanho(){
+  var esperado = 42;
+  var  obtido = t.tamanho(texto_teste);
+
+  se (esperado != obtido){
+    escreva("TESTE: função tamanho(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função tamanho(): passou!");
+}
+
+função testa_repita(){
+  var texto_teste = "aa";
+  var esperado = "aaaaaa";
+  var obtido = t.repita(texto_teste, 3);
+
+  se (esperado != obtido){
+    escreva("TESTE: função repita(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função repita(): passou!");
+}
+
+função testa_substituir(){
+  var texto_teste = "aaacaa";
+  var esperado = "aaabaa";
+  var obtido = t.substituir(texto_teste, "c", "b");
+
+  se (esperado != obtido){
+    escreva("TESTE: função substituir(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função substituir(): passou!");
+}
+
+função testa_busca(){
+  var texto_teste = "aabaa";
+  var esperado = 2;
+  var obtido = t.busca(texto_teste, "b");
+
+  se (esperado != obtido){
+    escreva("TESTE: função busca(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função busca(): passou!");
+}
+
+função testa_apara(){
+  var texto_teste = "  egua  ";
+  var esperado = "egua";
+  var obtido = t.apara(texto_teste);
+
+  se (esperado != obtido){
+    escreva("TESTE: função apara(): falhou!");
+    escreva("| esperado: '" + texto(esperado) + "'");
+    escreva("| obtido: '" + texto(obtido) + "'");
+    erros_t = erros_t + 1;
+    retorna;
+  }
+
+  escreva("TESTE: função apara(): passou!");
+}
+
+checa_minusculas();
+checa_maiusculas();
+checa_letras();
+checa_digitos();
+checa_pontuacoes();
+testa_maiusculo();
+testa_minusculo();
+testa_contem();
+testa_formate();
+testa_dividir();
+testa_tamanho();
+testa_repita();
+testa_substituir();
+testa_busca();
+testa_apara();
+
+escreva("----------------------------");
+escreva("  terminado com " + texto(erros_t) + " erro(s)!");
+escreva("----------------------------");
