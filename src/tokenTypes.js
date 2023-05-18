@@ -43,7 +43,7 @@ module.exports = {
     SENÃO: "SENÃO",
     ESCOLHA: "ESCOLHA",
     CASO: "CASO",
-    PADRAO: "PADRAO",
+    PADRÃO: "PADRÃO",
     NULO: "NULO",
     OU: "OU",
     ESCREVA: "ESCREVA",

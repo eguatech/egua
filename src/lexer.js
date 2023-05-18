@@ -24,7 +24,7 @@ const reservedWords = {
     continua: tokenTypes.CONTINUA,
     escolha: tokenTypes.ESCOLHA,
     caso: tokenTypes.CASO,
-    padrao: tokenTypes.PADRAO,
+    padrão: tokenTypes.PADRÃO,
     importar: tokenTypes.IMPORTAR,
     tente: tokenTypes.TENTE,
     pegue: tokenTypes.PEGUE,

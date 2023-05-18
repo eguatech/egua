@@ -580,7 +580,7 @@ module.exports = class Parser {
                         stmts.push(this.statement());
                     } while (
                         !this.check(tokenTypes.CASO) &&
-                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.PADRÃO) &&
                         !this.check(tokenTypes.RIGHT_BRACE)
                     );
 
@@ -588,15 +588,15 @@ module.exports = class Parser {
                         conditions: branchConditions,
                         stmts
                     });
-                } else if (this.match(tokenTypes.PADRAO)) {
+                } else if (this.match(tokenTypes.PADRÃO)) {
                     if (defaultBranch !== null)
                         throw new ParserError(
-                            "Você só pode ter um 'padrao' em cada declaração de 'escolha'."
+                            "Você só pode ter um 'padrão' em cada declaração de 'escolha'."
                         );
 
                     this.consume(
                         tokenTypes.COLON,
-                        "Esperado ':' após declaração do 'padrao'."
+                        "Esperado ':' após declaração do 'padrão'."
                     );
 
                     let stmts = [];
@@ -604,7 +604,7 @@ module.exports = class Parser {
                         stmts.push(this.statement());
                     } while (
                         !this.check(tokenTypes.CASO) &&
-                        !this.check(tokenTypes.PADRAO) &&
+                        !this.check(tokenTypes.PADRÃO) &&
                         !this.check(tokenTypes.RIGHT_BRACE)
                     );
 

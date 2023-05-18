@@ -1023,6 +1023,30 @@ testa_substituir();
 testa_busca();
 testa_apara();
 
+// Exemplo: Imprime "correspondente à opção 2"
+escolha (1) {
+  caso "1":
+    escreva("correspondente à opção 1");
+
+  caso 1:
+    escreva("correspondente à opção 2");
+
+  padrão:
+    escreva("Sem opção correspondente");
+}
+
+// Exemplo: Imprime "Sem opção correspondente"
+escolha (2) {
+  caso "1":
+    escreva("correspondente à opção 1");
+
+  caso 1:
+    escreva("correspondente à opção 2");
+
+  padrão:
+    escreva("Sem opção correspondente");
+}
+
 escreva("----------------------------");
 escreva("  terminado com " + texto(erros_t) + " erro(s)!");
 escreva("----------------------------");
