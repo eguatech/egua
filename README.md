@@ -7,10 +7,10 @@
   <p align="center">
     Linguagem de programação simples e moderna.
     <br />
-    <a href="https://egua.tech/docs/egua" target="_blank"><strong>Documentação »</strong></a>
+    <a href="https://egua.dev/docs/egua" target="_blank"><strong>Documentação »</strong></a>
     <br />
     <br />
-    <a href="https://egua.tech/idegua" target="_blank">IDEgua</a>
+    <a href="https://egua.dev/idegua" target="_blank">IDEgua</a>
     ·
     <a href="https://github.com/eguatech/egua/issues" target="_blank">Reportar Bug</a>
     <br />
@@ -39,11 +39,11 @@
 
 ## Instalação
 
-- Apenas visite o [IDEgua](https://egua.tech/idegua) e comece a programar.
+- Apenas visite o [IDEgua](https://egua.dev/idegua) e comece a programar.
 
 ## Documentação
 
-- Para acessar nossa documentação, visite o [site de documentação](https://egua.tech/docs).
+- Para acessar nossa documentação, visite o [site de documentação](https://egua.dev/docs).
 
 ## Contruibuições
 
@@ -52,4 +52,4 @@
 ## Apoie-nos!
 
 - **A linguagem Égua é um projeto open-source que se faz possível com o empenho da nossa apaixonada equipe de desenvolvedores, talentoso colaboradores e apoiadores. Obrigado a todos!**
-- **Em caso da necessidade de um contato mais pessoal envie email para `lucaspompeuneves@gmail.com` ou [entre aqui](https://egua.tech/comunidade)**
+- **Em caso da necessidade de um contato mais pessoal envie email para `lucaspompeuneves@gmail.com` ou [entre aqui](https://egua.dev/comunidade)**
