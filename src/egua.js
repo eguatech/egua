@@ -46,6 +46,15 @@ module.exports.Egua = class Egua {
         if (this.hadRuntimeError) process.exit(70);
     }
 
+    runstring(string) {
+        const interpreter = new Interpreter(this, process.cwd());
+
+        this.run(string, interpreter);
+
+        if (this.hadError) process.exit(65);
+        if (this.hadRuntimeError) process.exit(70);
+    }
+
     run(code, interpreter) {
         const lexer = new Lexer(code, this);
         const tokens = lexer.scan();
